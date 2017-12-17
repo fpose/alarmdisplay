@@ -1,32 +1,67 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-"""
-ZetCode PyQt5 tutorial
-
-In this example, we create a simple
-window in PyQt5.
-
-Author: Jan Bodnar
-Website: zetcode.com
-Last edited: August 2017
-"""
-
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel
+
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
 
-    w = QWidget()
-    w.resize(250, 150)
-    w.move(300, 300)
-    w.setWindowTitle('Simple')
+    mainWidget = QWidget()
+    mainWidget.resize(1920, 1080)
+    mainWidget.move(0, 0)
+    mainWidget.setWindowTitle('Alarmdisplay')
+    mainWidget.setStyleSheet("""
+        font-size: 70px;
+        background-color: rgb(0, 34, 44);
+        color: rgb(2, 203, 255);
+        font-family: "DejaVu Sans";
+        """)
 
-    l = QLabel(w)
-    l.setText(u'Hallo')
+    verLayout = QVBoxLayout(mainWidget)
 
-    w.show()
+    msgLabel = QLabel(mainWidget)
+    msgLabel.resize(mainWidget.width(), 300)
+    msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\nKatze auf Baum')
+    msgLabel.setStyleSheet("""
+        color: white;
+        background-color: rgb(80, 0, 0);
+        """)
+    verLayout.addWidget(msgLabel, 1)
+
+    horLayout = QHBoxLayout(mainWidget)
+    verLayout.addLayout(horLayout, 2)
+
+    lmapLabel = QLabel(mainWidget)
+    lmapLabel.setStyleSheet("""
+        background-color: rgb(80, 80, 0);
+        """)
+    horLayout.addWidget(lmapLabel, 2)
+
+    centerLayout = QVBoxLayout(mainWidget)
+    horLayout.addLayout(centerLayout, 1)
+
+    logoLabel = QLabel(mainWidget)
+    logoLabel.setStyleSheet('image: url(images/wappen-reichswalde.png);')
+    centerLayout.addWidget(logoLabel)
+
+    timerLabel = QLabel(mainWidget)
+    timerLabel.setText('4:59')
+    timerLabel.setAlignment(Qt.AlignCenter)
+    centerLayout.addWidget(timerLabel)
+
+    rmapLabel = QLabel(mainWidget)
+    rmapLabel.setStyleSheet("""
+        background-color: rgb(0, 80, 80);
+        """)
+    horLayout.addWidget(rmapLabel, 2)
+
+    mainWidget.setLayout(verLayout)
+
+    mainWidget.show()
 
     sys.exit(app.exec_())
