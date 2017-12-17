@@ -23,6 +23,7 @@ if __name__ == '__main__':
         """)
 
     verLayout = QVBoxLayout(mainWidget)
+    verLayout.setContentsMargins(0, 0, 0, 0)
 
     msgLabel = QLabel(mainWidget)
     msgLabel.resize(mainWidget.width(), 300)
