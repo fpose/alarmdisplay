@@ -4,6 +4,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
+from MapWidget import MapWidget
+
 class MainWidget(QWidget):
 
     def __init__(self):
@@ -35,11 +37,11 @@ class MainWidget(QWidget):
         horLayout = QHBoxLayout(self)
         verLayout.addLayout(horLayout, 2)
 
-        lmapLabel = QLabel(self)
-        lmapLabel.setStyleSheet("""
+        leftMap = MapWidget(self, 17)
+        leftMap.setStyleSheet("""
             background-color: rgb(80, 80, 0);
             """)
-        horLayout.addWidget(lmapLabel, 2)
+        horLayout.addWidget(leftMap, 2)
 
         centerLayout = QVBoxLayout(self)
         horLayout.addLayout(centerLayout, 1)
@@ -53,10 +55,10 @@ class MainWidget(QWidget):
         timerLabel.setAlignment(Qt.AlignCenter)
         centerLayout.addWidget(timerLabel)
 
-        rmapLabel = QLabel(self)
-        rmapLabel.setStyleSheet("""
+        rightMap = MapWidget(self, 15)
+        rightMap.setStyleSheet("""
             background-color: rgb(0, 80, 80);
             """)
-        horLayout.addWidget(rmapLabel, 2)
+        horLayout.addWidget(rightMap, 2)
 
         self.setLayout(verLayout)
