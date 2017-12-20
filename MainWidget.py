@@ -63,3 +63,16 @@ class MainWidget(QWidget):
         horLayout.addWidget(rightMap, 2)
 
         self.setLayout(verLayout)
+
+        # Jugendherberge
+        lat_deg = 51.78317
+        lon_deg = 6.10695
+        msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\nJugendherberge')
+
+        # # Engelsstraße 5
+        # lat_deg = 51.75065
+        # lon_deg = 6.11170
+        # msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\nKatze auf Baum')
+
+        leftMap.setTarget(lat_deg, lon_deg)
+        rightMap.setTarget(lat_deg, lon_deg)

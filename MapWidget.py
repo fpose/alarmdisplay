@@ -13,22 +13,23 @@ class MapWidget(QFrame):
         self.pixmap = None
         self.zoom = zoom
 
-        # Einfahrt Depot
-        self.lat_deg = 51.76059
-        self.lon_deg = 6.09806
-
-        # Jugendherberge
-        self.lat_deg = 51.78317
-        self.lon_deg = 6.10695
-
         # Engelsstraße 5
-        self.lat_deg = 51.75065
-        self.lon_deg = 6.11170
+        self.lat_deg = 0.0
+        self.lon_deg = 0.0
 
-    def resizeEvent(self, event):
+    def setTarget(self, lat_deg, lon_deg):
+        self.lat_deg = lat_deg
+        self.lon_deg = lon_deg
+        self.updateMap()
+
+    def updateMap(self):
         self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
                 self.zoom, self.contentsRect().width(),
                 self.contentsRect().height())
+        self.update()
+
+    def resizeEvent(self, event):
+        self.updateMap()
 
     def paintEvent(self, event):
         painter = QPainter(self)

@@ -16,14 +16,23 @@ class RouteWidget(QFrame):
         self.home_lat_deg = 51.76059
         self.home_lon_deg = 6.09806
 
-        # Engelsstraße 5
-        self.dest_lat_deg = 51.75065
-        self.dest_lon_deg = 6.11170
+        # Destination
+        self.dest_lat_deg = 0.0
+        self.dest_lon_deg = 0.0
 
-    def resizeEvent(self, event):
+    def setTarget(self, lat_deg, lon_deg):
+        self.dest_lat_deg = lat_deg
+        self.dest_lon_deg = lon_deg
+        self.updateMap()
+
+    def updateMap(self):
         self.pixmap = Map.getRoutePixmap(self.home_lat_deg, self.home_lon_deg,
             self.dest_lat_deg, self.dest_lon_deg,
             self.contentsRect().width(), self.contentsRect().height())
+        self.update()
+
+    def resizeEvent(self, event):
+        self.updateMap()
 
     def paintEvent(self, event):
         painter = QPainter(self)

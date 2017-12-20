@@ -192,16 +192,18 @@ def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
             #painter.drawRect(xp, yp, tileDim, tileDim)
 
     marker = QPixmap()
-    marker.load("images/marker1.png")
-    markerOffset = QPoint(marker.width() / 2, marker.height())
 
     totHeight = numY * tileDim
 
+    marker.load("images/marker_home.png")
+    markerOffset = QPoint(marker.width() / 2, marker.height())
     coord = totMap(home_lon_deg, home_lat_deg)
     px = np.array(coord) / mpp
     pos = QPoint(originX + px[0], originY + totHeight - px[1])
     painter.drawPixmap(pos - markerOffset, marker)
 
+    marker.load("images/marker1.png")
+    markerOffset = QPoint(marker.width() / 2, marker.height())
     coord = totMap(dest_lon_deg, dest_lat_deg)
     px = np.array(coord) / mpp
     pos = QPoint(originX + px[0], originY + totHeight - px[1])
