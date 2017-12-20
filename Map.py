@@ -37,18 +37,13 @@ def meters_per_pixel(zoom, lat_deg):
 def getPixmap(lat_deg, lon_deg, zoom, width, height):
 
     pixmap = QPixmap(width, height)
-
     painter = QPainter()
     painter.begin(pixmap)
 
     tileDim = 256
-    print(u'getPixmap(', lat_deg, lon_deg, zoom, width, height, u')')
     x, y = deg2num(lat_deg, lon_deg, zoom)
-    print(u'Tile:', x, y)
     tile_lat_deg, tile_lon_deg = num2deg(x, y, zoom)
-    print(u'Tile coord lat/lon:', tile_lat_deg, tile_lon_deg)
     next_tile_lat_deg, next_tile_lon_deg = num2deg(x + 1, y + 1, zoom)
-    print(u'Next coord lat/lon:', next_tile_lat_deg, next_tile_lon_deg)
 
     m = Basemap(
         llcrnrlon = tile_lon_deg,
@@ -59,22 +54,13 @@ def getPixmap(lat_deg, lon_deg, zoom, width, height):
     )
 
     proj = m(lon_deg, lat_deg)
-    print('Proj: ', proj)
 
     mpp = meters_per_pixel(zoom, lat_deg)
     px = np.array(proj) / mpp
-    print('px: ', px)
 
     center = QPoint(width / 2, height / 2)
-    print(u'Center:', center)
-
     offset = QPoint(px[0], tileDim - px[1])
-    print(u'Offset:', offset)
     centerTilePoint = center - offset
-    print(u'Center tile:', centerTilePoint)
-
-    #tile = getTile(x, y, zoom)
-    #painter.drawPixmap(centerTilePoint, tile)
 
     xd = math.ceil(centerTilePoint.x() / tileDim)
     if xd < 0:
@@ -85,16 +71,12 @@ def getPixmap(lat_deg, lon_deg, zoom, width, height):
     if yd < 0:
         yd = 0
     minY = y - yd
-    print (minX, minY)
 
-    xtile = minX
     originX = centerTilePoint.x() - xd * tileDim
     originY = centerTilePoint.y() - yd * tileDim
-    print (originX, originY)
 
     numX = math.ceil((width - originX) / tileDim)
     numY = math.ceil((height - originY) / tileDim)
-    print (numX, numY)
 
     for i in range(0, numX):
         for j in range(0, numY):
