@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from MapWidget import MapWidget
+from RouteWidget import RouteWidget
 
 class MainWidget(QWidget):
 
@@ -55,7 +56,7 @@ class MainWidget(QWidget):
         timerLabel.setAlignment(Qt.AlignCenter)
         centerLayout.addWidget(timerLabel)
 
-        rightMap = MapWidget(self, 15)
+        rightMap = RouteWidget(self)
         rightMap.setStyleSheet("""
             background-color: rgb(0, 80, 80);
             """)

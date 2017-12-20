@@ -26,8 +26,9 @@ class MapWidget(QFrame):
         self.lon_deg = 6.11170
 
     def resizeEvent(self, event):
-        self.pixmap = Map.getPixmap(self.lat_deg, self.lon_deg, self.zoom,
-            self.contentsRect().width(), self.contentsRect().height())
+        self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
+                self.zoom, self.contentsRect().width(),
+                self.contentsRect().height())
 
     def paintEvent(self, event):
         painter = QPainter(self)
