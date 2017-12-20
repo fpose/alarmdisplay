@@ -104,8 +104,10 @@ def getPixmap(lat_deg, lon_deg, zoom, width, height):
             painter.drawPixmap(xp, yp, tile)
             #painter.drawRect(xp, yp, tileDim, tileDim)
 
-    rect = QRect(center - QPoint(5, 5), QSize(10, 10))
-    painter.drawEllipse(rect)
+    marker = QPixmap()
+    marker.load("images/marker1.png")
+    markerOffset = QPoint(marker.width() / 2, marker.height())
+    painter.drawPixmap(center - markerOffset, marker)
     painter.end()
 
     return pixmap
