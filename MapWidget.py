@@ -12,8 +12,18 @@ class MapWidget(QFrame):
 
         self.pixmap = None
         self.zoom = zoom
-        self.lat_deg = 51.76062
-        self.lon_deg = 6.09792
+
+        # Einfahrt Depot
+        self.lat_deg = 51.76059
+        self.lon_deg = 6.09806
+
+        # Jugendherberge
+        self.lat_deg = 51.78317
+        self.lon_deg = 6.10695
+
+        # Engelsstraße 5
+        self.lat_deg = 51.75065
+        self.lon_deg = 6.11170
 
     def resizeEvent(self, event):
         self.pixmap = Map.getPixmap(self.lat_deg, self.lon_deg, self.zoom,
