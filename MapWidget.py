@@ -13,9 +13,8 @@ class MapWidget(QFrame):
         self.pixmap = None
         self.zoom = zoom
 
-        # Engelsstraße 5
-        self.lat_deg = 0.0
-        self.lon_deg = 0.0
+        self.lat_deg = None
+        self.lon_deg = None
 
     def setTarget(self, lat_deg, lon_deg):
         self.lat_deg = lat_deg
@@ -23,9 +22,12 @@ class MapWidget(QFrame):
         self.updateMap()
 
     def updateMap(self):
-        self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
-                self.zoom, self.contentsRect().width(),
-                self.contentsRect().height())
+        if not self.lat_deg or not self.lon_deg:
+            self.pixmap = None
+        else:
+            self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
+                    self.zoom, self.contentsRect().width(),
+                    self.contentsRect().height())
         self.update()
 
     def resizeEvent(self, event):
@@ -33,4 +35,5 @@ class MapWidget(QFrame):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.drawPixmap(0, 0, self.pixmap)
+        if self.pixmap:
+            painter.drawPixmap(0, 0, self.pixmap)

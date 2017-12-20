@@ -26,9 +26,13 @@ class RouteWidget(QFrame):
         self.updateMap()
 
     def updateMap(self):
-        self.pixmap = Map.getRoutePixmap(self.home_lat_deg, self.home_lon_deg,
-            self.dest_lat_deg, self.dest_lon_deg,
-            self.contentsRect().width(), self.contentsRect().height())
+        if not self.home_lat_deg or not self.home_lon_deg or \
+            not self.dest_lat_deg or not self. dest_lon_deg:
+            self.pixmap = None
+        else:
+            self.pixmap = Map.getRoutePixmap(self.home_lat_deg,
+                    self.home_lon_deg, self.dest_lat_deg, self.dest_lon_deg,
+                    self.contentsRect().width(), self.contentsRect().height())
         self.update()
 
     def resizeEvent(self, event):
@@ -36,4 +40,5 @@ class RouteWidget(QFrame):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.drawPixmap(0, 0, self.pixmap)
+        if self.pixmap:
+            painter.drawPixmap(0, 0, self.pixmap)

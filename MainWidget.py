@@ -26,23 +26,23 @@ class MainWidget(QWidget):
         verLayout = QVBoxLayout(self)
         verLayout.setContentsMargins(0, 0, 0, 0)
 
-        msgLabel = QLabel(self)
-        msgLabel.resize(self.width(), 300)
-        msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\nKatze auf Baum')
-        msgLabel.setStyleSheet("""
+        self.msgLabel = QLabel(self)
+        self.msgLabel.resize(self.width(), 300)
+        self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\nKatze auf Baum')
+        self.msgLabel.setStyleSheet("""
             color: white;
             background-color: rgb(80, 0, 0);
             """)
-        verLayout.addWidget(msgLabel, 1)
+        verLayout.addWidget(self.msgLabel, 1)
 
         horLayout = QHBoxLayout(self)
         verLayout.addLayout(horLayout, 2)
 
-        leftMap = MapWidget(self, 17)
-        leftMap.setStyleSheet("""
+        self.leftMap = MapWidget(self, 17)
+        self.leftMap.setStyleSheet("""
             background-color: rgb(80, 80, 0);
             """)
-        horLayout.addWidget(leftMap, 2)
+        horLayout.addWidget(self.leftMap, 2)
 
         centerLayout = QVBoxLayout(self)
         horLayout.addLayout(centerLayout, 1)
@@ -56,23 +56,39 @@ class MainWidget(QWidget):
         timerLabel.setAlignment(Qt.AlignCenter)
         centerLayout.addWidget(timerLabel)
 
-        rightMap = RouteWidget(self)
-        rightMap.setStyleSheet("""
+        self.rightMap = RouteWidget(self)
+        self.rightMap.setStyleSheet("""
             background-color: rgb(0, 80, 80);
             """)
-        horLayout.addWidget(rightMap, 2)
+        horLayout.addWidget(self.rightMap, 2)
 
         self.setLayout(verLayout)
 
-        # Jugendherberge
+        action = QAction(self)
+        action.setShortcut(QKeySequence("1"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleJugend)
+        self.addAction(action)
+
+        action = QAction(self)
+        action.setShortcut(QKeySequence("2"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleEngels)
+        self.addAction(action)
+
+    def exampleJugend(self):
+        self.msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\n' \
+                u'Jugendherberge')
         lat_deg = 51.78317
         lon_deg = 6.10695
-        msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\nJugendherberge')
+        self.leftMap.setTarget(lat_deg, lon_deg)
+        self.rightMap.setTarget(lat_deg, lon_deg)
 
-        # # Engelsstraße 5
-        # lat_deg = 51.75065
-        # lon_deg = 6.11170
-        # msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\nKatze auf Baum')
+    def exampleEngels(self):
+        self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\n' \
+                u'Katze auf Baum')
+        lat_deg = 51.75065
+        lon_deg = 6.11170
+        self.leftMap.setTarget(lat_deg, lon_deg)
+        self.rightMap.setTarget(lat_deg, lon_deg)
 
-        leftMap.setTarget(lat_deg, lon_deg)
-        rightMap.setTarget(lat_deg, lon_deg)
