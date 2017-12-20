@@ -6,6 +6,7 @@ from PyQt5.QtCore import *
 
 from MapWidget import MapWidget
 from RouteWidget import RouteWidget
+from Map import getRoute
 
 class MainWidget(QWidget):
 
@@ -76,19 +77,39 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleEngels)
         self.addAction(action)
 
+        action = QAction(self)
+        action.setShortcut(QKeySequence("3"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleSack)
+        self.addAction(action)
+
+        self.home_lat_deg = 51.76059
+        self.home_lon_deg = 6.09806
+        self.rightMap.setHome(self.home_lat_deg, self.home_lon_deg)
+
     def exampleJugend(self):
         self.msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\n' \
                 u'Jugendherberge')
         lat_deg = 51.78317
         lon_deg = 6.10695
-        self.leftMap.setTarget(lat_deg, lon_deg)
-        self.rightMap.setTarget(lat_deg, lon_deg)
+        route = getRoute(self.home_lat_deg, self.home_lon_deg, lat_deg, lon_deg)
+        self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.rightMap.setTarget(lat_deg, lon_deg, route)
 
     def exampleEngels(self):
         self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\n' \
                 u'Katze auf Baum')
         lat_deg = 51.75065
         lon_deg = 6.11170
-        self.leftMap.setTarget(lat_deg, lon_deg)
-        self.rightMap.setTarget(lat_deg, lon_deg)
+        route = getRoute(self.home_lat_deg, self.home_lon_deg, lat_deg, lon_deg)
+        self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.rightMap.setTarget(lat_deg, lon_deg, route)
 
+    def exampleSack(self):
+        self.msgLabel.setText(u'B2 Garagenbrand\nSackstraße 173\n' \
+                u'Kfz brennt unter Carport')
+        lat_deg = 51.77190
+        lon_deg = 6.12305
+        route = getRoute(self.home_lat_deg, self.home_lon_deg, lat_deg, lon_deg)
+        self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.rightMap.setTarget(lat_deg, lon_deg, route)

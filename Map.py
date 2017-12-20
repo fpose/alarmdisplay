@@ -50,7 +50,7 @@ def meters_per_pixel(zoom, lat_deg):
 
 #-----------------------------------------------------------------------------
 
-def getTargetPixmap(lat_deg, lon_deg, zoom, width, height):
+def getTargetPixmap(lat_deg, lon_deg, zoom, width, height, route):
 
     x, y = deg2num(lat_deg, lon_deg, zoom)
     tile_lat_deg, tile_lon_deg = num2deg(x, y, zoom)
@@ -89,6 +89,17 @@ def getTargetPixmap(lat_deg, lon_deg, zoom, width, height):
     numX = math.ceil((width - originX) / tileDim)
     numY = math.ceil((height - originY) / tileDim)
 
+    lllat, lllon = num2deg(minX, minY + numY, zoom)
+    urlat, urlon = num2deg(minX + numX, minY, zoom)
+
+    totMap = Basemap(
+        llcrnrlon = lllon, llcrnrlat = lllat,
+        urcrnrlon = urlon, urcrnrlat = urlat,
+        projection='merc'
+    )
+
+    totHeight = numY * tileDim
+
     pixmap = QPixmap(width, height)
     painter = QPainter()
     painter.begin(pixmap)
@@ -101,6 +112,18 @@ def getTargetPixmap(lat_deg, lon_deg, zoom, width, height):
             painter.drawPixmap(xp, yp, tile)
             #painter.drawRect(xp, yp, tileDim, tileDim)
 
+    poly = QPolygonF()
+    for point in route:
+        coord = totMap(point[0], point[1])
+        px = np.array(coord) / mpp
+        pos = QPoint(originX + px[0], originY + totHeight - px[1])
+        poly.append(pos)
+    pen = QPen()
+    pen.setWidth(7)
+    pen.setColor(QColor(0, 0, 200, 100))
+    painter.setPen(pen)
+    painter.drawPolyline(poly)
+
     marker = QPixmap()
     marker.load("images/marker1.png")
     markerOffset = QPoint(marker.width() / 2, marker.height())
@@ -112,7 +135,7 @@ def getTargetPixmap(lat_deg, lon_deg, zoom, width, height):
 #-----------------------------------------------------------------------------
 
 def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
-        width, height):
+        width, height, route):
 
     min_lat_deg = min(home_lat_deg, dest_lat_deg)
     max_lat_deg = max(home_lat_deg, dest_lat_deg)
@@ -196,7 +219,6 @@ def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
 
     totHeight = numY * tileDim
 
-    route = getRoute(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg)
     poly = QPolygonF()
     for point in route:
         coord = totMap(point[0], point[1])
@@ -205,7 +227,7 @@ def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
         poly.append(pos)
     pen = QPen()
     pen.setWidth(5)
-    pen.setColor(QColor(0, 0, 200, 128))
+    pen.setColor(QColor(0, 0, 200, 100))
     painter.setPen(pen)
     painter.drawPolyline(poly)
 
