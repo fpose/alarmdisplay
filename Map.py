@@ -4,8 +4,11 @@ import math
 import numpy as np
 from mpl_toolkits.basemap import Basemap
 
-from PyQt5.QtGui import QPixmap, QPainter
+from PyQt5.QtGui import QPixmap, QPainter, QPolygonF, QPen, QColor
 from PyQt5.QtCore import QPoint, QRect, QSize
+
+import urllib3
+import json
 
 #-----------------------------------------------------------------------------
 
@@ -191,9 +194,22 @@ def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
             painter.drawPixmap(xp, yp, tile)
             #painter.drawRect(xp, yp, tileDim, tileDim)
 
-    marker = QPixmap()
-
     totHeight = numY * tileDim
+
+    route = getRoute(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg)
+    poly = QPolygonF()
+    for point in route:
+        coord = totMap(point[0], point[1])
+        px = np.array(coord) / mpp
+        pos = QPoint(originX + px[0], originY + totHeight - px[1])
+        poly.append(pos)
+    pen = QPen()
+    pen.setWidth(5)
+    pen.setColor(QColor(0, 0, 200, 128))
+    painter.setPen(pen)
+    painter.drawPolyline(poly)
+
+    marker = QPixmap()
 
     marker.load("images/marker_home.png")
     markerOffset = QPoint(marker.width() / 2, marker.height())
@@ -225,5 +241,49 @@ def getTile(x, y, zoom):
     except:
         print("Couldn't open image")
     return tile
+
+#-----------------------------------------------------------------------------
+
+def getRoute(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg):
+    headers = {
+      'Accept': 'text/json; charset=utf-8'
+    }
+
+    http = urllib3.PoolManager()
+
+    url = 'https://api.openrouteservice.org/directions?' \
+        'api_key=58d904a497c67e00015b45fc756c5baed3b94bf2a9cbfa35fb4e86ae&' \
+        'coordinates={0},{1}|{2},{3}&' \
+        'profile=driving-car&' \
+        'preference=&' \
+        'units=&' \
+        'language=de&' \
+        'geometry=&' \
+        'geometry_format=polyline&' \
+        'geometry_simplify=&' \
+        'instructions=false&' \
+        'instructions_format=&' \
+        'roundabout_exits=&' \
+        'attributes=&' \
+        'maneuvers=&' \
+        'radiuses=&' \
+        'bearings=&' \
+        'continue_straight=&' \
+        'elevation=&' \
+        'extra_info=&' \
+        'optimized=&' \
+        'options=&' \
+        'id='.format(home_lon_deg, home_lat_deg, dest_lon_deg, dest_lat_deg)
+
+    request = http.request('GET', url, headers = headers)
+
+    print(request.status)
+
+    data = json.loads(request.data.decode('utf-8'))
+    #print(json.dumps(data, sort_keys=True, indent = 4, separators = (',', ': ')))
+
+    route = data["routes"][0]["geometry"]
+
+    return route
 
 #-----------------------------------------------------------------------------
