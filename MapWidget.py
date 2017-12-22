@@ -7,11 +7,11 @@ import Map
 
 class MapWidget(QFrame):
 
-    def __init__(self, parent, zoom):
+    def __init__(self, parent, config):
         super(MapWidget, self).__init__(parent)
 
         self.pixmap = None
-        self.zoom = zoom
+        self.config = config
 
         self.lat_deg = None
         self.lon_deg = None
@@ -27,8 +27,8 @@ class MapWidget(QFrame):
             self.pixmap = None
         else:
             self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
-                    self.zoom, self.contentsRect().width(),
-                    self.contentsRect().height(), self.route)
+                    self.contentsRect().width(), self.contentsRect().height(),
+                    self.route, self.config)
         self.update()
 
     def resizeEvent(self, event):

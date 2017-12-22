@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -10,8 +12,10 @@ from Map import getRoute
 
 class MainWidget(QWidget):
 
-    def __init__(self):
+    def __init__(self, config):
         super(MainWidget, self).__init__()
+
+        self.config = config
 
         self.move(0, 0)
         self.resize(1920, 1080)
@@ -28,8 +32,6 @@ class MainWidget(QWidget):
         verLayout.setContentsMargins(0, 0, 0, 0)
 
         self.msgLabel = QLabel(self)
-        self.msgLabel.resize(self.width(), 300)
-        self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\nKatze auf Baum')
         self.msgLabel.setStyleSheet("""
             color: white;
             background-color: rgb(80, 0, 0);
@@ -39,7 +41,7 @@ class MainWidget(QWidget):
         horLayout = QHBoxLayout(self)
         verLayout.addLayout(horLayout, 2)
 
-        self.leftMap = MapWidget(self, 17)
+        self.leftMap = MapWidget(self, self.config)
         self.leftMap.setStyleSheet("""
             background-color: rgb(80, 80, 0);
             """)
@@ -49,15 +51,21 @@ class MainWidget(QWidget):
         horLayout.addLayout(centerLayout, 1)
 
         logoLabel = QLabel(self)
-        logoLabel.setStyleSheet('image: url(images/wappen-reichswalde.png);')
+        logo = self.config.get("display", "logo", fallback = None)
+        if logo:
+            imageDir = self.config.get("display", "image_dir",
+                    fallback = "images")
+            styleSheet = 'image: url({0});'.format( \
+                    os.path.join(imageDir, logo))
+            logoLabel.setStyleSheet(styleSheet)
         centerLayout.addWidget(logoLabel)
 
         timerLabel = QLabel(self)
-        timerLabel.setText('4:59')
+        timerLabel.setText('4:59') # FIXME
         timerLabel.setAlignment(Qt.AlignCenter)
         centerLayout.addWidget(timerLabel)
 
-        self.rightMap = RouteWidget(self)
+        self.rightMap = RouteWidget(self, self.config)
         self.rightMap.setStyleSheet("""
             background-color: rgb(0, 80, 80);
             """)
@@ -83,16 +91,17 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleSack)
         self.addAction(action)
 
-        self.home_lat_deg = 51.76059
-        self.home_lon_deg = 6.09806
-        self.rightMap.setHome(self.home_lat_deg, self.home_lon_deg)
+        self.exampleJugend()
+
+    def resizeEvent(self, event):
+        print(event.size())
 
     def exampleJugend(self):
         self.msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\n' \
                 u'Jugendherberge')
         lat_deg = 51.78317
         lon_deg = 6.10695
-        route = getRoute(self.home_lat_deg, self.home_lon_deg, lat_deg, lon_deg)
+        route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)
 
@@ -101,7 +110,7 @@ class MainWidget(QWidget):
                 u'Katze auf Baum')
         lat_deg = 51.75065
         lon_deg = 6.11170
-        route = getRoute(self.home_lat_deg, self.home_lon_deg, lat_deg, lon_deg)
+        route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)
 
@@ -110,6 +119,6 @@ class MainWidget(QWidget):
                 u'Kfz brennt unter Carport')
         lat_deg = 51.77190
         lon_deg = 6.12305
-        route = getRoute(self.home_lat_deg, self.home_lon_deg, lat_deg, lon_deg)
+        route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)

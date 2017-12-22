@@ -1,5 +1,6 @@
 #-----------------------------------------------------------------------------
 
+import os
 import math
 import numpy as np
 from mpl_toolkits.basemap import Basemap
@@ -50,7 +51,9 @@ def meters_per_pixel(zoom, lat_deg):
 
 #-----------------------------------------------------------------------------
 
-def getTargetPixmap(lat_deg, lon_deg, zoom, width, height, route):
+def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
+
+    zoom = config.getint("destination_map", "zoom", fallback = 17)
 
     x, y = deg2num(lat_deg, lon_deg, zoom)
     tile_lat_deg, tile_lon_deg = num2deg(x, y, zoom)
@@ -106,7 +109,7 @@ def getTargetPixmap(lat_deg, lon_deg, zoom, width, height, route):
 
     for i in range(0, numX):
         for j in range(0, numY):
-            tile = getTile(minX + i, minY + j, zoom)
+            tile = getTile(minX + i, minY + j, zoom, config)
             xp = originX + i * tileDim
             yp = originY + j * tileDim
             painter.drawPixmap(xp, yp, tile)
@@ -119,13 +122,17 @@ def getTargetPixmap(lat_deg, lon_deg, zoom, width, height, route):
         pos = QPoint(originX + px[0], originY + totHeight - px[1])
         poly.append(pos)
     pen = QPen()
-    pen.setWidth(7)
-    pen.setColor(QColor(0, 0, 200, 100))
+    pen.setWidth(config.getint("destination_map", "route_width",
+        fallback = 7))
+    pen.setColor(QColor(config.get("maps", "route_color",
+        fallback = "#400000c0")))
     painter.setPen(pen)
     painter.drawPolyline(poly)
 
     marker = QPixmap()
-    marker.load("images/marker1.png")
+    imageDir = config.get("display", "image_dir", fallback = "images")
+    marker.load(os.path.join(imageDir, config.get("maps",
+        "destination_marker", fallback = "marker1.png")))
     markerOffset = QPoint(marker.width() / 2, marker.height())
     painter.drawPixmap(center - markerOffset, marker)
     painter.end()
@@ -134,8 +141,13 @@ def getTargetPixmap(lat_deg, lon_deg, zoom, width, height, route):
 
 #-----------------------------------------------------------------------------
 
-def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
-        width, height, route):
+def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
+
+    # Home / Start point
+    home_lon_deg = config.getfloat("route", "home_longitude",
+            fallback = 6.09806)
+    home_lat_deg = config.getfloat("route", "home_latitude",
+            fallback = 51.76059)
 
     min_lat_deg = min(home_lat_deg, dest_lat_deg)
     max_lat_deg = max(home_lat_deg, dest_lat_deg)
@@ -211,7 +223,7 @@ def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
 
     for i in range(0, numX):
         for j in range(0, numY):
-            tile = getTile(minX + i, minY + j, zoom)
+            tile = getTile(minX + i, minY + j, zoom, config)
             xp = originX + i * tileDim
             yp = originY + j * tileDim
             painter.drawPixmap(xp, yp, tile)
@@ -226,21 +238,26 @@ def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
         pos = QPoint(originX + px[0], originY + totHeight - px[1])
         poly.append(pos)
     pen = QPen()
-    pen.setWidth(5)
-    pen.setColor(QColor(0, 0, 200, 100))
+    pen.setWidth(config.getint("route_map", "route_width", fallback = 5))
+    pen.setColor(QColor(config.get("maps", "route_color",
+        fallback = "#400000c0")))
     painter.setPen(pen)
     painter.drawPolyline(poly)
 
     marker = QPixmap()
 
-    marker.load("images/marker_home.png")
+    imageDir = config.get("display", "image_dir", fallback = "images")
+
+    marker.load(os.path.join(imageDir, config.get("maps", "home_marker",
+        fallback = "marker_home.png")))
     markerOffset = QPoint(marker.width() / 2, marker.height())
     coord = totMap(home_lon_deg, home_lat_deg)
     px = np.array(coord) / mpp
     pos = QPoint(originX + px[0], originY + totHeight - px[1])
     painter.drawPixmap(pos - markerOffset, marker)
 
-    marker.load("images/marker1.png")
+    marker.load(os.path.join(imageDir, config.get("maps",
+        "destination_marker", fallback = "marker1.png")))
     markerOffset = QPoint(marker.width() / 2, marker.height())
     coord = totMap(dest_lon_deg, dest_lat_deg)
     px = np.array(coord) / mpp
@@ -253,9 +270,9 @@ def getRoutePixmap(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg,
 
 #-----------------------------------------------------------------------------
 
-def getTile(x, y, zoom):
-    tilePath = r"/home/fp/reichswalde/hydranten/tiles/{0}/{1}/{2}.png"
-    path = tilePath.format(zoom, x, y)
+def getTile(x, y, zoom, config):
+    tilesDir = config.get("maps", "tiles_dir", fallback = "tiles")
+    path = os.path.join(tilesDir, str(zoom), str(x), str(y) + '.png')
     print("Opening: " + path)
     tile = QPixmap()
     try:
@@ -266,7 +283,15 @@ def getTile(x, y, zoom):
 
 #-----------------------------------------------------------------------------
 
-def getRoute(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg):
+def getRoute(dest_lat_deg, dest_lon_deg, config):
+
+    # Home / Start point
+    home_lon_deg = config.getfloat("route", "home_longitude",
+            fallback = 6.09806)
+    home_lat_deg = config.getfloat("route", "home_latitude",
+            fallback = 51.76059)
+    api_key = config.get("route", "ors_api_key", fallback = "")
+
     headers = {
       'Accept': 'text/json; charset=utf-8'
     }
@@ -274,28 +299,12 @@ def getRoute(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg):
     http = urllib3.PoolManager()
 
     url = 'https://api.openrouteservice.org/directions?' \
-        'api_key=58d904a497c67e00015b45fc756c5baed3b94bf2a9cbfa35fb4e86ae&' \
+        'api_key={4}&' \
         'coordinates={0},{1}|{2},{3}&' \
         'profile=driving-car&' \
-        'preference=&' \
-        'units=&' \
-        'language=de&' \
-        'geometry=&' \
         'geometry_format=polyline&' \
-        'geometry_simplify=&' \
-        'instructions=false&' \
-        'instructions_format=&' \
-        'roundabout_exits=&' \
-        'attributes=&' \
-        'maneuvers=&' \
-        'radiuses=&' \
-        'bearings=&' \
-        'continue_straight=&' \
-        'elevation=&' \
-        'extra_info=&' \
-        'optimized=&' \
-        'options=&' \
-        'id='.format(home_lon_deg, home_lat_deg, dest_lon_deg, dest_lat_deg)
+        'instructions=false&'.format(home_lon_deg, home_lat_deg, \
+            dest_lon_deg, dest_lat_deg, api_key)
 
     request = http.request('GET', url, headers = headers)
 
@@ -304,7 +313,10 @@ def getRoute(home_lat_deg, home_lon_deg, dest_lat_deg, dest_lon_deg):
     data = json.loads(request.data.decode('utf-8'))
     #print(json.dumps(data, sort_keys=True, indent = 4, separators = (',', ': ')))
 
-    route = data["routes"][0]["geometry"]
+    try:
+        route = data["routes"][0]["geometry"]
+    except:
+        route = []
 
     return route
 

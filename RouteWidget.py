@@ -7,23 +7,15 @@ import Map
 
 class RouteWidget(QFrame):
 
-    def __init__(self, parent):
+    def __init__(self, parent, config):
         super(RouteWidget, self).__init__(parent)
 
+        self.config = config
         self.pixmap = None
-
-        # Einfahrt Depot
-        self.home_lat_deg = None
-        self.home_lon_deg = None
 
         # Destination
         self.dest_lat_deg = None
         self.dest_lon_deg = None
-
-    def setHome(self, lat_deg, lon_deg):
-        self.home_lat_deg = lat_deg
-        self.home_lon_deg = lon_deg
-        self.updateMap()
 
     def setTarget(self, lat_deg, lon_deg, route):
         self.dest_lat_deg = lat_deg
@@ -32,14 +24,13 @@ class RouteWidget(QFrame):
         self.updateMap()
 
     def updateMap(self):
-        if not self.home_lat_deg or not self.home_lon_deg or \
-            not self.dest_lat_deg or not self. dest_lon_deg:
+        if not self.dest_lat_deg or not self.dest_lon_deg:
             self.pixmap = None
         else:
-            self.pixmap = Map.getRoutePixmap(self.home_lat_deg,
-                    self.home_lon_deg, self.dest_lat_deg, self.dest_lon_deg,
+            self.pixmap = Map.getRoutePixmap( \
+                    self.dest_lat_deg, self.dest_lon_deg,
                     self.contentsRect().width(), self.contentsRect().height(),
-                    self.route)
+                    self.route, self.config)
         self.update()
 
     def resizeEvent(self, event):
