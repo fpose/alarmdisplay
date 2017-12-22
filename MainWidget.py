@@ -116,27 +116,31 @@ class MainWidget(QWidget):
             parity = serial.PARITY_NONE,
             stopbits = serial.STOPBITS_ONE,
             bytesize = serial.EIGHTBITS,
-            timeout = 0)
+            timeout = None)
 
         print('Connected to: ' + self.ser.portstr)
 
         self.runSerial = True
 
-        serialThread = threading.Thread(self.readSerial)
+        serialThread = threading.Thread(target = self.readSerial)
         serialThread.start()
 
     def readSerial(self):
         print('Thread started.')
 
-        serData = ''
+        serData = b''
+        count = 0
         while self.runSerial:
             c = self.ser.read()
             print(repr(c))
-            if c != 0:
+            count += 1
+            if c == b'':
+                continue
+            if c != b'\x00':
                 serData += c
             else:
-                print('Complete: ', serData)
-                serData = ''
+                print('Complete: ', repr(serData), count)
+                serData = b''
 
         ser.close()
 
