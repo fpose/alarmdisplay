@@ -1,6 +1,7 @@
 #-----------------------------------------------------------------------------
 
 import os
+import time
 import math
 import numpy as np
 from mpl_toolkits.basemap import Basemap
@@ -59,6 +60,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
     tile_lat_deg, tile_lon_deg = num2deg(x, y, zoom)
     next_tile_lat_deg, next_tile_lon_deg = num2deg(x + 1, y + 1, zoom)
 
+    start = time.perf_counter()
     m = Basemap(
         llcrnrlon = tile_lon_deg,
         llcrnrlat = next_tile_lat_deg,
@@ -66,6 +68,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
         urcrnrlat = tile_lat_deg,
         projection='merc'
     )
+    print(time.perf_counter()  - start)
 
     proj = m(lon_deg, lat_deg)
 
@@ -95,11 +98,13 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
     lllat, lllon = num2deg(minX, minY + numY, zoom)
     urlat, urlon = num2deg(minX + numX, minY, zoom)
 
+    start = time.perf_counter()
     totMap = Basemap(
         llcrnrlon = lllon, llcrnrlat = lllat,
         urcrnrlon = urlon, urcrnrlat = urlat,
         projection='merc'
     )
+    print(time.perf_counter()  - start)
 
     totHeight = numY * tileDim
 
@@ -149,12 +154,13 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
     home_lat_deg = config.getfloat("route", "home_latitude",
             fallback = 51.76059)
 
-    min_lat_deg = min(home_lat_deg, dest_lat_deg)
-    max_lat_deg = max(home_lat_deg, dest_lat_deg)
     min_lon_deg = min(home_lon_deg, dest_lon_deg)
     max_lon_deg = max(home_lon_deg, dest_lon_deg)
-    lat_diff = max_lat_deg - min_lat_deg
-    lon_diff = max_lon_deg - min_lon_deg
+    lon_diff = (max_lon_deg - min_lon_deg) * 1.2
+
+    min_lat_deg = min(home_lat_deg, dest_lat_deg)
+    max_lat_deg = max(home_lat_deg, dest_lat_deg)
+    lat_diff = (max_lat_deg - min_lat_deg) * 1.8 # FIXME cos()
 
     # mean shall be center
     lat_deg = (home_lat_deg + dest_lat_deg) / 2
@@ -170,13 +176,15 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
 
     zoom_x = math.log(min_x_tiles * 360.0 / lon_diff, 2.0)
     zoom_y = math.log(min_y_tiles * 360.0 / lat_diff, 2.0)
-    zoom = math.floor(min(zoom_x, zoom_y)) - 1
+    zoom = round(min(zoom_x, zoom_y)) - 1
+    print(zoom_x, zoom_y, zoom)
     mpp = meters_per_pixel(zoom, lat_deg)
 
     x, y = deg2num(lat_deg, lon_deg, zoom)
     tile_lat_deg, tile_lon_deg = num2deg(x, y, zoom)
     next_tile_lat_deg, next_tile_lon_deg = num2deg(x + 1, y + 1, zoom)
 
+    start = time.perf_counter()
     m = Basemap(
         llcrnrlon = tile_lon_deg,
         llcrnrlat = next_tile_lat_deg,
@@ -184,6 +192,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
         urcrnrlat = tile_lat_deg,
         projection='merc'
     )
+    print(time.perf_counter()  - start)
 
     proj = m(lon_deg, lat_deg)
     px = np.array(proj) / mpp
@@ -211,11 +220,13 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
     lllat, lllon = num2deg(minX, minY + numY, zoom)
     urlat, urlon = num2deg(minX + numX, minY, zoom)
 
+    start = time.perf_counter()
     totMap = Basemap(
         llcrnrlon = lllon, llcrnrlat = lllat,
         urcrnrlon = urlon, urcrnrlat = urlat,
         projection='merc'
     )
+    print(time.perf_counter()  - start)
 
     pixmap = QPixmap(width, height)
     painter = QPainter()
@@ -311,7 +322,8 @@ def getRoute(dest_lat_deg, dest_lon_deg, config):
     print(request.status)
 
     data = json.loads(request.data.decode('utf-8'))
-    #print(json.dumps(data, sort_keys=True, indent = 4, separators = (',', ': ')))
+    #print(json.dumps(data, sort_keys=True, indent = 4,
+    #    separators = (',', ': ')))
 
     try:
         route = data["routes"][0]["geometry"]
