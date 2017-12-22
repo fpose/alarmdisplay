@@ -3,6 +3,8 @@
 import os
 import math
 import subprocess
+import threading
+import serial
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -107,6 +109,36 @@ class MainWidget(QWidget):
         action.setShortcutContext(Qt.ApplicationShortcut)
         action.triggered.connect(self.exampleSack)
         self.addAction(action)
+
+        self.ser = serial.Serial(
+            port = '/dev/ttyUSB0',
+            baudrate = 9600,
+            parity = serial.PARITY_NONE,
+            stopbits = serial.STOPBITS_ONE,
+            bytesize = serial.EIGHTBITS,
+            timeout = 0)
+
+        print('Connected to: ' + self.ser.portstr)
+
+        self.runSerial = True
+
+        serialThread = threading.Thread(self.readSerial)
+        serialThread.start()
+
+    def readSerial(self):
+        print('Thread started.')
+
+        serData = ''
+        while self.runSerial:
+            c = self.ser.read()
+            print(repr(c))
+            if c != 0:
+                serData += c
+            else:
+                print('Complete: ', serData)
+                serData = ''
+
+        ser.close()
 
     def resizeEvent(self, event):
         print(event.size())
