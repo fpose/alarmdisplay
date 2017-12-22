@@ -2,6 +2,7 @@
 
 import os
 import math
+import subprocess
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -22,8 +23,17 @@ class MainWidget(QWidget):
         self.elapsedTimer = QTimer(self)
         self.elapsedTimer.setInterval(1000)
         self.elapsedTimer.setSingleShot(False)
-        self.elapsedTimer.timeout.connect(self.timeout)
+        self.elapsedTimer.timeout.connect(self.elapsedTimeout)
         self.alarmDateTime = None
+
+        self.simTimer = QTimer(self)
+        self.simTimer.setInterval(20000)
+        self.simTimer.setSingleShot(True)
+        self.simTimer.timeout.connect(self.simTimeout)
+        self.simTimer.start()
+
+        subprocess.call(['xset', 's', 'noblank'])
+        subprocess.call(['xset', '-dpms'])
 
         self.move(0, 0)
         self.resize(1920, 1080)
@@ -98,23 +108,36 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleSack)
         self.addAction(action)
 
-        self.exampleJugend()
-
     def resizeEvent(self, event):
         print(event.size())
 
     def startTimer(self):
         self.alarmDateTime = QDateTime.currentDateTime()
         self.elapsedTimer.start()
-        self.timeout()
+        self.elapsedTimeout()
+        print(u'Alarm', self.alarmDateTime)
 
-    def timeout(self):
+        args = ['cec-client', '-s', '-d', '1']
+        cecCommand = 'on 0'
+
+        try:
+            cec = subprocess.Popen(args, stdin = subprocess.PIPE)
+            cec.communicate(input = cecCommand.encode('UTF-8'))
+        except OSError as e:
+            print('CEC wakeup failed:', e)
+        except:
+            print('CEC wakeup failed.')
+
+    def elapsedTimeout(self):
         now = QDateTime.currentDateTime()
         diffMs = self.alarmDateTime.msecsTo(now)
         seconds = math.floor(diffMs / 1000)
         minutes = math.floor(seconds / 60)
         seconds -= minutes * 60
         self.timerLabel.setText(u'%02u:%02u' % (minutes, seconds))
+
+    def simTimeout(self):
+        self.exampleJugend()
 
     def exampleJugend(self):
         self.startTimer()
