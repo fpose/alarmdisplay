@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import math
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -16,6 +17,13 @@ class MainWidget(QWidget):
         super(MainWidget, self).__init__()
 
         self.config = config
+
+        self.alarmActive = False
+        self.elapsedTimer = QTimer(self)
+        self.elapsedTimer.setInterval(1000)
+        self.elapsedTimer.setSingleShot(False)
+        self.elapsedTimer.timeout.connect(self.timeout)
+        self.alarmDateTime = None
 
         self.move(0, 0)
         self.resize(1920, 1080)
@@ -60,10 +68,9 @@ class MainWidget(QWidget):
             logoLabel.setStyleSheet(styleSheet)
         centerLayout.addWidget(logoLabel)
 
-        timerLabel = QLabel(self)
-        timerLabel.setText('4:59') # FIXME
-        timerLabel.setAlignment(Qt.AlignCenter)
-        centerLayout.addWidget(timerLabel)
+        self.timerLabel = QLabel(self)
+        self.timerLabel.setAlignment(Qt.AlignCenter)
+        centerLayout.addWidget(self.timerLabel)
 
         self.rightMap = RouteWidget(self, self.config)
         self.rightMap.setStyleSheet("""
@@ -96,7 +103,17 @@ class MainWidget(QWidget):
     def resizeEvent(self, event):
         print(event.size())
 
+    def timeout(self):
+        now = QDateTime.currentDateTime()
+        diffMs = self.alarmDateTime.msecsTo(now)
+        seconds = math.floor(diffMs / 1000)
+        minutes = math.floor(seconds / 60)
+        seconds -= minutes * 60
+        self.timerLabel.setText(u'%02u:%02u' % (minutes, seconds))
+
     def exampleJugend(self):
+        self.alarmDateTime = QDateTime.currentDateTime()
+        self.elapsedTimer.start()
         self.msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\n' \
                 u'Jugendherberge')
         lat_deg = 51.78317
@@ -106,6 +123,8 @@ class MainWidget(QWidget):
         self.rightMap.setTarget(lat_deg, lon_deg, route)
 
     def exampleEngels(self):
+        self.alarmDateTime = QDateTime.currentDateTime()
+        self.elapsedTimer.start()
         self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\n' \
                 u'Katze auf Baum')
         lat_deg = 51.75065
@@ -115,6 +134,8 @@ class MainWidget(QWidget):
         self.rightMap.setTarget(lat_deg, lon_deg, route)
 
     def exampleSack(self):
+        self.alarmDateTime = QDateTime.currentDateTime()
+        self.elapsedTimer.start()
         self.msgLabel.setText(u'B2 Garagenbrand\nSackstraße 173\n' \
                 u'Kfz brennt unter Carport')
         lat_deg = 51.77190
