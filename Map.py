@@ -318,6 +318,16 @@ def getRoute(dest_lat_deg, dest_lon_deg, config):
     except:
         route = []
 
-    return route
+    try:
+        distance = float(data["routes"][0]["summary"]["distance"])
+    except:
+        distance = None
+
+    try:
+        duration = float(data["routes"][0]["summary"]["duration"])
+    except:
+        duration = None
+
+    return (route, distance, duration)
 
 #-----------------------------------------------------------------------------

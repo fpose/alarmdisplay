@@ -19,7 +19,7 @@ class MapWidget(QFrame):
     def setTarget(self, lat_deg, lon_deg, route):
         self.lat_deg = lat_deg
         self.lon_deg = lon_deg
-        self.route = route
+        self.route = route[0]
         self.updateMap()
 
     def updateMap(self):
