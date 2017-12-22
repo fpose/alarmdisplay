@@ -3,8 +3,7 @@
 import os
 import math
 import subprocess
-import threading
-import serial
+import re
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -13,6 +12,7 @@ from PyQt5.QtCore import *
 from MapWidget import MapWidget
 from RouteWidget import RouteWidget
 from Map import getRoute
+from AlarmReceiver import AlarmReceiver
 
 class MainWidget(QWidget):
 
@@ -32,9 +32,11 @@ class MainWidget(QWidget):
         self.simTimer.setInterval(20000)
         self.simTimer.setSingleShot(True)
         self.simTimer.timeout.connect(self.simTimeout)
-        self.simTimer.start()
+        #self.simTimer.start()
 
+        subprocess.call(['xset', 's', 'off'])
         subprocess.call(['xset', 's', 'noblank'])
+        subprocess.call(['xset', 's', '0', '0'])
         subprocess.call(['xset', '-dpms'])
 
         self.move(0, 0)
@@ -110,39 +112,84 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleSack)
         self.addAction(action)
 
-        self.ser = serial.Serial(
-            port = '/dev/ttyUSB0',
-            baudrate = 9600,
-            parity = serial.PARITY_NONE,
-            stopbits = serial.STOPBITS_ONE,
-            bytesize = serial.EIGHTBITS,
-            timeout = None)
+        self.thread = QThread()
+        self.alarmReceiver = AlarmReceiver()
+        self.alarmReceiver.receivedAlarm.connect(self.receivedAlarm)
+        self.alarmReceiver.moveToThread(self.thread)
+        self.alarmReceiver.finished.connect(self.thread.quit)
+        self.thread.started.connect(self.alarmReceiver.receive)
+        self.thread.start()
 
-        print('Connected to: ' + self.ser.portstr)
+    def receivedAlarm(self, alarm):
+        print('Received alarm', alarm)
 
-        self.runSerial = True
+        alarm = alarm.decode('latin1')
 
-        serialThread = threading.Thread(target = self.readSerial)
-        serialThread.start()
+        # '16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung
+        # #K01;N5174110E0608130; *57274*H1 Hilfeleistung*
+        # Holla die Waldfee*Kleve*Reichswalde*Grunewaldstrasse*
+        # *KLV 03/124*Hinweis
 
-    def readSerial(self):
-        print('Thread started.')
+        #  1) Datum/Uhrzeit TT-MM-YY HH:MM:SS
+        #  2) Einheit, Funktion
+        #  3+4) Koordinaten
+        #  5) Einsatznummer
+        #  6) Einsatzart und Sichwort
+        #  7) Diagnose und Eskalationsstufe
+        #  8) Hinweis (Freitext)
+        #  9) Stadt
+        # 10) Ortsteil
+        # 11) Straße
+        # 12) Hausnummer
+        # 13) Objektplan
+        # 14) Ortshinweis
+        regex = \
+                '(\d+-\d+-\d+ \d+:\d+:\d+)\s+' \
+                '(.*)\s*' \
+                '#K01;N(\d+)E(\d+);\s*\*' \
+                '(.*)\*' \
+                '(..)\s+' \
+                '(.*)\*' \
+                '(.*)\*' \
+                '(.*)\*' \
+                '(.*)\*' \
+                '(.*)\*' \
+                '(.*)\*' \
+                '(.*)\*' \
+                '(.*)'
+        alarmRe = re.compile(regex)
+        ma = alarmRe.match(alarm)
+        if not ma:
+            print('Alarmtext nicht erkannt!')
+            return
 
-        serData = b''
-        count = 0
-        while self.runSerial:
-            c = self.ser.read()
-            print(repr(c))
-            count += 1
-            if c == b'':
-                continue
-            if c != b'\x00':
-                serData += c
-            else:
-                print('Complete: ', repr(serData), count)
-                serData = b''
+        print(ma.groups())
+        datetime = QDateTime.fromString(ma.group(1), 'dd-MM-yy hh:mm:ss')
+        datetime = datetime.addYears(100)
+        print(datetime)
+        einheit = ma.group(2).strip()
+        coord = ma.group(3)
+        coord = coord[:2] + '.' + coord[2:]
+        lat_deg = float(coord)
+        coord = ma.group(4)
+        coord = coord[:2] + '.' + coord[2:]
+        lon_deg = float(coord)
+        print(lon_deg, lat_deg)
+        text = ma.group(6) + ' ' + ma.group(7)
+        address = ma.group(11)
+        housenumber = ma.group(12)
+        if housenumber:
+            address += ' ' + housenumber
+        ortshinweis = ma.group(14)
+        if ortshinweis:
+            address += ' (' + ortshinweis + ')'
+        hinweis = ma.group(8)
 
-        ser.close()
+        self.startTimer()
+        self.msgLabel.setText(text + '\n' + address + '\n' + hinweis)
+        route = getRoute(lat_deg, lon_deg, self.config)
+        self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.rightMap.setTarget(lat_deg, lon_deg, route)
 
     def resizeEvent(self, event):
         print(event.size())
