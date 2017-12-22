@@ -103,6 +103,11 @@ class MainWidget(QWidget):
     def resizeEvent(self, event):
         print(event.size())
 
+    def startTimer(self):
+        self.alarmDateTime = QDateTime.currentDateTime()
+        self.elapsedTimer.start()
+        self.timeout()
+
     def timeout(self):
         now = QDateTime.currentDateTime()
         diffMs = self.alarmDateTime.msecsTo(now)
@@ -112,8 +117,7 @@ class MainWidget(QWidget):
         self.timerLabel.setText(u'%02u:%02u' % (minutes, seconds))
 
     def exampleJugend(self):
-        self.alarmDateTime = QDateTime.currentDateTime()
-        self.elapsedTimer.start()
+        self.startTimer()
         self.msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\n' \
                 u'Jugendherberge')
         lat_deg = 51.78317
@@ -123,8 +127,7 @@ class MainWidget(QWidget):
         self.rightMap.setTarget(lat_deg, lon_deg, route)
 
     def exampleEngels(self):
-        self.alarmDateTime = QDateTime.currentDateTime()
-        self.elapsedTimer.start()
+        self.startTimer()
         self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\n' \
                 u'Katze auf Baum')
         lat_deg = 51.75065
@@ -134,8 +137,7 @@ class MainWidget(QWidget):
         self.rightMap.setTarget(lat_deg, lon_deg, route)
 
     def exampleSack(self):
-        self.alarmDateTime = QDateTime.currentDateTime()
-        self.elapsedTimer.start()
+        self.startTimer()
         self.msgLabel.setText(u'B2 Garagenbrand\nSackstraße 173\n' \
                 u'Kfz brennt unter Carport')
         lat_deg = 51.77190
