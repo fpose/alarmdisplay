@@ -1,0 +1,28 @@
+vim: syntax=markdown tw=78 spl=de
+
+# Anzeige
+
+* Objektnummer in halbtransparenter Box über Zielkarte
+* Distant und Dauer in halbtransparenten Boxen anzeigen
+* Symbol für Distanz
+* Symbol für Fahrtdauer
+* Stunden/Minuten
+* Alarmierte Einheiten in Mittelspalte anzeigen
+* Symbol für Adresse
+* CEC-Auswecken in Thread
+* Kritischen Pfad ermitteln
+* Zuerst EInsatzstelle anzeigen, dann Process Messages
+* Route in Thread holen
+* Route später über bereits geladene Kacheln zeichnen
+* Basemap ersetzen (langsam)
+
+# Alarmdepesche
+
+* Drucker aufwecken
+* LaTeX-Template füllen
+
+# Administration
+
+* Startscript
+* Read-Only-Dateisystem
+* CUPS aufsetzen
