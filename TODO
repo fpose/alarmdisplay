@@ -12,7 +12,6 @@ vim: syntax=markdown tw=78 spl=de
 * Kritischen Pfad ermitteln
 * Route in Thread holen
 * Route später über bereits geladene Kacheln zeichnen
-* Basemap ersetzen (langsam)
 
 # Alarmdepesche
 

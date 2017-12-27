@@ -4,13 +4,14 @@ import os
 import time
 import math
 import numpy as np
-from pyproj import Proj
 
 from PyQt5.QtGui import QPixmap, QPainter, QPolygonF, QPen, QColor
 from PyQt5.QtCore import QPoint, QRect, QSize
 
 import urllib3
 import json
+
+from Projection import MercatorProjection
 
 #-----------------------------------------------------------------------------
 
@@ -52,45 +53,6 @@ def meters_per_pixel(zoom, lat_deg):
 
 #-----------------------------------------------------------------------------
 
-R = 6370997.0
-_dg2rad = math.radians(1.)
-
-def genProj(llcrnrlon, llcrnrlat, urcrnrlon, urcrnrlat, logger):
-
-    start = time.perf_counter()
-    projparams = {}
-    projparams['proj'] = 'merc'
-    projparams['units'] = 'm'
-    projparams['lat_ts'] = 0.0
-    projparams['R'] = R
-    projparams['lon_0'] = 0.5 * (llcrnrlon + urcrnrlon)
-    #logger.debug('Params: %s', repr(projparams))
-    proj4 = Proj(projparams)
-    llcrnrx, llcrnry = proj4(llcrnrlon, llcrnrlat)
-    projparams['x_0'] = -llcrnrx
-    projparams['y_0'] = -llcrnry
-    #logger.debug('Params: %s', repr(projparams))
-
-    pp = Proj(
-        projparams,
-        llcrnrlon = llcrnrlon,
-        llcrnrlat = llcrnrlat,
-        urcrnrlon = urcrnrlon,
-        urcrnrlat = urcrnrlat
-    )
-    logger.debug('Proj: %f', time.perf_counter()  - start)
-
-    return pp
-
-#-----------------------------------------------------------------------------
-
-def prj(proj, lon_deg, lat_deg, llcrnrlon):
-    outx, outy = proj(lon_deg, lat_deg)
-    outx = R * _dg2rad * (lon_deg - llcrnrlon)
-    return outx, outy
-
-#-----------------------------------------------------------------------------
-
 def getTargetPixmap(lat_deg, lon_deg, width, height, route, config, logger):
 
     zoom = config.getint("destination_map", "zoom", fallback = 17)
@@ -99,13 +61,11 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config, logger):
     tile_lat_deg, tile_lon_deg = num2deg(x, y, zoom)
     next_tile_lat_deg, next_tile_lon_deg = num2deg(x + 1, y + 1, zoom)
 
-    projection = genProj(tile_lon_deg, next_tile_lat_deg,
-            next_tile_lon_deg, tile_lat_deg, logger)
-
-    proj = prj(projection, lon_deg, lat_deg, tile_lon_deg)
-
+    proj = MercatorProjection(tile_lon_deg, next_tile_lat_deg,
+            next_tile_lon_deg, tile_lat_deg)
+    coord = proj(lon_deg, lat_deg)
     mpp = meters_per_pixel(zoom, lat_deg)
-    px = np.array(proj) / mpp
+    px = np.array(coord) / mpp
 
     center = QPoint(width / 2, height / 2)
     offset = QPoint(px[0], tileDim - px[1])
@@ -126,15 +86,11 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config, logger):
 
     numX = math.ceil((width - originX) / tileDim)
     numY = math.ceil((height - originY) / tileDim)
+    totHeight = numY * tileDim
 
     lllat, lllon = num2deg(minX, minY + numY, zoom)
     urlat, urlon = num2deg(minX + numX, minY, zoom)
-
-    start = time.perf_counter()
-    totMap = genProj(lllon, lllat, urlon, urlat, logger)
-    logger.debug('Proj: %f', time.perf_counter()  - start)
-
-    totHeight = numY * tileDim
+    totProj = MercatorProjection(lllon, lllat, urlon, urlat)
 
     pixmap = QPixmap(width, height)
     painter = QPainter()
@@ -150,7 +106,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config, logger):
 
     poly = QPolygonF()
     for point in route:
-        coord = prj(totMap, point[0], point[1], lllon)
+        coord = totProj(point[0], point[1])
         px = np.array(coord) / mpp
         pos = QPoint(originX + px[0], originY + totHeight - px[1])
         poly.append(pos)
@@ -213,11 +169,10 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     tile_lat_deg, tile_lon_deg = num2deg(x, y, zoom)
     next_tile_lat_deg, next_tile_lon_deg = num2deg(x + 1, y + 1, zoom)
 
-    projection = genProj(tile_lon_deg, next_tile_lat_deg,
-            next_tile_lon_deg, tile_lat_deg, logger)
-
-    proj = prj(projection, lon_deg, lat_deg, tile_lon_deg)
-    px = np.array(proj) / mpp
+    proj = MercatorProjection(tile_lon_deg, next_tile_lat_deg,
+            next_tile_lon_deg, tile_lat_deg)
+    coord = proj(lon_deg, lat_deg)
+    px = np.array(coord) / mpp
 
     center = QPoint(width / 2, height / 2)
     offset = QPoint(px[0], tileDim - px[1])
@@ -238,12 +193,11 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
 
     numX = math.ceil((width - originX) / tileDim)
     numY = math.ceil((height - originY) / tileDim)
+    totHeight = numY * tileDim
 
     lllat, lllon = num2deg(minX, minY + numY, zoom)
     urlat, urlon = num2deg(minX + numX, minY, zoom)
-
-    start = time.perf_counter()
-    totMap = genProj(lllon, lllat, urlon, urlat, logger)
+    totProj = MercatorProjection(lllon, lllat, urlon, urlat)
 
     pixmap = QPixmap(width, height)
     painter = QPainter()
@@ -257,11 +211,9 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
             painter.drawPixmap(xp, yp, tile)
             #painter.drawRect(xp, yp, tileDim, tileDim)
 
-    totHeight = numY * tileDim
-
     poly = QPolygonF()
     for point in route:
-        coord = prj(totMap, point[0], point[1], lllon)
+        coord = totProj(point[0], point[1])
         px = np.array(coord) / mpp
         pos = QPoint(originX + px[0], originY + totHeight - px[1])
         poly.append(pos)
@@ -279,7 +231,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     marker.load(os.path.join(imageDir, config.get("maps", "home_marker",
         fallback = "marker_home.png")))
     markerOffset = QPoint(marker.width() / 2, marker.height())
-    coord = prj(totMap, home_lon_deg, home_lat_deg, lllon)
+    coord = totProj(home_lon_deg, home_lat_deg)
     px = np.array(coord) / mpp
     pos = QPoint(originX + px[0], originY + totHeight - px[1])
     painter.drawPixmap(pos - markerOffset, marker)
@@ -287,7 +239,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     marker.load(os.path.join(imageDir, config.get("maps",
         "destination_marker", fallback = "marker1.png")))
     markerOffset = QPoint(marker.width() / 2, marker.height())
-    coord = prj(totMap, dest_lon_deg, dest_lat_deg, lllon)
+    coord = totProj(dest_lon_deg, dest_lat_deg)
     px = np.array(coord) / mpp
     pos = QPoint(originX + px[0], originY + totHeight - px[1])
     painter.drawPixmap(pos - markerOffset, marker)
