@@ -9,8 +9,12 @@ class AlarmReceiver(QtCore.QObject):
     receivedAlarm = QtCore.pyqtSignal(bytes)
     finished = QtCore.pyqtSignal()
 
+    def __init__(self, logger):
+        super(AlarmReceiver, self).__init__()
+        self.logger = logger
+
     def receive(self):
-        print('Thread started.')
+        self.logger.info('Receiver thread started.')
 
         try:
             ser = serial.Serial(
@@ -21,11 +25,11 @@ class AlarmReceiver(QtCore.QObject):
                 bytesize = serial.EIGHTBITS,
                 timeout = None)
         except:
-            print('Failed to open port!')
+            self.logger.error('Failed to open port!')
             self.finished.emit()
             return
 
-        print('Connected to', ser.portstr)
+        self.logger.info('Connected to %s', ser.portstr)
 
         run = True
         data = b''
@@ -43,4 +47,5 @@ class AlarmReceiver(QtCore.QObject):
                 data += c
 
         ser.close()
+        self.logger.info('Receiver thread finished.')
         self.finished.emit()

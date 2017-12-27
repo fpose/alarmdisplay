@@ -118,7 +118,7 @@ class MainWidget(QWidget):
         self.addAction(action)
 
         self.thread = QThread()
-        self.alarmReceiver = AlarmReceiver()
+        self.alarmReceiver = AlarmReceiver(self.logger)
         self.alarmReceiver.receivedAlarm.connect(self.receivedAlarm)
         self.alarmReceiver.moveToThread(self.thread)
         self.alarmReceiver.finished.connect(self.thread.quit)
@@ -181,7 +181,7 @@ class MainWidget(QWidget):
         self.logger.debug(ma.groups())
         datetime = QDateTime.fromString(ma.group(1), 'dd-MM-yy hh:mm:ss')
         datetime = datetime.addYears(100)
-        self.logger.debug(datetime)
+        self.logger.debug('Date %s', datetime)
         einheit = ma.group(2).strip()
         coord = ma.group(3)
         coord = coord[:2] + '.' + coord[2:]
@@ -189,7 +189,7 @@ class MainWidget(QWidget):
         coord = ma.group(4)
         coord = coord[:2] + '.' + coord[2:]
         lon_deg = float(coord)
-        self.logger.debug(lon_deg, lat_deg)
+        self.logger.debug('Coordinates: lon=%f lat=%f', lon_deg, lat_deg)
         text = ma.group(6) + ' ' + ma.group(7)
         address = ma.group(11)
         housenumber = ma.group(12)
@@ -216,6 +216,9 @@ class MainWidget(QWidget):
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.logger.info('Route map...')
         self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.logger.info('Maps ready.')
+        QApplication.processEvents()
+
         self.logger.info('Report...')
         self.report.generate(lat_deg, lon_deg, route)
         self.logger.info('Finished.')
@@ -227,7 +230,7 @@ class MainWidget(QWidget):
         self.alarmDateTime = QDateTime.currentDateTime()
         self.elapsedTimer.start()
         self.elapsedTimeout()
-        self.logger.info(u'Alarm', self.alarmDateTime)
+        self.logger.info(u'Alarm at %s', self.alarmDateTime)
         self.cecCommand.switchOn()
 
     def elapsedTimeout(self):

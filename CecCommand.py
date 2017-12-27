@@ -18,7 +18,7 @@ class CecCommand(QtCore.QObject):
 
     @QtCore.pyqtSlot(str)
     def run(self, cecCommand):
-        self.logger.info('CEC command started:', cecCommand)
+        self.logger.info('CEC command started: %s', cecCommand)
 
         args = ['cec-client', '-s', '-d', '1']
 
@@ -26,7 +26,7 @@ class CecCommand(QtCore.QObject):
             cec = subprocess.Popen(args, stdin = subprocess.PIPE)
             cec.communicate(input = cecCommand.encode('UTF-8'))
         except OSError as e:
-            self.logger.error('CEC wakeup failed:', e)
+            self.logger.error('CEC wakeup failed: %s', e)
         except:
             self.logger.error('CEC wakeup failed.')
 
