@@ -10,10 +10,11 @@ import Map
 
 class RouteWidget(QFrame):
 
-    def __init__(self, parent, config):
+    def __init__(self, parent, config, logger):
         super(RouteWidget, self).__init__(parent)
 
         self.config = config
+        self.logger = logger
         self.pixmap = None
         self.invalidate()
 
@@ -40,7 +41,7 @@ class RouteWidget(QFrame):
             self.pixmap = Map.getRoutePixmap( \
                     self.dest_lat_deg, self.dest_lon_deg,
                     self.contentsRect().width(), self.contentsRect().height(),
-                    self.route, self.config)
+                    self.route, self.config, self.logger)
         self.update()
 
     def resizeEvent(self, event):

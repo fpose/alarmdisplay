@@ -18,10 +18,11 @@ from CecCommand import CecCommand
 
 class MainWidget(QWidget):
 
-    def __init__(self, config):
+    def __init__(self, config, logger):
         super(MainWidget, self).__init__()
 
         self.config = config
+        self.logger = logger
 
         self.alarmActive = False
         self.elapsedTimer = QTimer(self)
@@ -35,6 +36,8 @@ class MainWidget(QWidget):
         self.simTimer.setSingleShot(True)
         self.simTimer.timeout.connect(self.simTimeout)
         #self.simTimer.start()
+
+        self.logger.info('Setting up X server...')
 
         subprocess.call(['xset', 's', 'off'])
         subprocess.call(['xset', 's', 'noblank'])
@@ -65,7 +68,7 @@ class MainWidget(QWidget):
         horLayout = QHBoxLayout(self)
         verLayout.addLayout(horLayout, 2)
 
-        self.leftMap = MapWidget(self, self.config)
+        self.leftMap = MapWidget(self, self.config, self.logger)
         self.leftMap.setStyleSheet("""
             background-color: rgb(80, 80, 0);
             """)
@@ -88,7 +91,7 @@ class MainWidget(QWidget):
         self.timerLabel.setAlignment(Qt.AlignCenter)
         centerLayout.addWidget(self.timerLabel)
 
-        self.rightMap = RouteWidget(self, self.config)
+        self.rightMap = RouteWidget(self, self.config, self.logger)
         self.rightMap.setStyleSheet("""
             background-color: rgb(0, 80, 80);
             """)
@@ -125,13 +128,15 @@ class MainWidget(QWidget):
         self.cecThread = QThread()
         self.cecThread.start()
 
-        self.cecCommand = CecCommand()
+        self.cecCommand = CecCommand(self.logger)
         self.cecCommand.moveToThread(self.cecThread)
 
-        self.report = AlarmReport(self.config)
+        self.report = AlarmReport(self.config, self.logger)
+
+        self.logger.info('Setup finished.')
 
     def receivedAlarm(self, alarm):
-        print('Received alarm', alarm)
+        self.logger.info('Received alarm: %s', repr(alarm))
 
         alarm = alarm.decode('latin1')
 
@@ -170,13 +175,13 @@ class MainWidget(QWidget):
         alarmRe = re.compile(regex)
         ma = alarmRe.match(alarm)
         if not ma:
-            print('Alarmtext nicht erkannt!')
+            self.logger.warn('Alarmtext nicht erkannt!')
             return
 
-        print(ma.groups())
+        self.logger.debug(ma.groups())
         datetime = QDateTime.fromString(ma.group(1), 'dd-MM-yy hh:mm:ss')
         datetime = datetime.addYears(100)
-        print(datetime)
+        self.logger.debug(datetime)
         einheit = ma.group(2).strip()
         coord = ma.group(3)
         coord = coord[:2] + '.' + coord[2:]
@@ -184,7 +189,7 @@ class MainWidget(QWidget):
         coord = ma.group(4)
         coord = coord[:2] + '.' + coord[2:]
         lon_deg = float(coord)
-        print(lon_deg, lat_deg)
+        self.logger.debug(lon_deg, lat_deg)
         text = ma.group(6) + ' ' + ma.group(7)
         address = ma.group(11)
         housenumber = ma.group(12)
@@ -195,25 +200,34 @@ class MainWidget(QWidget):
             address += ' (' + ortshinweis + ')'
         hinweis = ma.group(8)
 
+        self.logger.info('Dispatching alarm...')
         self.startTimer()
         self.msgLabel.setText(text + '\n' + address + '\n' + hinweis)
         self.leftMap.invalidate()
         self.rightMap.invalidate()
         QApplication.processEvents()
 
-        route = getRoute(lat_deg, lon_deg, self.config)
+        self.processAlarm(lat_deg, lon_deg)
+
+    def processAlarm(self, lat_deg, lon_deg):
+        self.logger.info('Route query...')
+        route = getRoute(lat_deg, lon_deg, self.config, self.logger)
+        self.logger.info('Destination map...')
         self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.logger.info('Route map...')
         self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.logger.info('Report...')
         self.report.generate(lat_deg, lon_deg, route)
+        self.logger.info('Finished.')
 
     def resizeEvent(self, event):
-        print(event.size())
+        self.logger.debug(event.size())
 
     def startTimer(self):
         self.alarmDateTime = QDateTime.currentDateTime()
         self.elapsedTimer.start()
         self.elapsedTimeout()
-        print(u'Alarm', self.alarmDateTime)
+        self.logger.info(u'Alarm', self.alarmDateTime)
         self.cecCommand.switchOn()
 
     def elapsedTimeout(self):
@@ -243,10 +257,7 @@ class MainWidget(QWidget):
 
         lat_deg = 51.78317
         lon_deg = 6.10695
-        route = getRoute(lat_deg, lon_deg, self.config)
-        self.leftMap.setTarget(lat_deg, lon_deg, route)
-        self.rightMap.setTarget(lat_deg, lon_deg, route)
-        self.report.generate(lat_deg, lon_deg, route)
+        self.processAlarm(lat_deg, lon_deg)
 
     def exampleEngels(self):
         self.startTimer()
@@ -258,10 +269,7 @@ class MainWidget(QWidget):
 
         lat_deg = 51.75065
         lon_deg = 6.11170
-        route = getRoute(lat_deg, lon_deg, self.config)
-        self.leftMap.setTarget(lat_deg, lon_deg, route)
-        self.rightMap.setTarget(lat_deg, lon_deg, route)
-        self.report.generate(lat_deg, lon_deg, route)
+        self.processAlarm(lat_deg, lon_deg)
 
     def exampleSack(self):
         self.startTimer()
@@ -273,7 +281,4 @@ class MainWidget(QWidget):
 
         lat_deg = 51.77190
         lon_deg = 6.12305
-        route = getRoute(lat_deg, lon_deg, self.config)
-        self.leftMap.setTarget(lat_deg, lon_deg, route)
-        self.rightMap.setTarget(lat_deg, lon_deg, route)
-        self.report.generate(lat_deg, lon_deg, route)
+        self.processAlarm(lat_deg, lon_deg)

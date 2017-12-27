@@ -7,10 +7,11 @@ import Map
 
 class MapWidget(QFrame):
 
-    def __init__(self, parent, config):
+    def __init__(self, parent, config, logger):
         super(MapWidget, self).__init__(parent)
 
         self.config = config
+        self.logger = logger
         self.invalidate()
 
     def invalidate(self):
@@ -31,7 +32,7 @@ class MapWidget(QFrame):
         else:
             self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
                     self.contentsRect().width(), self.contentsRect().height(),
-                    self.route, self.config)
+                    self.route, self.config, self.logger)
         self.update()
 
     def resizeEvent(self, event):

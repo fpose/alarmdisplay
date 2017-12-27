@@ -52,7 +52,7 @@ def meters_per_pixel(zoom, lat_deg):
 
 #-----------------------------------------------------------------------------
 
-def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
+def getTargetPixmap(lat_deg, lon_deg, width, height, route, config, logger):
 
     zoom = config.getint("destination_map", "zoom", fallback = 17)
 
@@ -68,7 +68,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
         urcrnrlat = tile_lat_deg,
         projection='merc'
     )
-    print(time.perf_counter()  - start)
+    logger.debug(time.perf_counter()  - start)
 
     proj = m(lon_deg, lat_deg)
 
@@ -104,7 +104,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
         urcrnrlon = urlon, urcrnrlat = urlat,
         projection='merc'
     )
-    print(time.perf_counter()  - start)
+    logger.debug(time.perf_counter()  - start)
 
     totHeight = numY * tileDim
 
@@ -114,7 +114,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
 
     for i in range(0, numX):
         for j in range(0, numY):
-            tile = getTile(minX + i, minY + j, zoom, config)
+            tile = getTile(minX + i, minY + j, zoom, config, logger)
             xp = originX + i * tileDim
             yp = originY + j * tileDim
             painter.drawPixmap(xp, yp, tile)
@@ -146,7 +146,8 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config):
 
 #-----------------------------------------------------------------------------
 
-def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
+def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
+        logger):
 
     # Home / Start point
     home_lon_deg = config.getfloat("route", "home_longitude",
@@ -177,7 +178,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
     zoom_x = math.log(min_x_tiles * 360.0 / lon_diff, 2.0)
     zoom_y = math.log(min_y_tiles * 360.0 / lat_diff, 2.0)
     zoom = round(min(zoom_x, zoom_y)) - 1
-    print(zoom_x, zoom_y, zoom)
+    logger.debug(zoom_x, zoom_y, zoom)
     mpp = meters_per_pixel(zoom, lat_deg)
 
     x, y = deg2num(lat_deg, lon_deg, zoom)
@@ -192,7 +193,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
         urcrnrlat = tile_lat_deg,
         projection='merc'
     )
-    print(time.perf_counter()  - start)
+    logger.debug(time.perf_counter()  - start)
 
     proj = m(lon_deg, lat_deg)
     px = np.array(proj) / mpp
@@ -226,7 +227,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
         urcrnrlon = urlon, urcrnrlat = urlat,
         projection='merc'
     )
-    print(time.perf_counter()  - start)
+    logger.debug(time.perf_counter()  - start)
 
     pixmap = QPixmap(width, height)
     painter = QPainter()
@@ -234,7 +235,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
 
     for i in range(0, numX):
         for j in range(0, numY):
-            tile = getTile(minX + i, minY + j, zoom, config)
+            tile = getTile(minX + i, minY + j, zoom, config, logger)
             xp = originX + i * tileDim
             yp = originY + j * tileDim
             painter.drawPixmap(xp, yp, tile)
@@ -281,20 +282,20 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config):
 
 #-----------------------------------------------------------------------------
 
-def getTile(x, y, zoom, config):
+def getTile(x, y, zoom, config, logger):
     tilesDir = config.get("maps", "tiles_dir", fallback = "tiles")
     path = os.path.join(tilesDir, str(zoom), str(x), str(y) + '.png')
-    print("Opening: " + path)
+    logger.debug("Opening: " + path)
     tile = QPixmap()
     try:
         tile.load(path)
     except:
-        print("Couldn't open image")
+        logger.debug("Couldn't open image")
     return tile
 
 #-----------------------------------------------------------------------------
 
-def getRoute(dest_lat_deg, dest_lon_deg, config):
+def getRoute(dest_lat_deg, dest_lon_deg, config, logger):
 
     # Home / Start point
     home_lon_deg = config.getfloat("route", "home_longitude",
@@ -319,10 +320,10 @@ def getRoute(dest_lat_deg, dest_lon_deg, config):
 
     request = http.request('GET', url, headers = headers)
 
-    print(request.status)
+    logger.debug(request.status)
 
     data = json.loads(request.data.decode('utf-8'))
-    #print(json.dumps(data, sort_keys=True, indent = 4,
+    #logger.debug(json.dumps(data, sort_keys=True, indent = 4,
     #    separators = (',', ': ')))
 
     try:

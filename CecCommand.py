@@ -8,8 +8,9 @@ class CecCommand(QtCore.QObject):
 
     start = QtCore.pyqtSignal(str)
 
-    def __init__(self):
+    def __init__(self, logger):
         super(CecCommand, self).__init__()
+        self.logger = logger
         self.start.connect(self.run)
 
     def switchOn(self):
@@ -17,7 +18,7 @@ class CecCommand(QtCore.QObject):
 
     @QtCore.pyqtSlot(str)
     def run(self, cecCommand):
-        print('CEC command started:', cecCommand)
+        self.logger.info('CEC command started:', cecCommand)
 
         args = ['cec-client', '-s', '-d', '1']
 
@@ -25,8 +26,8 @@ class CecCommand(QtCore.QObject):
             cec = subprocess.Popen(args, stdin = subprocess.PIPE)
             cec.communicate(input = cecCommand.encode('UTF-8'))
         except OSError as e:
-            print('CEC wakeup failed:', e)
+            self.logger.error('CEC wakeup failed:', e)
         except:
-            print('CEC wakeup failed.')
+            self.logger.error('CEC wakeup failed.')
 
-        print('CEC command finished.')
+        self.logger.info('CEC command finished.')

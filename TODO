@@ -7,7 +7,6 @@ vim: syntax=markdown tw=78 spl=de
 * Symbol für Distanz
 * Symbol für Fahrtdauer
 * Symbol für Brand / Hilfeleistung / etc.
-* logging-Modul verwenden
 * Alarmierte Einheiten in Mittelspalte anzeigen
 * Symbol für Adresse
 * Kritischen Pfad ermitteln

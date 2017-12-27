@@ -3,6 +3,7 @@
 
 import sys
 import configparser
+import logging
 
 import PyQt5.QtWidgets
 
@@ -21,9 +22,28 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read(configFiles)
 
+    logger = logging.getLogger('alarmdisplay')
+
+    logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter('%(asctime)s %(message)s')
+
+    streamHandler = logging.StreamHandler()
+    streamHandler.setLevel(logging.DEBUG)
+    streamHandler.setFormatter(formatter)
+    logger.addHandler(streamHandler)
+
+    logPath = 'alarmdisplay.log'
+    fileHandler = logging.FileHandler(logPath)
+    fileHandler.setLevel(logging.DEBUG)
+    fileHandler.setFormatter(formatter)
+    logger.addHandler(fileHandler)
+
+    logger.info('Starting up...')
+
     app = PyQt5.QtWidgets.QApplication(sys.argv)
 
-    mainWidget = MainWidget.MainWidget(config)
+    mainWidget = MainWidget.MainWidget(config, logger)
     mainWidget.showMaximized()
 
     sys.exit(app.exec_())
