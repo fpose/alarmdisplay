@@ -210,13 +210,21 @@ class MainWidget(QWidget):
         self.processAlarm(lat_deg, lon_deg)
 
     def processAlarm(self, lat_deg, lon_deg):
+        route = ([], None, None)
+        self.logger.info('Destination map...')
+        self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.logger.info('Route map...')
+        self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.logger.info('Maps ready.')
+        QApplication.processEvents()
+
         self.logger.info('Route query...')
         route = getRoute(lat_deg, lon_deg, self.config, self.logger)
         self.logger.info('Destination map...')
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.logger.info('Route map...')
         self.rightMap.setTarget(lat_deg, lon_deg, route)
-        self.logger.info('Maps ready.')
+        self.logger.info('Route ready.')
         QApplication.processEvents()
 
         self.logger.info('Report...')
