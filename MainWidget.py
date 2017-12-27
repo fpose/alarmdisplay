@@ -134,10 +134,10 @@ class MainWidget(QWidget):
         # *KLV 03/124*Hinweis
 
         #  1) Datum/Uhrzeit TT-MM-YY HH:MM:SS
-        #  2) Einheit, Funktion
+        #  2) Einheit, Funktion (RIC)
         #  3+4) Koordinaten
         #  5) Einsatznummer
-        #  6) Einsatzart und Sichwort
+        #  6) Einsatzart und Stichwort
         #  7) Diagnose und Eskalationsstufe
         #  8) Hinweis (Freitext)
         #  9) Stadt
