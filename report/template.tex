@@ -12,53 +12,63 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage{xcolor}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{scrpage2}
 
 \renewcommand\familydefault{\sfdefault}
 
 %-----------------------------------------------------------------------------
 
-\begin{document}
+\newcommand{\alarmreport}[1]{
+
+%\noindent\fcolorbox{red}{gray}{%
+\begin{minipage}[t]{.75\textwidth}
+\Huge
+\textbf{B3 Wohnungsbrand}
+
+Materborner Allee 177, Kleve
+\end{minipage}
+%}
+\hfill
+%\noindent\fcolorbox{red}{gray}{%
+\begin{minipage}[t]{.15\textwidth}
+    \hfill
+    \raisebox{-14mm}{\includegraphics[height=20mm]{../images/wappen-reichswalde.png}}
+\end{minipage}
+%}
+
+\rule{\textwidth}{.5pt}
+
+\begin{tabular}{rp{120mm}}
+Hinweis & \textbf{lt. Pol. 20 Peronen gemeldet}\\
+Objekthinweis & \textbf{Jugendherberge}\\
+Meldender & \textbf{Herr Müller / +49 179 73839876}\\
+Objektplan & \textbf{KLV 02 / 124}\\
+Sondersignal & \textbf{ja}\\
+Alarmierte Einheiten & \raggedright \textbf{%
+FW~KLV~01~LEITER~01, FW~KLV~05~LF10~01, FW~KLV~05~ELW1~01, FW~KLV~02~LF20~01
+}
+\end{tabular}
+
+\vfill
+\includegraphics[width=\textwidth]{#1}
+}
 
 %-----------------------------------------------------------------------------
 
-%\noindent\fcolorbox{red}{gray}{%
-\begin{minipage}[t]{.75\textwidth}
-\Huge
-\textbf{B1 Wohnungsbrand}
+\begin{document}
 
-Materborner Allee 177
-\end{minipage}
-%}
-\hfill
-%\noindent\fcolorbox{red}{gray}{%
-\begin{minipage}[t]{.15\textwidth}
-    \hfill
-    \raisebox{-24mm}{\includegraphics[height=30mm]{../images/wappen-reichswalde.png}}
-\end{minipage}
-%}
+\pagestyle{scrheadings}
+\ofoot{57357}
+\ifoot{2017-12-29 17:43}
 
-\includegraphics[width=\textwidth]{target.png}
+%-----------------------------------------------------------------------------
+
+\alarmreport{target.png}
 
 \newpage
 
-%\noindent\fcolorbox{red}{gray}{%
-\begin{minipage}[t]{.75\textwidth}
-\Huge
-\textbf{B1 Wohnungsbrand}
-
-Materborner Allee 177
-\end{minipage}
-%}
-\hfill
-%\noindent\fcolorbox{red}{gray}{%
-\begin{minipage}[t]{.15\textwidth}
-    \hfill
-    \raisebox{-24mm}{\includegraphics[height=30mm]{../images/wappen-reichswalde.png}}
-\end{minipage}
-%}
-
-\includegraphics[width=\textwidth]{route.png}
+\alarmreport{route.png}
 
 %-----------------------------------------------------------------------------
 
