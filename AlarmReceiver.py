@@ -12,13 +12,18 @@ class AlarmReceiver(QtCore.QObject):
     def receive(self):
         print('Thread started.')
 
-        ser = serial.Serial(
-            port = '/dev/ttyUSB0',
-            baudrate = 9600,
-            parity = serial.PARITY_NONE,
-            stopbits = serial.STOPBITS_ONE,
-            bytesize = serial.EIGHTBITS,
-            timeout = None)
+        try:
+            ser = serial.Serial(
+                port = '/dev/ttyUSB0',
+                baudrate = 9600,
+                parity = serial.PARITY_NONE,
+                stopbits = serial.STOPBITS_ONE,
+                bytesize = serial.EIGHTBITS,
+                timeout = None)
+        except:
+            print('Failed to open port!')
+            self.finished.emit()
+            return
 
         print('Connected to', ser.portstr)
 
