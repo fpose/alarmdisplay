@@ -14,6 +14,7 @@ from RouteWidget import RouteWidget
 from Map import getRoute
 from AlarmReceiver import AlarmReceiver
 from AlarmReport import AlarmReport
+from CecCommand import CecCommand
 
 class MainWidget(QWidget):
 
@@ -121,6 +122,12 @@ class MainWidget(QWidget):
         self.thread.started.connect(self.alarmReceiver.receive)
         self.thread.start()
 
+        self.cecThread = QThread()
+        self.cecThread.start()
+
+        self.cecCommand = CecCommand()
+        self.cecCommand.moveToThread(self.cecThread)
+
         self.report = AlarmReport(self.config)
 
     def receivedAlarm(self, alarm):
@@ -207,17 +214,7 @@ class MainWidget(QWidget):
         self.elapsedTimer.start()
         self.elapsedTimeout()
         print(u'Alarm', self.alarmDateTime)
-
-        args = ['cec-client', '-s', '-d', '1']
-        cecCommand = 'on 0'
-
-        try:
-            cec = subprocess.Popen(args, stdin = subprocess.PIPE)
-            cec.communicate(input = cecCommand.encode('UTF-8'))
-        except OSError as e:
-            print('CEC wakeup failed:', e)
-        except:
-            print('CEC wakeup failed.')
+        self.cecCommand.switchOn()
 
     def elapsedTimeout(self):
         now = QDateTime.currentDateTime()

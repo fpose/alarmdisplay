@@ -6,9 +6,10 @@ vim: syntax=markdown tw=78 spl=de
 * Distant und Dauer in halbtransparenten Boxen anzeigen
 * Symbol für Distanz
 * Symbol für Fahrtdauer
+* Symbol für Brand / Hilfeleistung / etc.
+* logging-Modul verwenden
 * Alarmierte Einheiten in Mittelspalte anzeigen
 * Symbol für Adresse
-* CEC-Auswecken in Thread
 * Kritischen Pfad ermitteln
 * Route in Thread holen
 * Route später über bereits geladene Kacheln zeichnen
