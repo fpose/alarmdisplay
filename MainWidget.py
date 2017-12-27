@@ -187,6 +187,10 @@ class MainWidget(QWidget):
 
         self.startTimer()
         self.msgLabel.setText(text + '\n' + address + '\n' + hinweis)
+        self.leftMap.invalidate()
+        self.rightMap.invalidate()
+        QApplication.processEvents()
+
         route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)
@@ -232,6 +236,10 @@ class MainWidget(QWidget):
         self.startTimer()
         self.msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\n' \
                 u'Jugendherberge')
+        self.leftMap.invalidate()
+        self.rightMap.invalidate()
+        QApplication.processEvents()
+
         lat_deg = 51.78317
         lon_deg = 6.10695
         route = getRoute(lat_deg, lon_deg, self.config)
@@ -242,6 +250,10 @@ class MainWidget(QWidget):
         self.startTimer()
         self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\n' \
                 u'Katze auf Baum')
+        self.leftMap.invalidate()
+        self.rightMap.invalidate()
+        QApplication.processEvents()
+
         lat_deg = 51.75065
         lon_deg = 6.11170
         route = getRoute(lat_deg, lon_deg, self.config)
@@ -252,6 +264,10 @@ class MainWidget(QWidget):
         self.startTimer()
         self.msgLabel.setText(u'B2 Garagenbrand\nSackstraße 173\n' \
                 u'Kfz brennt unter Carport')
+        self.leftMap.invalidate()
+        self.rightMap.invalidate()
+        QApplication.processEvents()
+
         lat_deg = 51.77190
         lon_deg = 6.12305
         route = getRoute(lat_deg, lon_deg, self.config)

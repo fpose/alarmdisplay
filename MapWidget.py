@@ -10,11 +10,14 @@ class MapWidget(QFrame):
     def __init__(self, parent, config):
         super(MapWidget, self).__init__(parent)
 
-        self.pixmap = None
         self.config = config
+        self.invalidate()
 
+    def invalidate(self):
         self.lat_deg = None
         self.lon_deg = None
+        self.route = []
+        self.updateMap()
 
     def setTarget(self, lat_deg, lon_deg, route):
         self.lat_deg = lat_deg

@@ -15,13 +15,15 @@ class RouteWidget(QFrame):
 
         self.config = config
         self.pixmap = None
+        self.invalidate()
 
-        # Destination
+    def invalidate(self):
         self.dest_lat_deg = None
         self.dest_lon_deg = None
         self.route = []
         self.distance = None
         self.duration = None
+        self.updateMap()
 
     def setTarget(self, lat_deg, lon_deg, route):
         self.dest_lat_deg = lat_deg

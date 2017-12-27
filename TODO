@@ -10,7 +10,6 @@ vim: syntax=markdown tw=78 spl=de
 * Symbol für Adresse
 * CEC-Auswecken in Thread
 * Kritischen Pfad ermitteln
-* Zuerst EInsatzstelle anzeigen, dann Process Messages
 * Route in Thread holen
 * Route später über bereits geladene Kacheln zeichnen
 * Basemap ersetzen (langsam)
