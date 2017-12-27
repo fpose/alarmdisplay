@@ -6,7 +6,6 @@ vim: syntax=markdown tw=78 spl=de
 * Distant und Dauer in halbtransparenten Boxen anzeigen
 * Symbol für Distanz
 * Symbol für Fahrtdauer
-* Stunden/Minuten
 * Alarmierte Einheiten in Mittelspalte anzeigen
 * Symbol für Adresse
 * CEC-Auswecken in Thread

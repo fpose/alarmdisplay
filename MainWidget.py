@@ -215,9 +215,15 @@ class MainWidget(QWidget):
         now = QDateTime.currentDateTime()
         diffMs = self.alarmDateTime.msecsTo(now)
         seconds = math.floor(diffMs / 1000)
+        hours = math.floor(seconds / 3600)
+        seconds -= hours * 3600
         minutes = math.floor(seconds / 60)
         seconds -= minutes * 60
-        self.timerLabel.setText(u'%02u:%02u' % (minutes, seconds))
+        if hours > 0:
+            text = u'%u:%02u:%02u' % (hours, minutes, seconds)
+        else:
+            text = u'%u:%02u' % (minutes, seconds)
+        self.timerLabel.setText(text)
 
     def simTimeout(self):
         self.exampleJugend()
