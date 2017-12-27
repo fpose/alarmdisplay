@@ -13,6 +13,7 @@ from MapWidget import MapWidget
 from RouteWidget import RouteWidget
 from Map import getRoute
 from AlarmReceiver import AlarmReceiver
+from AlarmReport import AlarmReport
 
 class MainWidget(QWidget):
 
@@ -120,6 +121,8 @@ class MainWidget(QWidget):
         self.thread.started.connect(self.alarmReceiver.receive)
         self.thread.start()
 
+        self.report = AlarmReport(self.config)
+
     def receivedAlarm(self, alarm):
         print('Received alarm', alarm)
 
@@ -194,6 +197,7 @@ class MainWidget(QWidget):
         route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.report.generate(lat_deg, lon_deg, route)
 
     def resizeEvent(self, event):
         print(event.size())
@@ -245,6 +249,7 @@ class MainWidget(QWidget):
         route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.report.generate(lat_deg, lon_deg, route)
 
     def exampleEngels(self):
         self.startTimer()
@@ -259,6 +264,7 @@ class MainWidget(QWidget):
         route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.report.generate(lat_deg, lon_deg, route)
 
     def exampleSack(self):
         self.startTimer()
@@ -273,3 +279,4 @@ class MainWidget(QWidget):
         route = getRoute(lat_deg, lon_deg, self.config)
         self.leftMap.setTarget(lat_deg, lon_deg, route)
         self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.report.generate(lat_deg, lon_deg, route)
