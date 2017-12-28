@@ -28,6 +28,7 @@ class MainWidget(QWidget):
                 fallback = "images")
 
         self.alarmActive = False
+
         self.elapsedTimer = QTimer(self)
         self.elapsedTimer.setInterval(1000)
         self.elapsedTimer.setSingleShot(False)
@@ -39,6 +40,13 @@ class MainWidget(QWidget):
         self.simTimer.setSingleShot(True)
         self.simTimer.timeout.connect(self.simTimeout)
         #self.simTimer.start()
+
+        self.screenTimer = QTimer(self)
+        screenTimeout = self.config.getint("display", "screen_timeout",
+                fallback = 0)
+        self.screenTimer.setInterval(screenTimeout * 60000)
+        self.screenTimer.setSingleShot(True)
+        self.screenTimer.timeout.connect(self.screenTimeout)
 
         self.logger.info('Setting up X server...')
 
@@ -276,6 +284,10 @@ class MainWidget(QWidget):
 
     def startTimer(self):
         self.alarmDateTime = QDateTime.currentDateTime()
+        self.logger.debug('Screen timeout: %u ms',
+                self.screenTimer.interval())
+        if self.screenTimer.interval() > 0:
+            self.screenTimer.start()
         self.elapsedTimer.start()
         self.elapsedTimeout()
         self.logger.info(u'Alarm at %s', self.alarmDateTime)
@@ -297,6 +309,9 @@ class MainWidget(QWidget):
 
     def simTimeout(self):
         self.exampleJugend()
+
+    def screenTimeout(self):
+        self.cecCommand.switchOff()
 
     def exampleJugend(self):
         self.startTimer()

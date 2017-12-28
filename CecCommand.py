@@ -16,6 +16,9 @@ class CecCommand(QtCore.QObject):
     def switchOn(self):
         self.start.emit('on 0')
 
+    def switchOff(self):
+        self.start.emit('standby 0')
+
     @QtCore.pyqtSlot(str)
     def run(self, cecCommand):
         self.logger.info('CEC command started: %s', cecCommand)
