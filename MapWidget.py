@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtGui import QPainter
+from PyQt5.QtGui import QPainter, QFontMetrics, QColor
+from PyQt5.QtCore import Qt, QPoint
 
 import Map
 
@@ -18,7 +19,12 @@ class MapWidget(QFrame):
         self.lat_deg = None
         self.lon_deg = None
         self.route = []
+        self.objectPlan = None
         self.updateMap()
+
+    def setObjectPlan(self, objectPlan):
+        self.objectPlan = objectPlan
+        self.update()
 
     def setTarget(self, lat_deg, lon_deg, route):
         self.lat_deg = lat_deg
@@ -42,3 +48,14 @@ class MapWidget(QFrame):
         painter = QPainter(self)
         if self.pixmap:
             painter.drawPixmap(0, 0, self.pixmap)
+        margin = 25
+        pad = 10
+        if self.objectPlan:
+            txt = self.objectPlan
+            fm = QFontMetrics(painter.font())
+            rect = fm.boundingRect(txt)
+            rect = fm.boundingRect(rect, 0, txt)
+            rect.adjust(-pad, 0, pad, 0)
+            rect.moveBottomLeft(QPoint(margin, self.height() - margin))
+            painter.fillRect(rect, QColor(255, 255, 255, 192))
+            painter.drawText(rect, Qt.AlignCenter, txt)

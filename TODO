@@ -2,13 +2,13 @@ vim: syntax=markdown tw=78 spl=de
 
 # Anzeige
 
-* Objektnummer in halbtransparenter Box über Zielkarte
+* Symbol für Brand / Hilfeleistung / etc.
+* Symbol für Adresse
 * Symbol für Distanz
 * Symbol für Fahrtdauer
-* Symbol für Brand / Hilfeleistung / etc.
+* Symbol für Objektplan
 * Alarmierte Einheiten in Mittelspalte anzeigen
-* Symbol für Adresse
-* Kritischen Pfad ermitteln
+* Kritischen Pfad ermitteln / Reihenfolge editierbar?
 * Route in einem Thread holen
 * Route später über bereits geladene Kacheln zeichnen
 * Suspend timer

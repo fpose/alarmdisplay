@@ -216,6 +216,7 @@ class MainWidget(QWidget):
             msg += '\n' + hinweis
         self.msgLabel.setText(msg)
         self.leftMap.invalidate()
+        self.leftMap.setObjectPlan(ma.group(13))
         self.rightMap.invalidate()
         QApplication.processEvents()
 
@@ -275,6 +276,7 @@ class MainWidget(QWidget):
         self.titleLabel.setText('B3 Wohnungsbrand')
         self.msgLabel.setText('St.-Anna-Berg 5\nJugendherberge')
         self.leftMap.invalidate()
+        self.leftMap.setObjectPlan('KLV 02/140')
         self.rightMap.invalidate()
         QApplication.processEvents()
 
