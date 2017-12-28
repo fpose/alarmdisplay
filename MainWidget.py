@@ -49,7 +49,7 @@ class MainWidget(QWidget):
 
         self.setWindowTitle('Alarmdisplay')
         self.setStyleSheet("""
-            font-size: 70px;
+            font-size: 60px;
             background-color: rgb(0, 34, 44);
             color: rgb(2, 203, 255);
             font-family: "DejaVu Sans";
@@ -58,10 +58,18 @@ class MainWidget(QWidget):
         verLayout = QVBoxLayout(self)
         verLayout.setContentsMargins(0, 0, 0, 0)
 
+        self.titleLabel = QLabel(self)
+        self.titleLabel.setStyleSheet("""
+            color: white;
+            background-color: rgb(120, 0, 0);
+            padding: 20px;
+            """)
+        verLayout.addWidget(self.titleLabel, 0)
+
         self.msgLabel = QLabel(self)
         self.msgLabel.setStyleSheet("""
-            color: white;
-            background-color: rgb(80, 0, 0);
+            padding: 20px;
+            font-size: 80px;
             """)
         verLayout.addWidget(self.msgLabel, 1)
 
@@ -72,7 +80,7 @@ class MainWidget(QWidget):
         self.leftMap.setStyleSheet("""
             background-color: rgb(80, 80, 0);
             """)
-        horLayout.addWidget(self.leftMap, 2)
+        horLayout.addWidget(self.leftMap, 3)
 
         centerLayout = QVBoxLayout(self)
         horLayout.addLayout(centerLayout, 1)
@@ -95,7 +103,7 @@ class MainWidget(QWidget):
         self.rightMap.setStyleSheet("""
             background-color: rgb(0, 80, 80);
             """)
-        horLayout.addWidget(self.rightMap, 2)
+        horLayout.addWidget(self.rightMap, 3)
 
         self.setLayout(verLayout)
 
@@ -202,7 +210,11 @@ class MainWidget(QWidget):
 
         self.logger.info('Dispatching alarm...')
         self.startTimer()
-        self.msgLabel.setText(text + '\n' + address + '\n' + hinweis)
+        self.titleLabel.setText(text)
+        msg = address
+        if hinweis:
+            msg += '\n' + hinweis
+        self.msgLabel.setText(msg)
         self.leftMap.invalidate()
         self.rightMap.invalidate()
         QApplication.processEvents()
@@ -260,8 +272,8 @@ class MainWidget(QWidget):
 
     def exampleJugend(self):
         self.startTimer()
-        self.msgLabel.setText(u'B3 Wohnungsbrand\nSt.-Anna-Berg 5\n' \
-                u'Jugendherberge')
+        self.titleLabel.setText('B3 Wohnungsbrand')
+        self.msgLabel.setText('St.-Anna-Berg 5\nJugendherberge')
         self.leftMap.invalidate()
         self.rightMap.invalidate()
         QApplication.processEvents()
@@ -272,8 +284,8 @@ class MainWidget(QWidget):
 
     def exampleEngels(self):
         self.startTimer()
-        self.msgLabel.setText(u'H1 Tierrettung\nEngelsstraße 5\n' \
-                u'Katze auf Baum')
+        self.titleLabel.setText('H1 Tierrettung')
+        self.msgLabel.setText('Engelsstraße 5\nKatze auf Baum')
         self.leftMap.invalidate()
         self.rightMap.invalidate()
         QApplication.processEvents()
@@ -284,8 +296,8 @@ class MainWidget(QWidget):
 
     def exampleSack(self):
         self.startTimer()
-        self.msgLabel.setText(u'B2 Garagenbrand\nSackstraße 173\n' \
-                u'Kfz brennt unter Carport')
+        self.titleLabel.setText('B2 Garagenbrand')
+        self.msgLabel.setText('Sackstraße 173\nKfz brennt unter Carport')
         self.leftMap.invalidate()
         self.rightMap.invalidate()
         QApplication.processEvents()
