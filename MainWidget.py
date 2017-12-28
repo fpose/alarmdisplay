@@ -24,6 +24,9 @@ class MainWidget(QWidget):
         self.config = config
         self.logger = logger
 
+        self.imageDir = self.config.get("display", "image_dir",
+                fallback = "images")
+
         self.alarmActive = False
         self.elapsedTimer = QTimer(self)
         self.elapsedTimer.setInterval(1000)
@@ -58,14 +61,26 @@ class MainWidget(QWidget):
         verLayout = QVBoxLayout(self)
         verLayout.setContentsMargins(0, 0, 0, 0)
 
+        titleLayout = QHBoxLayout(self)
+        titleLayout.setSpacing(0)
+
+        self.symbolLabel = QLabel(self)
+        self.symbolLabel.setStyleSheet("""
+            background-color: rgb(120, 0, 0);
+            padding: 10px;
+            """)
+        titleLayout.addWidget(self.symbolLabel, 0)
+
         self.titleLabel = QLabel(self)
         self.titleLabel.setStyleSheet("""
             color: white;
             font-size: 80px;
             background-color: rgb(120, 0, 0);
-            padding: 20px;
+            padding: 10px;
             """)
-        verLayout.addWidget(self.titleLabel, 0)
+        titleLayout.addWidget(self.titleLabel, 1)
+
+        verLayout.addLayout(titleLayout, 0)
 
         self.msgLabel = QLabel(self)
         self.msgLabel.setStyleSheet("""
@@ -88,10 +103,8 @@ class MainWidget(QWidget):
         logoLabel = QLabel(self)
         logo = self.config.get("display", "logo", fallback = None)
         if logo:
-            imageDir = self.config.get("display", "image_dir",
-                    fallback = "images")
             styleSheet = 'image: url({0});'.format( \
-                    os.path.join(imageDir, logo))
+                    os.path.join(self.imageDir, logo))
             logoLabel.setStyleSheet(styleSheet)
         centerLayout.addWidget(logoLabel)
 
@@ -223,6 +236,20 @@ class MainWidget(QWidget):
         self.processAlarm(lat_deg, lon_deg)
 
     def processAlarm(self, lat_deg, lon_deg):
+        image = None
+        if self.titleLabel.text():
+            alarmType = self.titleLabel.text()[0].upper()
+            if alarmType == 'B':
+                image = 'feuer.svg'
+            if alarmType == 'H':
+                image = 'hilfe.svg'
+
+        if image:
+            pixmap = QPixmap(os.path.join(self.imageDir, image))
+        else:
+            pixmap = QPixmap()
+        self.symbolLabel.setPixmap(pixmap)
+
         route = ([], None, None)
         self.logger.info('Destination map...')
         self.leftMap.setTarget(lat_deg, lon_deg, route)
@@ -274,7 +301,8 @@ class MainWidget(QWidget):
     def exampleJugend(self):
         self.startTimer()
         self.titleLabel.setText('B3 Wohnungsbrand')
-        self.msgLabel.setText('St.-Anna-Berg 5\nJugendherberge')
+        self.msgLabel.setText('St.-Anna-Berg 5 (Jugendherberge)\n' \
+            'lt. Betreiber 34 Personen gemeldet')
         self.leftMap.invalidate()
         self.leftMap.setObjectPlan('KLV 02/140')
         self.rightMap.invalidate()
