@@ -3,8 +3,8 @@
 import math
 
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtGui import QPainter
-from PyQt5.QtCore import QRect, Qt
+from PyQt5.QtGui import QPainter, QFontMetrics, QColor
+from PyQt5.QtCore import QRect, Qt, QPoint, QLocale
 
 import Map
 
@@ -52,11 +52,26 @@ class RouteWidget(QFrame):
         if self.pixmap:
             painter.drawPixmap(0, 0, self.pixmap)
         rect = QRect(0, 0, self.width(), self.height())
+        margin = 25
+        pad = 10
         if self.distance:
-            painter.drawText(rect, Qt.AlignLeft | Qt.AlignBottom,
-                    '%.1f km' % (self.distance / 1000))
+            txt = QLocale().toString(self.distance / 1000, 'f', 1) + ' km'
+            fm = QFontMetrics(painter.font())
+            rect = fm.boundingRect(txt)
+            rect = fm.boundingRect(rect, 0, txt)
+            rect.adjust(-pad, 0, pad, 0)
+            rect.moveBottomRight(QPoint(self.width() - margin,
+                self.height() - margin))
+            painter.fillRect(rect, QColor(255, 255, 255, 192))
+            painter.drawText(rect, Qt.AlignCenter, txt)
         if self.duration:
             minutes = math.floor(self.duration / 60)
             seconds = self.duration - minutes * 60
-            painter.drawText(rect, Qt.AlignRight | Qt.AlignBottom,
-                    '%u:%02u min.' % (minutes, seconds))
+            txt = '%u:%02u min.' % (minutes, seconds)
+            fm = QFontMetrics(painter.font())
+            rect = fm.boundingRect(txt)
+            rect = fm.boundingRect(rect, 0, txt)
+            rect.adjust(-pad, 0, pad, 0)
+            rect.moveBottomLeft(QPoint(margin, self.height() - margin))
+            painter.fillRect(rect, QColor(255, 255, 255, 192))
+            painter.drawText(rect, Qt.AlignCenter, txt)

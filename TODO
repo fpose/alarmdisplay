@@ -3,15 +3,17 @@ vim: syntax=markdown tw=78 spl=de
 # Anzeige
 
 * Objektnummer in halbtransparenter Box über Zielkarte
-* Distant und Dauer in halbtransparenten Boxen anzeigen
 * Symbol für Distanz
 * Symbol für Fahrtdauer
 * Symbol für Brand / Hilfeleistung / etc.
 * Alarmierte Einheiten in Mittelspalte anzeigen
 * Symbol für Adresse
 * Kritischen Pfad ermitteln
-* Route in Thread holen
+* Route in einem Thread holen
 * Route später über bereits geladene Kacheln zeichnen
+* Suspend timer
+* EMail-Abfrage / XML auswerten
+* Letzte Einsätze anzeigen
 
 # Alarmdepesche
 
