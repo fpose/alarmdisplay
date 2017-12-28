@@ -231,7 +231,6 @@ class MainWidget(QWidget):
         self.leftMap.invalidate()
         self.leftMap.setObjectPlan(ma.group(13))
         self.rightMap.invalidate()
-        QApplication.processEvents()
 
         self.processAlarm(lat_deg, lon_deg)
 
@@ -249,6 +248,7 @@ class MainWidget(QWidget):
         else:
             pixmap = QPixmap()
         self.symbolLabel.setPixmap(pixmap)
+        QApplication.processEvents()
 
         route = ([], None, None)
         self.logger.info('Destination map...')
@@ -306,7 +306,6 @@ class MainWidget(QWidget):
         self.leftMap.invalidate()
         self.leftMap.setObjectPlan('KLV 02/140')
         self.rightMap.invalidate()
-        QApplication.processEvents()
 
         lat_deg = 51.78317
         lon_deg = 6.10695
@@ -318,7 +317,6 @@ class MainWidget(QWidget):
         self.msgLabel.setText('Engelsstraße 5\nKatze auf Baum')
         self.leftMap.invalidate()
         self.rightMap.invalidate()
-        QApplication.processEvents()
 
         lat_deg = 51.75065
         lon_deg = 6.11170
@@ -330,7 +328,6 @@ class MainWidget(QWidget):
         self.msgLabel.setText('Sackstraße 173\nKfz brennt unter Carport')
         self.leftMap.invalidate()
         self.rightMap.invalidate()
-        QApplication.processEvents()
 
         lat_deg = 51.77190
         lon_deg = 6.12305
