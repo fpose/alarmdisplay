@@ -61,6 +61,7 @@ class MainWidget(QWidget):
         self.titleLabel = QLabel(self)
         self.titleLabel.setStyleSheet("""
             color: white;
+            font-size: 80px;
             background-color: rgb(120, 0, 0);
             padding: 20px;
             """)
@@ -69,7 +70,6 @@ class MainWidget(QWidget):
         self.msgLabel = QLabel(self)
         self.msgLabel.setStyleSheet("""
             padding: 20px;
-            font-size: 80px;
             """)
         verLayout.addWidget(self.msgLabel, 1)
 
