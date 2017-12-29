@@ -37,8 +37,9 @@ class RouteWidget(QFrame):
     def updateMap(self):
         if not self.dest_lat_deg or not self.dest_lon_deg:
             self.pixmap = None
+            self.markerRects = []
         else:
-            self.pixmap = Map.getRoutePixmap( \
+            self.pixmap, self.markerRects = Map.getRoutePixmap( \
                     self.dest_lat_deg, self.dest_lon_deg,
                     self.contentsRect().width(), self.contentsRect().height(),
                     self.route, self.config, self.logger)
@@ -63,6 +64,8 @@ class RouteWidget(QFrame):
             rect.adjust(-pad, 0, pad, 0)
             rect.moveBottomRight(QPoint(self.width() - margin,
                 self.height() - margin))
+            if self.intersectsMarkers(rect):
+                rect.moveTopRight(QPoint(self.width() - margin, margin))
             painter.fillRect(rect, QColor(255, 255, 255, 192))
             painter.drawText(rect, Qt.AlignCenter, txt)
         if self.duration:
@@ -74,5 +77,14 @@ class RouteWidget(QFrame):
             rect = fm.boundingRect(rect, 0, txt)
             rect.adjust(-pad, 0, pad, 0)
             rect.moveBottomLeft(QPoint(margin, self.height() - margin))
+            if self.intersectsMarkers(rect):
+                rect.moveTopLeft(QPoint(margin, margin))
             painter.fillRect(rect, QColor(255, 255, 255, 192))
             painter.drawText(rect, Qt.AlignCenter, txt)
+
+    def intersectsMarkers(self, rect):
+        for markerRect in self.markerRects:
+            if markerRect.intersects(rect):
+                return True
+        return False
+

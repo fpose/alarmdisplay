@@ -224,6 +224,8 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     painter.setPen(pen)
     painter.drawPolyline(poly)
 
+    markerRects = []
+
     marker = QPixmap()
 
     imageDir = config.get("display", "image_dir", fallback = "images")
@@ -234,7 +236,10 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     coord = totProj(home_lon_deg, home_lat_deg)
     px = np.array(coord) / mpp
     pos = QPoint(originX + px[0], originY + totHeight - px[1])
-    painter.drawPixmap(pos - markerOffset, marker)
+    markerPos = pos - markerOffset
+    painter.drawPixmap(markerPos, marker)
+    markerRect = QRect(markerPos, marker.size())
+    markerRects.append(markerRect)
 
     marker.load(os.path.join(imageDir, config.get("maps",
         "destination_marker", fallback = "marker1.png")))
@@ -242,11 +247,14 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     coord = totProj(dest_lon_deg, dest_lat_deg)
     px = np.array(coord) / mpp
     pos = QPoint(originX + px[0], originY + totHeight - px[1])
-    painter.drawPixmap(pos - markerOffset, marker)
+    markerPos = pos - markerOffset
+    painter.drawPixmap(markerPos, marker)
+    markerRect = QRect(markerPos, marker.size())
+    markerRects.append(markerRect)
 
     painter.end()
 
-    return pixmap
+    return pixmap, markerRects
 
 #-----------------------------------------------------------------------------
 

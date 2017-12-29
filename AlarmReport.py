@@ -18,7 +18,7 @@ class AlarmReport:
                 route[0], self.config, self.logger)
         targetPixmap.save('/tmp/target.png')
 
-        routePixmap = Map.getRoutePixmap(lat_deg, lon_deg,
+        routePixmap, markerRects = Map.getRoutePixmap(lat_deg, lon_deg,
                 self.map_width, self.map_height,
                 route[0], self.config, self.logger)
         routePixmap.save('/tmp/route.png')
