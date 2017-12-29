@@ -3,6 +3,7 @@ syntax: glob
 **.swp
 __pycache__
 alarmdisplay.conf
+alarmdisplay.log
 report/*.aux
 report/*.log
 report/template.pdf
