@@ -90,11 +90,39 @@ class MainWidget(QWidget):
 
         verLayout.addLayout(titleLayout, 0)
 
-        self.msgLabel = QLabel(self)
-        self.msgLabel.setStyleSheet("""
-            padding: 20px;
+        locationLayout = QHBoxLayout(self)
+        locationLayout.setSpacing(0)
+
+        self.locationSymbolLabel = QLabel(self)
+        self.locationSymbolLabel.setStyleSheet("""
+            padding: 10px;
             """)
-        verLayout.addWidget(self.msgLabel, 1)
+        locationLayout.addWidget(self.locationSymbolLabel, 0)
+
+        self.locationLabel = QLabel(self)
+        self.locationLabel.setStyleSheet("""
+            padding: 10px;
+            """)
+        locationLayout.addWidget(self.locationLabel, 1)
+
+        verLayout.addLayout(locationLayout, 0)
+
+        attentionLayout = QHBoxLayout(self)
+        attentionLayout.setSpacing(0)
+
+        self.attentionSymbolLabel = QLabel(self)
+        self.attentionSymbolLabel.setStyleSheet("""
+            padding: 10px;
+            """)
+        attentionLayout.addWidget(self.attentionSymbolLabel, 0)
+
+        self.attentionLabel = QLabel(self)
+        self.attentionLabel.setStyleSheet("""
+            padding: 10px;
+            """)
+        attentionLayout.addWidget(self.attentionLabel, 1)
+
+        verLayout.addLayout(attentionLayout, 0)
 
         horLayout = QHBoxLayout(self)
         verLayout.addLayout(horLayout, 2)
@@ -144,6 +172,12 @@ class MainWidget(QWidget):
         action.setShortcut(QKeySequence("3"))
         action.setShortcutContext(Qt.ApplicationShortcut)
         action.triggered.connect(self.exampleSack)
+        self.addAction(action)
+
+        action = QAction(self)
+        action.setShortcut(QKeySequence("4"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleWolfsgraben)
         self.addAction(action)
 
         self.thread = QThread()
@@ -232,10 +266,8 @@ class MainWidget(QWidget):
         self.logger.info('Dispatching alarm...')
         self.startTimer()
         self.titleLabel.setText(text)
-        msg = address
-        if hinweis:
-            msg += '\n' + hinweis
-        self.msgLabel.setText(msg)
+        self.locationLabel.setText(address)
+        self.attentionLabel.setText(hinweis)
         self.leftMap.invalidate()
         self.leftMap.setObjectPlan(ma.group(13))
         self.rightMap.invalidate()
@@ -256,6 +288,22 @@ class MainWidget(QWidget):
         else:
             pixmap = QPixmap()
         self.symbolLabel.setPixmap(pixmap)
+        if self.locationLabel.text():
+            pixmap = QPixmap(os.path.join(self.imageDir, 'go-home.svg'))
+        else:
+            pixmap = QPixmap()
+        self.locationSymbolLabel.setPixmap(pixmap)
+        if self.attentionLabel.text():
+            pixmap = QPixmap(os.path.join(self.imageDir,
+                        'emblem-important.svg'))
+            self.attentionSymbolLabel.setPixmap(pixmap)
+            self.attentionSymbolLabel.show()
+            self.attentionLabel.show()
+        else:
+            pixmap = QPixmap()
+            self.attentionSymbolLabel.setPixmap(pixmap)
+            self.attentionSymbolLabel.hide()
+            self.attentionLabel.hide()
         QApplication.processEvents()
 
         route = ([], None, None)
@@ -316,8 +364,8 @@ class MainWidget(QWidget):
     def exampleJugend(self):
         self.startTimer()
         self.titleLabel.setText('B3 Wohnungsbrand')
-        self.msgLabel.setText('St.-Anna-Berg 5 (Jugendherberge)\n' \
-            'lt. Betreiber 34 Personen gemeldet')
+        self.locationLabel.setText('St.-Anna-Berg 5 (Jugendherberge)')
+        self.attentionLabel.setText('lt. Betreiber 34 Personen gemeldet')
         self.leftMap.invalidate()
         self.leftMap.setObjectPlan('KLV 02/140')
         self.rightMap.invalidate()
@@ -329,7 +377,8 @@ class MainWidget(QWidget):
     def exampleEngels(self):
         self.startTimer()
         self.titleLabel.setText('H1 Tierrettung')
-        self.msgLabel.setText('Engelsstraße 5\nKatze auf Baum')
+        self.locationLabel.setText('Engelsstraße 5')
+        self.attentionLabel.setText('Katze auf Baum')
         self.leftMap.invalidate()
         self.rightMap.invalidate()
 
@@ -340,10 +389,23 @@ class MainWidget(QWidget):
     def exampleSack(self):
         self.startTimer()
         self.titleLabel.setText('B2 Garagenbrand')
-        self.msgLabel.setText('Sackstraße 173\nKfz brennt unter Carport')
+        self.locationLabel.setText('Sackstraße 173')
+        self.attentionLabel.setText('Kfz brennt unter Carport')
         self.leftMap.invalidate()
         self.rightMap.invalidate()
 
         lat_deg = 51.77190
         lon_deg = 6.12305
+        self.processAlarm(lat_deg, lon_deg)
+
+    def exampleWolfsgraben(self):
+        self.startTimer()
+        self.titleLabel.setText('B2 Kaminbrand')
+        self.locationLabel.setText('Wolfsgraben 11')
+        self.attentionLabel.setText('')
+        self.leftMap.invalidate()
+        self.rightMap.invalidate()
+
+        lat_deg = 51.75638
+        lon_deg = 6.11815
         self.processAlarm(lat_deg, lon_deg)
