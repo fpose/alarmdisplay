@@ -6,4 +6,6 @@ alarmdisplay.conf
 alarmdisplay.log
 report/*.aux
 report/*.log
+report/route.png
+report/target.png
 report/template.pdf
