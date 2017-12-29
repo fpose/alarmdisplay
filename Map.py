@@ -286,7 +286,7 @@ def getRoute(dest_lat_deg, dest_lon_deg, config, logger):
         'instructions=false&'.format(home_lon_deg, home_lat_deg, \
             dest_lon_deg, dest_lat_deg, api_key)
 
-    request = http.request('GET', url, headers = headers)
+    request = http.request('GET', url, headers = headers, timeout = 5.0)
 
     logger.debug('Status %u', request.status)
 
