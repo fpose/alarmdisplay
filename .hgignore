@@ -2,6 +2,7 @@ syntax: glob
 
 **.swp
 __pycache__
+alarm*.pdf
 alarmdisplay.conf
 alarmdisplay.log
 report/*.aux
