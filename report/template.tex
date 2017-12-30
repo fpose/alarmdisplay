@@ -24,30 +24,42 @@ cheetahVarStartToken = @
 %\noindent\fcolorbox{red}{gray}{%
 \begin{minipage}[t]{.75\textwidth}
 \Huge
-\textbf{B3 Wohnungsbrand}
+\textbf{@title}
 
-Materborner Allee 177, Kleve
+@address
 \end{minipage}
 %}
 \hfill
 %\noindent\fcolorbox{red}{gray}{%
 \begin{minipage}[t]{.15\textwidth}
     \hfill
-    \raisebox{-14mm}{\includegraphics[height=20mm]{wappen-reichswalde.png}}
+    \raisebox{-12mm}{\includegraphics[height=18mm]{wappen-reichswalde.png}}
 \end{minipage}
 %}
 
 \rule{\textwidth}{.5pt}
 
 \begin{tabular}{rp{120mm}}
-Hinweis & \textbf{lt. Pol. 20 Peronen gemeldet}\\
-Objekthinweis & \textbf{Jugendherberge}\\
-Meldender & \textbf{Herr Müller / +49 179 73839876}\\
-Objektplan & \textbf{KLV 02 / 124}\\
-Sondersignal & \textbf{ja}\\
+#if @location_hint
+Objekthinweis & \textbf{@location_hint}\\
+#end if
+#if @object_plan
+Objektplan & \textbf{@object_plan}\\
+#end if
+#if @attention
+Hinweis & \textbf{@attention}\\
+#end if
+#if @contact
+Meldender & \textbf{@contact}\\
+#end if
+#if @signal
+Sondersignal & \textbf{@signal}\\
+#end if
+#if @resources
 Alarmierte Einheiten & \raggedright \textbf{%
-FW~KLV~01~LEITER~01, FW~KLV~05~LF10~01, FW~KLV~05~ELW1~01, FW~KLV~02~LF20~01
+@resources%
 }
+#end if
 \end{tabular}
 
 \vfill
@@ -59,8 +71,8 @@ FW~KLV~01~LEITER~01, FW~KLV~05~LF10~01, FW~KLV~05~ELW1~01, FW~KLV~02~LF20~01
 \begin{document}
 
 \pagestyle{scrheadings}
-\ofoot{57357}
-\ifoot{2017-12-29 17:43}
+\ofoot{@number}
+\ifoot{@datetime}
 
 %-----------------------------------------------------------------------------
 

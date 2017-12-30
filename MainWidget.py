@@ -3,7 +3,6 @@
 import os
 import math
 import subprocess
-import re
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -15,6 +14,7 @@ from Map import getRoute
 from AlarmReceiver import AlarmReceiver
 from AlarmReport import AlarmReport
 from CecCommand import CecCommand
+from Alarm import Alarm, EinsatzMittel
 
 class MainWidget(QWidget):
 
@@ -181,6 +181,12 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleWolfsgraben)
         self.addAction(action)
 
+        action = QAction(self)
+        action.setShortcut(QKeySequence("5"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleWaldfee)
+        self.addAction(action)
+
         self.thread = QThread()
         self.alarmReceiver = AlarmReceiver(self.logger)
         self.alarmReceiver.receivedAlarm.connect(self.receivedAlarm)
@@ -199,101 +205,39 @@ class MainWidget(QWidget):
 
         self.logger.info('Setup finished.')
 
-    def receivedAlarm(self, alarm):
-        self.logger.info('Received alarm: %s', repr(alarm))
+    def receivedAlarm(self, pagerStr):
+        self.logger.info('Received alarm: %s', repr(pagerStr))
 
-        alarm = alarm.decode('latin1')
-
-        # '16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung
-        # #K01;N5174110E0608130; *57274*H1 Hilfeleistung*
-        # Holla die Waldfee*Kleve*Reichswalde*Grunewaldstrasse*
-        # *KLV 03/124*Hinweis
-
-        #  1) Datum/Uhrzeit TT-MM-YY HH:MM:SS
-        #  2) Einheit, Funktion (RIC)
-        #  3+4) Koordinaten
-        #  5) Einsatznummer
-        #  6) Einsatzart und Stichwort
-        #  7) Diagnose und Eskalationsstufe
-        #  8) Hinweis (Freitext)
-        #  9) Stadt
-        # 10) Ortsteil
-        # 11) Straße
-        # 12) Hausnummer
-        # 13) Objektplan
-        # 14) Ortshinweis
-        regex = \
-                '(\d+-\d+-\d+ \d+:\d+:\d+)\s+' \
-                '(.*)\s*' \
-                '#K01;N(\d+)E(\d+);\s*\*' \
-                '(.*)\*' \
-                '(..)\s+' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)'
-        alarmRe = re.compile(regex)
-        ma = alarmRe.match(alarm)
-        if not ma:
-            self.logger.warn('Alarmtext nicht erkannt!')
-            return
-
-        self.logger.debug(ma.groups())
-        datetime = QDateTime.fromString(ma.group(1), 'dd-MM-yy hh:mm:ss')
-        datetime = datetime.addYears(100)
-        self.logger.debug('Date %s', datetime)
-        einheit = ma.group(2).strip()
-        coord = ma.group(3)
-        coord = coord[:2] + '.' + coord[2:]
-        lat_deg = float(coord)
-        coord = ma.group(4)
-        coord = coord[:2] + '.' + coord[2:]
-        lon_deg = float(coord)
-        self.logger.debug('Coordinates: lon=%f lat=%f', lon_deg, lat_deg)
-        text = ma.group(6) + ' ' + ma.group(7)
-        address = ma.group(11)
-        housenumber = ma.group(12)
-        if housenumber:
-            address += ' ' + housenumber
-        ortshinweis = ma.group(14)
-        if ortshinweis:
-            address += ' (' + ortshinweis + ')'
-        hinweis = ma.group(8)
-
-        self.logger.info('Dispatching alarm...')
         self.startTimer()
-        self.titleLabel.setText(text)
-        self.locationLabel.setText(address)
-        self.attentionLabel.setText(hinweis)
-        self.leftMap.invalidate()
-        self.leftMap.setObjectPlan(ma.group(13))
-        self.rightMap.invalidate()
 
-        self.processAlarm(lat_deg, lon_deg)
+        alarm = Alarm(self.config)
+        alarm.fromPager(pagerStr, self.logger)
 
-    def processAlarm(self, lat_deg, lon_deg):
+        self.processAlarm(alarm)
+
+    def processAlarm(self, alarm):
+        self.titleLabel.setText(alarm.title())
+
         image = None
-        if self.titleLabel.text():
-            alarmType = self.titleLabel.text()[0].upper()
-            if alarmType == 'B':
-                image = 'feuer.svg'
-            if alarmType == 'H':
-                image = 'hilfe.svg'
-
+        alarmType = alarm.art.upper()
+        if alarmType == 'B':
+            image = 'feuer.svg'
+        if alarmType == 'H':
+            image = 'hilfe.svg'
         if image:
             pixmap = QPixmap(os.path.join(self.imageDir, image))
         else:
             pixmap = QPixmap()
         self.symbolLabel.setPixmap(pixmap)
+
+        self.locationLabel.setText(alarm.location())
         if self.locationLabel.text():
             pixmap = QPixmap(os.path.join(self.imageDir, 'go-home.svg'))
         else:
             pixmap = QPixmap()
         self.locationSymbolLabel.setPixmap(pixmap)
+
+        self.attentionLabel.setText(alarm.attention())
         if self.attentionLabel.text():
             pixmap = QPixmap(os.path.join(self.imageDir,
                         'emblem-important.svg'))
@@ -305,27 +249,33 @@ class MainWidget(QWidget):
             self.attentionSymbolLabel.setPixmap(pixmap)
             self.attentionSymbolLabel.hide()
             self.attentionLabel.hide()
+
+        self.leftMap.invalidate()
+        self.leftMap.setObjectPlan(alarm.objektnummer)
+
+        self.rightMap.invalidate()
+
         QApplication.processEvents()
 
         route = ([], None, None)
         self.logger.info('Destination map...')
-        self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.leftMap.setTarget(alarm.lat, alarm.lon, route)
         self.logger.info('Route map...')
-        self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.rightMap.setTarget(alarm.lat, alarm.lon, route)
         self.logger.info('Maps ready.')
         QApplication.processEvents()
 
         self.logger.info('Route query...')
-        route = getRoute(lat_deg, lon_deg, self.config, self.logger)
+        route = getRoute(alarm.lat, alarm.lon, self.config, self.logger)
         self.logger.info('Destination map...')
-        self.leftMap.setTarget(lat_deg, lon_deg, route)
+        self.leftMap.setTarget(alarm.lat, alarm.lon, route)
         self.logger.info('Route map...')
-        self.rightMap.setTarget(lat_deg, lon_deg, route)
+        self.rightMap.setTarget(alarm.lat, alarm.lon, route)
         self.logger.info('Route ready.')
         QApplication.processEvents()
 
         self.logger.info('Report...')
-        self.report.generate(lat_deg, lon_deg, route)
+        self.report.generate(alarm, route)
         self.logger.info('Finished.')
 
     def resizeEvent(self, event):
@@ -364,49 +314,82 @@ class MainWidget(QWidget):
 
     def exampleJugend(self):
         self.startTimer()
-        self.titleLabel.setText('B3 Wohnungsbrand')
-        self.locationLabel.setText('St.-Anna-Berg 5 (Jugendherberge)')
-        self.attentionLabel.setText('lt. Betreiber 34 Personen gemeldet')
-        self.leftMap.invalidate()
-        self.leftMap.setObjectPlan('KLV 02/140')
-        self.rightMap.invalidate()
 
-        lat_deg = 51.78317
-        lon_deg = 6.10695
-        self.processAlarm(lat_deg, lon_deg)
+        alarm = Alarm(self.config)
+        alarm.art = 'B'
+        alarm.stichwort = '3'
+        alarm.diagnose = 'Wohnungsbrand'
+        alarm.strasse = 'St.-Anna-Berg'
+        alarm.ort = 'Kleve'
+        alarm.hausnummer = '5'
+        alarm.objektname = 'Jugendherberge'
+        alarm.besonderheit = 'lt. Betreiber 34 Personen gemeldet'
+        alarm.objektnummer = 'KLV 02/140'
+        alarm.lat = 51.78317
+        alarm.lon = 6.10695
+
+        self.processAlarm(alarm)
 
     def exampleEngels(self):
         self.startTimer()
-        self.titleLabel.setText('H1 Tierrettung')
-        self.locationLabel.setText('Engelsstraße 5')
-        self.attentionLabel.setText('Katze auf Baum')
-        self.leftMap.invalidate()
-        self.rightMap.invalidate()
 
-        lat_deg = 51.75065
-        lon_deg = 6.11170
-        self.processAlarm(lat_deg, lon_deg)
+        alarm = Alarm(self.config)
+        alarm.art = 'H'
+        alarm.stichwort = '1'
+        alarm.diagnose = 'Tierrettung'
+        alarm.strasse = 'Engelsstraße'
+        alarm.hausnummer = '5'
+        alarm.ort = 'Kleve'
+        alarm.besonderheit = 'Katze auf Baum'
+        alarm.lat = 51.75065
+        alarm.lon = 6.11170
+
+        self.processAlarm(alarm)
 
     def exampleSack(self):
         self.startTimer()
-        self.titleLabel.setText('B2 Garagenbrand')
-        self.locationLabel.setText('Sackstraße 173')
-        self.attentionLabel.setText('Kfz brennt unter Carport')
-        self.leftMap.invalidate()
-        self.rightMap.invalidate()
 
-        lat_deg = 51.77190
-        lon_deg = 6.12305
-        self.processAlarm(lat_deg, lon_deg)
+        alarm = Alarm(self.config)
+        alarm.art = 'B'
+        alarm.stichwort = '2'
+        alarm.diagnose = 'Garagenbrand'
+        alarm.strasse = 'Sackstraße'
+        alarm.hausnummer = '173'
+        alarm.ort = 'Kleve'
+        alarm.besonderheit = 'Kfz brennt unter Carport'
+        alarm.lat = 51.77190
+        alarm.lon = 6.12305
+
+        self.processAlarm(alarm)
 
     def exampleWolfsgraben(self):
         self.startTimer()
-        self.titleLabel.setText('B2 Kaminbrand')
-        self.locationLabel.setText('Wolfsgraben 11')
-        self.attentionLabel.setText('')
-        self.leftMap.invalidate()
-        self.rightMap.invalidate()
 
-        lat_deg = 51.75638
-        lon_deg = 6.11815
-        self.processAlarm(lat_deg, lon_deg)
+        alarm = Alarm(self.config)
+        alarm.art = 'B'
+        alarm.stichwort = '2'
+        alarm.diagnose = 'Kaminbrand'
+        alarm.strasse = 'Wolfsgraben'
+        alarm.hausnummer = '11'
+        alarm.ort = 'Kleve'
+        alarm.lat = 51.75638
+        alarm.lon = 6.11815
+        em = EinsatzMittel()
+        em.org = 'FW'
+        em.ort = 'KLV'
+        em.zusatz = '05'
+        em.typ = 'LF10'
+        em.kennung = '1'
+        alarm.einsatzmittel.append(em)
+
+        self.processAlarm(alarm)
+
+    def exampleWaldfee(self):
+        pagerStr = r'16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung #K01;N5173170E0606900; *57274*H1 Hilfeleistung*Von draussen vom Walde komm ich her*Kleve*Reichswalde*Grunewaldstrasse***Waldweg C'
+
+        self.startTimer()
+
+        alarm = Alarm(self.config)
+        alarm.fromPager(pagerStr, self.logger)
+
+        self.processAlarm(alarm)

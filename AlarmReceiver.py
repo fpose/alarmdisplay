@@ -37,11 +37,10 @@ class AlarmReceiver(QtCore.QObject):
 
         while run:
             c = ser.read()
-            #print(repr(c))
             bytesReceived += 1
             if c == b'\x00':
-                #print('Complete: ', repr(data), bytesReceived)
-                self.receivedAlarm.emit(data)
+                pagerStr = data.decode('latin1')
+                self.receivedAlarm.emit(pagerStr)
                 data = b''
             else:
                 data += c

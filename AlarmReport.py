@@ -27,22 +27,52 @@ class AlarmReport:
         self.template = templateFile.read()
         templateFile.close()
 
-    def generate(self, lat_deg, lon_deg, route):
+    def generate(self, alarm, route):
 
         tempDir = tempfile.mkdtemp(prefix = 'alarm-')
 
-        targetPixmap = Map.getTargetPixmap(lat_deg, lon_deg,
+        targetPixmap = Map.getTargetPixmap(alarm.lat, alarm.lon,
                 self.map_width, self.map_height,
                 route[0], self.config, self.logger)
         targetPixmap.save(os.path.join(tempDir, 'target.png'))
 
-        routePixmap, markerRects = Map.getRoutePixmap(lat_deg, lon_deg,
+        routePixmap, markerRects = Map.getRoutePixmap(alarm.lat, alarm.lon,
                 self.map_width, self.map_height,
                 route[0], self.config, self.logger)
         routePixmap.save(os.path.join(tempDir, 'route.png'))
 
+        # Lokale Einheiten
+        einheit = {
+            u'01': u'LZ Kleve',
+            u'02': u'LZ Materborn',
+            u'03': u'LZ Kellen',
+            u'04': u'LZ Rindern',
+            u'05': u'LG Reichswalde',
+            u'06': u'LG Donsbrüggen',
+            u'07': u'LG Wardhausen-Brienen',
+            u'08': u'LG Griethausen',
+            u'09': u'LG Düffelward',
+            u'10': u'LG Keeken',
+            u'11': u'LG Schenkenschanz',
+            u'12': u'LG Warbeyen'
+            }
+
         variables = {}
-        # TODO fill
+        variables['title'] = alarm.title()
+        variables['address'] = alarm.address()
+        variables['attention'] = alarm.attention()
+        variables['location_hint'] = alarm.objektname
+        variables['contact'] = alarm.meldender
+        variables['object_plan'] = alarm.objektnummer
+        variables['signal'] = alarm.sondersignal
+        variables['resources'] = alarm.einheiten(einheit,
+                lambda x: False, self.logger)
+        if alarm.datetime:
+            variables['datetime'] = \
+                alarm.datetime.strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            variables['datetime'] = ''
+        variables['number'] = alarm.number
 
         try:
             templateOutput = Template(self.template, searchList = variables)

@@ -6,6 +6,7 @@ vim: syntax=markdown tw=78 spl=de
 * Symbol für Distanz
 * Symbol für Fahrtdauer
 * Symbol für Objektplan
+* Symbol für Wegerechte
 * Alarmierte Einheiten in Mittelspalte anzeigen
 * Kritischen Pfad ermitteln / Reihenfolge editierbar?
 * Route in einem Thread holen
@@ -16,7 +17,6 @@ vim: syntax=markdown tw=78 spl=de
 # Alarmdepesche
 
 * Drucker aufwecken
-* LaTeX-Template füllen
 
 # Administration
 
