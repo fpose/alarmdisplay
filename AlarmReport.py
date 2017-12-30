@@ -25,7 +25,6 @@ class AlarmReport:
         templatePath = os.path.join(templateDir, 'template.tex')
         templateFile = codecs.open(templatePath, encoding="utf-8", mode = 'r')
         self.template = templateFile.read()
-        self.logger.debug(repr(self.template))
         templateFile.close()
 
     def generate(self, lat_deg, lon_deg, route):
