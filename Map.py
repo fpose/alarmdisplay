@@ -139,17 +139,19 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     home_lat_deg = config.getfloat("route", "home_latitude",
             fallback = 51.76059)
 
-    min_lon_deg = min(home_lon_deg, dest_lon_deg)
-    max_lon_deg = max(home_lon_deg, dest_lon_deg)
-    lon_diff = (max_lon_deg - min_lon_deg) * 1.2
-
-    min_lat_deg = min(home_lat_deg, dest_lat_deg)
-    max_lat_deg = max(home_lat_deg, dest_lat_deg)
-    lat_diff = (max_lat_deg - min_lat_deg) * 1.8 # FIXME cos()
-
     # mean shall be center
     lat_deg = (home_lat_deg + dest_lat_deg) / 2
     lon_deg = (home_lon_deg + dest_lon_deg) / 2
+    lat_cos = math.cos(math.radians(lat_deg))
+
+    marginFactor = 1.3
+    min_lon_deg = min(home_lon_deg, dest_lon_deg)
+    max_lon_deg = max(home_lon_deg, dest_lon_deg)
+    lon_diff = (max_lon_deg - min_lon_deg) * marginFactor
+
+    min_lat_deg = min(home_lat_deg, dest_lat_deg)
+    max_lat_deg = max(home_lat_deg, dest_lat_deg)
+    lat_diff = (max_lat_deg - min_lat_deg) * marginFactor / lat_cos
 
     min_x_tiles = math.ceil(width / tileDim) + 1
     min_y_tiles = math.ceil(height / tileDim) + 1
