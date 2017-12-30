@@ -119,6 +119,7 @@ class MainWidget(QWidget):
         self.attentionLabel = QLabel(self)
         self.attentionLabel.setStyleSheet("""
             padding: 10px;
+            font-size: 40px;
             """)
         attentionLayout.addWidget(self.attentionLabel, 1)
 
@@ -129,7 +130,7 @@ class MainWidget(QWidget):
 
         self.leftMap = MapWidget(self, self.config, self.logger)
         self.leftMap.setStyleSheet("""
-            background-color: rgb(80, 80, 0);
+            font-size: 40px;
             """)
         horLayout.addWidget(self.leftMap, 3)
 
@@ -150,7 +151,7 @@ class MainWidget(QWidget):
 
         self.rightMap = RouteWidget(self, self.config, self.logger)
         self.rightMap.setStyleSheet("""
-            background-color: rgb(0, 80, 80);
+            font-size: 40px;
             """)
         horLayout.addWidget(self.rightMap, 3)
 
