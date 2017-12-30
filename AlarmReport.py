@@ -8,6 +8,7 @@ import subprocess
 import shutil
 
 import Map
+from LaTeX import escapeLaTeX
 
 class AlarmReport:
 
@@ -41,7 +42,7 @@ class AlarmReport:
                 route[0], self.config, self.logger)
         routePixmap.save(os.path.join(tempDir, 'route.png'))
 
-        # Lokale Einheiten
+        # Lokale Einheiten FIXME config
         einheit = {
             u'01': u'LZ Kleve',
             u'02': u'LZ Materborn',
@@ -58,21 +59,21 @@ class AlarmReport:
             }
 
         variables = {}
-        variables['title'] = alarm.title()
-        variables['address'] = alarm.address()
-        variables['attention'] = alarm.attention()
-        variables['location_hint'] = alarm.objektname
-        variables['contact'] = alarm.meldender
-        variables['object_plan'] = alarm.objektnummer
-        variables['signal'] = alarm.sondersignal
-        variables['resources'] = alarm.einheiten(einheit,
-                lambda x: False, self.logger)
+        variables['title'] = escapeLaTeX(alarm.title())
+        variables['address'] = escapeLaTeX(alarm.address())
+        variables['attention'] = escapeLaTeX(alarm.attention())
+        variables['location_hint'] = escapeLaTeX(alarm.objektname)
+        variables['contact'] = escapeLaTeX(alarm.meldender)
+        variables['object_plan'] = escapeLaTeX(alarm.objektnummer)
+        variables['signal'] = escapeLaTeX(alarm.sondersignal)
+        variables['resources'] = escapeLaTeX(alarm.einheiten(einheit,
+                lambda x: False, self.logger))
         if alarm.datetime:
             variables['datetime'] = \
                 alarm.datetime.strftime('%Y-%m-%d %H:%M:%S')
         else:
             variables['datetime'] = ''
-        variables['number'] = alarm.number
+        variables['number'] = escapeLaTeX(alarm.number)
 
         try:
             templateOutput = Template(self.template, searchList = variables)
