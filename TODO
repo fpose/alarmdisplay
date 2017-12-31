@@ -9,9 +9,13 @@ vim: syntax=markdown tw=78 spl=de
 * Symbol für Wegerechte
 * Alarmierte Einheiten in Mittelspalte anzeigen
 * Kritischen Pfad ermitteln / Reihenfolge editierbar?
-* Route in einem Thread holen
 * Route später über bereits geladene Kacheln zeichnen
-* EMail-Abfrage / XML auswerten
+
+# Alarmierung
+
+* Route asynchron holen
+* Einsätze anhand von eMails und Pager kombinieren
+* EMail-Abfrage / IMAP-Idle
 * Letzte Einsätze anzeigen
 
 # Alarmdepesche
