@@ -13,7 +13,6 @@ vim: syntax=markdown tw=78 spl=de
 # Alarmierung
 
 * Route asynchron holen
-* Einsätze anhand von eMails und Pager kombinieren
 * EMail-Abfrage / IMAP-Idle
 * Letzte Einsätze anzeigen
 

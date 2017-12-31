@@ -27,7 +27,8 @@ class MainWidget(QWidget):
         self.imageDir = self.config.get("display", "image_dir",
                 fallback = "images")
 
-        self.alarmActive = False
+        self.alarmDict = {}
+        self.currentAlarm = None
 
         self.elapsedTimer = QTimer(self)
         self.elapsedTimer.setInterval(1000)
@@ -178,11 +179,17 @@ class MainWidget(QWidget):
         action = QAction(self)
         action.setShortcut(QKeySequence("4"))
         action.setShortcutContext(Qt.ApplicationShortcut)
-        action.triggered.connect(self.exampleWolfsgraben)
+        action.triggered.connect(self.exampleWolfsgrabenPager)
         self.addAction(action)
 
         action = QAction(self)
         action.setShortcut(QKeySequence("5"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleWolfsgrabenMail)
+        self.addAction(action)
+
+        action = QAction(self)
+        action.setShortcut(QKeySequence("6"))
         action.setShortcutContext(Qt.ApplicationShortcut)
         action.triggered.connect(self.exampleWaldfee)
         self.addAction(action)
@@ -362,10 +369,33 @@ class MainWidget(QWidget):
 
         self.processAlarm(alarm)
 
-    def exampleWolfsgraben(self):
-        self.startTimer()
+    def exampleWolfsgrabenPager(self):
+
+        pagerStr = '21-12-17 11:55:10 LG Reichswalde Geb{udesteuerung #K01;N5175638E0611815; *40000*B2 Kaminbrand**Kleve*Reichswalde*Wolfsgraben*11**'
 
         alarm = Alarm(self.config)
+        alarm.fromPager(pagerStr, self.logger)
+
+        self.alarmDict[alarm.number] = alarm
+
+        if self.currentAlarm and self.currentAlarm.number != alarm.number:
+            self.startTimer()
+        self.currentAlarm = alarm
+
+        self.processAlarm(alarm)
+
+    def exampleWolfsgrabenMail(self):
+
+        number = '40000'
+
+        if number in self.alarmDict:
+            alarm = self.alarmDict[number]
+            self.logger.info('Writing into existing alarm %s.', number)
+        else:
+            alarm = Alarm(self.config)
+            self.alarmDict[number] = alarm
+            self.logger.info('Generating new alarm %s.', number)
+
         alarm.art = 'B'
         alarm.stichwort = '2'
         alarm.diagnose = 'Kaminbrand'
@@ -374,6 +404,8 @@ class MainWidget(QWidget):
         alarm.ort = 'Kleve'
         alarm.lat = 51.75638
         alarm.lon = 6.11815
+        alarm.meldender = 'Pose'
+        alarm.number = str(number)
         em = EinsatzMittel()
         em.org = 'FW'
         em.ort = 'KLV'
@@ -381,6 +413,10 @@ class MainWidget(QWidget):
         em.typ = 'LF10'
         em.kennung = '1'
         alarm.einsatzmittel.append(em)
+
+        if self.currentAlarm and self.currentAlarm.number != alarm.number:
+            self.startTimer()
+        self.currentAlarm = alarm
 
         self.processAlarm(alarm)
 
