@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtGui import QPainter, QFontMetrics, QColor
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtGui import QPainter, QFontMetrics, QColor, QIcon
+from PyQt5.QtCore import Qt, QPoint, QSize, QRect
 
 import Map
 
@@ -57,6 +59,20 @@ class MapWidget(QFrame):
             rect = fm.boundingRect(txt)
             rect = fm.boundingRect(rect, 0, txt)
             rect.adjust(-pad, 0, pad, 0)
+
+            imageDir = self.config.get("display", "image_dir",
+                fallback = "images")
+            iconPath = os.path.join(imageDir, 'text-x-generic.svg')
+            icon = QIcon(iconPath)
+            iconSize = icon.actualSize(rect.size())
+            rect.adjust(0, 0, iconSize.width(), 0)
+
             rect.moveBottomLeft(QPoint(margin, self.height() - margin))
             painter.fillRect(rect, QColor(255, 255, 255, 192))
-            painter.drawText(rect, Qt.AlignCenter, txt)
+
+            iconRect = QRect(rect)
+            iconRect.setWidth(iconSize.width())
+            icon.paint(painter, iconRect)
+
+            textRect = rect.adjusted(iconRect.width(), 0, 0, 0)
+            painter.drawText(textRect, Qt.AlignCenter, txt)

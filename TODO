@@ -5,7 +5,6 @@ vim: syntax=markdown tw=78 spl=de
 * Symbol für Einsatzarten / ABC (C) / Tragehilfe (K) / etc.
 * Symbol für Distanz
 * Symbol für Fahrtdauer
-* Symbol für Objektplan
 * Symbol für Wegerechte
 * Alarmierte Einheiten in Mittelspalte anzeigen
 * Kritischen Pfad ermitteln / Reihenfolge editierbar?
