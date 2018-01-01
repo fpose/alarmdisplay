@@ -6,7 +6,7 @@ from PyQt5 import QtCore
 
 class AlarmReceiver(QtCore.QObject):
 
-    receivedAlarm = QtCore.pyqtSignal(bytes)
+    receivedAlarm = QtCore.pyqtSignal(str)
     finished = QtCore.pyqtSignal()
 
     def __init__(self, logger):
