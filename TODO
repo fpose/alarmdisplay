@@ -15,6 +15,7 @@ vim: syntax=markdown tw=78 spl=de
 * Route asynchron holen
 * EMail-Abfrage / IMAP-Idle
 * Letzte Einsätze anzeigen
+* Einsatzdaten bei Alarmierung in Verzeichnis ablegen
 
 # Alarmdepesche
 
@@ -25,3 +26,8 @@ vim: syntax=markdown tw=78 spl=de
 * Startscript
 * Read-Only-Dateisystem
 * CUPS aufsetzen
+
+# Ideen
+
+* Ausrückeordnung hinterlegen und anzeigen
+* Zeit bis Überschreiten des Schutzzieles
