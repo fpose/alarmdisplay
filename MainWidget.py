@@ -117,8 +117,11 @@ class MainWidget(QWidget):
 
         verLayout.addLayout(locationLayout, 0)
 
+        # Attention row ------------------------------------------------------
+
         attentionLayout = QHBoxLayout(self)
         attentionLayout.setSpacing(0)
+        verLayout.addLayout(attentionLayout, 0)
 
         self.attentionSymbolLabel = QLabel(self)
         self.attentionSymbolLabel.setStyleSheet("""
@@ -133,7 +136,20 @@ class MainWidget(QWidget):
             """)
         attentionLayout.addWidget(self.attentionLabel, 1)
 
-        verLayout.addLayout(attentionLayout, 0)
+        self.callerSymbolLabel = QLabel(self)
+        self.callerSymbolLabel.setStyleSheet("""
+            padding: 10px;
+            """)
+        attentionLayout.addWidget(self.callerSymbolLabel, 0)
+
+        self.callerLabel = QLabel(self)
+        self.callerLabel.setStyleSheet("""
+            padding: 10px;
+            font-size: 40px;
+            """)
+        attentionLayout.addWidget(self.callerLabel, 1)
+
+        # Maps ---------------------------------------------------------------
 
         horLayout = QHBoxLayout(self)
         verLayout.addLayout(horLayout, 2)
@@ -250,6 +266,19 @@ class MainWidget(QWidget):
             self.attentionSymbolLabel.setPixmap(pixmap)
             self.attentionSymbolLabel.hide()
             self.attentionLabel.hide()
+
+        self.callerLabel.setText(alarm.callerInfo())
+        if self.callerLabel.text():
+            pixmap = QPixmap(os.path.join(self.imageDir,
+                        'caller.svg'))
+            self.callerSymbolLabel.setPixmap(pixmap)
+            self.callerSymbolLabel.show()
+            self.callerLabel.show()
+        else:
+            pixmap = QPixmap()
+            self.callerSymbolLabel.setPixmap(pixmap)
+            self.callerSymbolLabel.hide()
+            self.callerLabel.hide()
 
         self.leftMap.invalidate()
         self.leftMap.setObjectPlan(alarm.objektnummer)
@@ -372,7 +401,7 @@ class MainWidget(QWidget):
 
         self.alarmDict[alarm.number] = alarm
 
-        if self.currentAlarm and self.currentAlarm.number != alarm.number:
+        if not self.currentAlarm or self.currentAlarm.number != alarm.number:
             self.startTimer()
         self.currentAlarm = alarm
 
@@ -400,6 +429,7 @@ class MainWidget(QWidget):
         alarm.lat = 51.75638
         alarm.lon = 6.11815
         alarm.meldender = 'Pose'
+        alarm.rufnummer = '0179 555 364532'
         alarm.number = str(number)
         em = EinsatzMittel()
         em.org = 'FW'
@@ -409,7 +439,7 @@ class MainWidget(QWidget):
         em.kennung = '1'
         alarm.einsatzmittel.append(em)
 
-        if self.currentAlarm and self.currentAlarm.number != alarm.number:
+        if not self.currentAlarm or self.currentAlarm.number != alarm.number:
             self.startTimer()
         self.currentAlarm = alarm
 

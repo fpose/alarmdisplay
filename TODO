@@ -6,7 +6,7 @@ vim: syntax=markdown tw=78 spl=de
 * Symbol für Distanz
 * Symbol für Fahrtdauer
 * Symbol für Wegerechte
-* Alarmierte Einheiten in Mittelspalte anzeigen
+* Alarmierte Einheiten anzeigen
 * Kritischen Pfad ermitteln / Reihenfolge editierbar?
 * Route später über bereits geladene Kacheln zeichnen
 

@@ -250,6 +250,16 @@ class Alarm:
         ret = self.besonderheit
         return ret
 
+    def callerInfo(self):
+        ret = ''
+        if self.meldender:
+            ret += self.meldender
+        if self.rufnummer:
+            if ret:
+                ret += ' / '
+            ret += self.rufnummer
+        return ret
+
     def betroffen(self, org, ort, ortZusatz):
         for em in self.einsatzmittel:
             if em.betroffen(org, ort, ortZusatz):
