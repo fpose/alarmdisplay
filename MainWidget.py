@@ -89,6 +89,15 @@ class MainWidget(QWidget):
             """)
         titleLayout.addWidget(self.titleLabel, 1)
 
+        self.timerLabel = QLabel(self)
+        self.timerLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.timerLabel.setStyleSheet("""
+            color: white;
+            background-color: rgb(120, 0, 0);
+            padding: 10px;
+            """)
+        titleLayout.addWidget(self.timerLabel, 0)
+
         verLayout.addLayout(titleLayout, 0)
 
         locationLayout = QHBoxLayout(self)
@@ -134,21 +143,6 @@ class MainWidget(QWidget):
             font-size: 40px;
             """)
         horLayout.addWidget(self.leftMap, 3)
-
-        centerLayout = QVBoxLayout(self)
-        horLayout.addLayout(centerLayout, 1)
-
-        logoLabel = QLabel(self)
-        logo = self.config.get("display", "logo", fallback = None)
-        if logo:
-            styleSheet = 'image: url({0});'.format( \
-                    os.path.join(self.imageDir, logo))
-            logoLabel.setStyleSheet(styleSheet)
-        centerLayout.addWidget(logoLabel)
-
-        self.timerLabel = QLabel(self)
-        self.timerLabel.setAlignment(Qt.AlignCenter)
-        centerLayout.addWidget(self.timerLabel)
 
         self.rightMap = RouteWidget(self, self.config, self.logger)
         self.rightMap.setStyleSheet("""
@@ -399,6 +393,7 @@ class MainWidget(QWidget):
         alarm.art = 'B'
         alarm.stichwort = '2'
         alarm.diagnose = 'Kaminbrand'
+        alarm.besonderheit = 'keine Personen mehr im Gebäude'
         alarm.strasse = 'Wolfsgraben'
         alarm.hausnummer = '11'
         alarm.ort = 'Kleve'
@@ -421,7 +416,7 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def exampleWaldfee(self):
-        pagerStr = r'16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung #K01;N5173170E0606900; *57274*H1 Hilfeleistung*Von draussen vom Walde komm ich her*Kleve*Reichswalde*Grunewaldstrasse***Waldweg C'
+        pagerStr = r'16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung #K01;N5173170E0606900; *57274*H1 Hilfeleistung*Eichhörnchen auf Baum*Kleve*Reichswalde*Grunewaldstrasse***Waldweg C'
 
         self.startTimer()
 
