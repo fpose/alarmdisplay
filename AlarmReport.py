@@ -63,7 +63,7 @@ class AlarmReport:
         variables['address'] = escapeLaTeX(alarm.address())
         variables['attention'] = escapeLaTeX(alarm.attention())
         variables['location_hint'] = escapeLaTeX(alarm.objektname)
-        variables['contact'] = escapeLaTeX(alarm.meldender)
+        variables['contact'] = escapeLaTeX(alarm.callerInfo())
         variables['object_plan'] = escapeLaTeX(alarm.objektnummer)
         variables['signal'] = escapeLaTeX(alarm.sondersignal)
         variables['resources'] = escapeLaTeX(alarm.einheiten(einheit,
