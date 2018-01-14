@@ -3,6 +3,7 @@
 import os
 import math
 import subprocess
+import datetime
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -346,6 +347,7 @@ class MainWidget(QWidget):
         self.startTimer()
 
         alarm = Alarm(self.config)
+        alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
         alarm.stichwort = '3'
         alarm.diagnose = 'Wohnungsbrand'
@@ -364,6 +366,7 @@ class MainWidget(QWidget):
         self.startTimer()
 
         alarm = Alarm(self.config)
+        alarm.datetime = datetime.datetime.now()
         alarm.art = 'H'
         alarm.stichwort = '1'
         alarm.diagnose = 'Tierrettung'
@@ -380,6 +383,7 @@ class MainWidget(QWidget):
         self.startTimer()
 
         alarm = Alarm(self.config)
+        alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
         alarm.stichwort = '2'
         alarm.diagnose = 'Garagenbrand'
@@ -419,10 +423,12 @@ class MainWidget(QWidget):
             self.alarmDict[number] = alarm
             self.logger.info('Generating new alarm %s.', number)
 
+        alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
         alarm.stichwort = '2'
         alarm.diagnose = 'Kaminbrand'
         alarm.besonderheit = 'keine Personen mehr im Gebäude'
+        alarm.ortsteil = 'Reichswalde'
         alarm.strasse = 'Wolfsgraben'
         alarm.hausnummer = '11'
         alarm.ort = 'Kleve'
@@ -436,6 +442,13 @@ class MainWidget(QWidget):
         em.ort = 'KLV'
         em.zusatz = '05'
         em.typ = 'LF10'
+        em.kennung = '1'
+        alarm.einsatzmittel.append(em)
+        em = EinsatzMittel()
+        em.org = 'FW'
+        em.ort = 'KLV'
+        em.zusatz = '02'
+        em.typ = 'LF20'
         em.kennung = '1'
         alarm.einsatzmittel.append(em)
 
