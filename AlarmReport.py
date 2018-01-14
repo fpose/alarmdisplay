@@ -65,7 +65,10 @@ class AlarmReport:
         variables['location_hint'] = escapeLaTeX(alarm.objektname)
         variables['contact'] = escapeLaTeX(alarm.callerInfo())
         variables['object_plan'] = escapeLaTeX(alarm.objektnummer)
-        variables['signal'] = escapeLaTeX(alarm.sondersignal)
+        sig = 'ja'
+        if alarm.sondersignal == '0':
+            sig = 'nein'
+        variables['signal'] = escapeLaTeX(sig)
         variables['resources'] = escapeLaTeX(alarm.einheiten(einheit,
                 lambda x: False, self.logger))
         if alarm.datetime:

@@ -437,6 +437,7 @@ class MainWidget(QWidget):
         alarm.meldender = 'Pose'
         alarm.rufnummer = '0179 555 364532'
         alarm.number = str(number)
+        alarm.sondersignal = '1'
         em = EinsatzMittel()
         em.org = 'FW'
         em.ort = 'KLV'
