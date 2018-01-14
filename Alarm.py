@@ -233,10 +233,18 @@ class Alarm:
     def address(self):
         ret = self.strasse
         if self.hausnummer:
-            ret += ' ' + self.hausnummer
+            if ret:
+                ret += ' '
+            ret += self.hausnummer
+        if self.ortsteil:
+            if ret:
+                ret += ', '
+            ret += self.ortsteil
         if self.ort:
             homeTown = self.config.get('display', 'home_town', fallback = '')
             if self.ort != homeTown:
+                if ret:
+                    ret += ', '
                 ret += ', ' + self.ort
         return ret
 
