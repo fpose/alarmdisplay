@@ -23,6 +23,11 @@ cheetahVarStartToken = @
 
 %\noindent\fcolorbox{red}{gray}{%
 \begin{minipage}[t]{.75\textwidth}
+#if @image
+\raisebox{-1mm}{%
+    \includegraphics[height=10mm]{@image}%
+}
+#end if
 \Huge
 \textbf{@title}
 

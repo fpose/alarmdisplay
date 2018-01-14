@@ -230,6 +230,16 @@ class Alarm:
     def title(self):
         return self.art + self.stichwort + ' ' + self.diagnose
 
+    def imageBase(self):
+        if not self.art:
+            return None
+        alarmType = self.art.upper()
+        if alarmType == 'B':
+            return 'feuer'
+        if alarmType == 'H':
+            return 'hilfe'
+        return None
+
     def address(self):
         ret = self.strasse
         if self.hausnummer:

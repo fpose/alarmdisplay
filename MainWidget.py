@@ -236,13 +236,9 @@ class MainWidget(QWidget):
     def processAlarm(self, alarm):
         self.titleLabel.setText(alarm.title())
 
-        image = None
-        alarmType = alarm.art.upper()
-        if alarmType == 'B':
-            image = 'feuer.svg'
-        if alarmType == 'H':
-            image = 'hilfe.svg'
+        image = alarm.imageBase()
         if image:
+            image += '.svg'
             pixmap = QPixmap(os.path.join(self.imageDir, image))
         else:
             pixmap = QPixmap()
@@ -366,14 +362,18 @@ class MainWidget(QWidget):
         self.startTimer()
 
         alarm = Alarm(self.config)
+        alarm.number = '40001'
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'H'
         alarm.stichwort = '1'
         alarm.diagnose = 'Tierrettung'
+        alarm.ort = 'Kleve'
+        alarm.ortsteil = 'Reichswalde'
         alarm.strasse = 'Engelsstraße'
         alarm.hausnummer = '5'
         alarm.ort = 'Kleve'
         alarm.besonderheit = 'Katze auf Baum'
+        alarm.sondersignal = '0'
         alarm.lat = 51.75065
         alarm.lon = 6.11170
 

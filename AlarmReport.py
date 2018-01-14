@@ -77,6 +77,11 @@ class AlarmReport:
         else:
             variables['datetime'] = ''
         variables['number'] = escapeLaTeX(alarm.number)
+        image = alarm.imageBase()
+        if image:
+            variables['image'] = image
+        else:
+            variables['image'] = ''
 
         try:
             templateOutput = Template(self.template, searchList = variables)
