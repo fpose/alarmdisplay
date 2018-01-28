@@ -38,7 +38,7 @@ class MainWidget(QWidget):
         self.alarmDateTime = None
 
         self.simTimer = QTimer(self)
-        self.simTimer.setInterval(20000)
+        self.simTimer.setInterval(10000)
         self.simTimer.setSingleShot(True)
         self.simTimer.timeout.connect(self.simTimeout)
         #self.simTimer.start()
@@ -380,6 +380,7 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def exampleSack(self):
+        self.logger.info('Example Sackstrasse')
         self.startTimer()
 
         alarm = Alarm(self.config)
