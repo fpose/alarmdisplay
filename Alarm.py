@@ -77,7 +77,7 @@ class Alarm:
         # 13) Objektplan
         # 14) Ortshinweis
         regex = \
-                '.*(\d+-\d+-\d+ \d+:\d+:\d+)\s+' \
+                '.*(\d\d-\d+-\d+ \d+:\d+:\d+)\s+' \
                 '(.*)\s*' \
                 '#K01;N(\d+)E(\d+);\s*\*' \
                 '(.*)\*' \
