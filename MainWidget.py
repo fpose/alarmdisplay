@@ -205,6 +205,12 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleWaldfee)
         self.addAction(action)
 
+        action = QAction(self)
+        action.setShortcut(QKeySequence("7"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleStadtwerkePager)
+        self.addAction(action)
+
         self.thread = QThread()
         self.alarmReceiver = AlarmReceiver(self.logger)
         self.alarmReceiver.receivedAlarm.connect(self.receivedAlarm)
@@ -469,3 +475,21 @@ class MainWidget(QWidget):
         alarm.fromPager(pagerStr, self.logger)
 
         self.processAlarm(alarm)
+
+    def exampleStadtwerkePager(self):
+
+        pagerStr = '21-12-17 11:55:10 LG Reichswalde Geb{udesteuerung' + \
+            ' #K01;N5179473E0613985; *40001*B3 Brand Bürogebäude*' + \
+            'Stadtwerke Kleve GmbH*Kleve*Kleve*Flutstraße*36**'
+
+        alarm = Alarm(self.config)
+        alarm.fromPager(pagerStr, self.logger)
+
+        self.alarmDict[alarm.number] = alarm
+
+        if not self.currentAlarm or self.currentAlarm.number != alarm.number:
+            self.startTimer()
+        self.currentAlarm = alarm
+
+        self.processAlarm(alarm)
+
