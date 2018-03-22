@@ -48,6 +48,7 @@ class Alarm:
         self.ortsteil = None
         self.strasse = None
         self.hausnummer = None
+        self.ortshinweis = None
         self.objektname = None
         self.objektnummer = None
         self.lat = 0.0
@@ -124,8 +125,8 @@ class Alarm:
         self.ortsteil = ma.group(10)
         self.strasse = ma.group(11)
         self.hausnummer = ma.group(12)
-        self.objektnummer = ma.group(13) # Objektplan
-        self.objektname = ma.group(14) # Ortshinweis
+        self.objektnummer = ma.group(13)
+        self.ortshinweis = ma.group(14)
 
     def fromXml(self, xmlString, logger):
         self.xml = xmlString
@@ -255,7 +256,7 @@ class Alarm:
             if self.ort != homeTown:
                 if ret:
                     ret += ', '
-                ret += ', ' + self.ort
+                ret += self.ort
         return ret
 
     def location(self):

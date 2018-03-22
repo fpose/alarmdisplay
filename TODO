@@ -12,6 +12,7 @@ vim: syntax=markdown tw=78 spl=de
 
 # Alarmierung
 
+* Alarm.fromPager() robuster (mit Rückfall)
 * Route asynchron holen
 * EMail-Abfrage / IMAP-Idle
 * Letzte Einsätze anzeigen

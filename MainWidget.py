@@ -69,6 +69,7 @@ class MainWidget(QWidget):
             """)
 
         verLayout = QVBoxLayout(self)
+        verLayout.setSpacing(0)
         verLayout.setContentsMargins(0, 0, 0, 0)
 
         titleLayout = QHBoxLayout(self)
@@ -112,13 +113,29 @@ class MainWidget(QWidget):
             """)
         locationLayout.addWidget(self.locationSymbolLabel, 0)
 
+        innerLocationLayout = QVBoxLayout(self)
+        innerLocationLayout.setSpacing(0)
+
         self.locationLabel = QLabel(self)
+        self.locationLabel.setIndent(0)
         self.locationLabel.setSizePolicy(QSizePolicy.Ignored,
                 QSizePolicy.Preferred)
         self.locationLabel.setStyleSheet("""
             padding: 10px;
             """)
-        locationLayout.addWidget(self.locationLabel, 1)
+        innerLocationLayout.addWidget(self.locationLabel, 1)
+
+        self.locationHintLabel = QLabel(self)
+        self.locationHintLabel.setIndent(0)
+        self.locationHintLabel.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Preferred)
+        self.locationHintLabel.setStyleSheet("""
+            padding: 10px;
+            font-size: 40px;
+            """)
+        innerLocationLayout.addWidget(self.locationHintLabel, 1)
+
+        locationLayout.addLayout(innerLocationLayout, 1)
 
         verLayout.addLayout(locationLayout, 0)
 
@@ -135,6 +152,7 @@ class MainWidget(QWidget):
         attentionLayout.addWidget(self.attentionSymbolLabel, 0)
 
         self.attentionLabel = QLabel(self)
+        self.attentionLabel.setIndent(0)
         self.attentionLabel.setSizePolicy(QSizePolicy.Ignored,
                 QSizePolicy.Preferred)
         self.attentionLabel.setStyleSheet("""
@@ -150,6 +168,7 @@ class MainWidget(QWidget):
         attentionLayout.addWidget(self.callerSymbolLabel, 0)
 
         self.callerLabel = QLabel(self)
+        self.callerLabel.setIndent(0)
         self.callerLabel.setSizePolicy(QSizePolicy.Ignored,
                 QSizePolicy.Preferred)
         self.callerLabel.setStyleSheet("""
@@ -265,7 +284,13 @@ class MainWidget(QWidget):
         self.symbolLabel.setPixmap(pixmap)
 
         self.locationLabel.setText(alarm.location())
-        if self.locationLabel.text():
+        self.locationHintLabel.setText(alarm.ortshinweis)
+        if self.locationHintLabel.text():
+            self.locationHintLabel.show()
+        else:
+            self.locationHintLabel.hide()
+
+        if self.locationLabel.text() or self.locationHintLabel.text():
             pixmap = QPixmap(os.path.join(self.imageDir, 'go-home.svg'))
         else:
             pixmap = QPixmap()
