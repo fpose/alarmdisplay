@@ -45,14 +45,20 @@ cheetahVarStartToken = @
 \rule{\textwidth}{.5pt}
 
 \begin{tabular}{rp{120mm}}
+#if @object_name
+Objekt & \textbf{@object_name}\\
+#end if
 #if @location_hint
-Objekthinweis & \textbf{@location_hint}\\
+Ortshinweis & \textbf{@location_hint}\\
 #end if
 #if @object_plan
 Objektplan & \textbf{@object_plan}\\
 #end if
 #if @attention
 Hinweis & \textbf{@attention}\\
+#end if
+#if @escalation
+Eskalation & \textbf{@escalation}\\
 #end if
 #if @contact
 Meldender & \textbf{@contact}\\

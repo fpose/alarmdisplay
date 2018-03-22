@@ -61,8 +61,10 @@ class AlarmReport:
         variables = {}
         variables['title'] = escapeLaTeX(alarm.title())
         variables['address'] = escapeLaTeX(alarm.address())
+        variables['object_name'] = escapeLaTeX(alarm.objektname)
+        variables['escalation'] = escapeLaTeX(alarm.eskalation)
         variables['attention'] = escapeLaTeX(alarm.attention())
-        variables['location_hint'] = escapeLaTeX(alarm.objektname)
+        variables['location_hint'] = escapeLaTeX(alarm.ortshinweis)
         variables['contact'] = escapeLaTeX(alarm.callerInfo())
         variables['object_plan'] = escapeLaTeX(alarm.objektnummer)
         sig = 'ja'
