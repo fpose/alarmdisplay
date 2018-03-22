@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from AlarmReceiver import AlarmReceiver
+
 from PyQt5 import QtCore
 from PyQt5 import QtNetwork
 
@@ -22,4 +24,5 @@ class SocketListener(QtCore.QObject):
             (data, host, port) = self.socket.readDatagram(size)
             self.logger.info("Received from %s:%i", host.toString(), port)
             pagerStr = data.decode('latin1')
+            pagerStr = AlarmReceiver.decode(pagerStr)
             self.receivedAlarm.emit(pagerStr)
