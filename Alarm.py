@@ -32,6 +32,13 @@ from PyQt5.QtCore import *
 #-----------------------------------------------------------------------------
 
 class Alarm:
+
+    images = {
+        'B': 'feuer',
+        'C': 'abc',
+        'H': 'hilfe'
+    }
+
     def __init__(self, config, receiveTimeStamp = None):
         self.number = None
         self.datetime = None
@@ -238,11 +245,9 @@ class Alarm:
         if not self.art:
             return None
         alarmType = self.art.upper()
-        if alarmType == 'B':
-            return 'feuer'
-        if alarmType == 'H':
-            return 'hilfe'
-        return None
+        if alarmType not in self.images:
+            return None
+        return self.images[alarmType]
 
     def address(self):
         ret = self.strasse
