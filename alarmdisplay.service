@@ -1,0 +1,16 @@
+[Unit]
+Description=Alarm Display
+Conflicts=getty@tty7.service
+Conflicts=xdm.service
+
+[Service]
+ExecStart=/usr/bin/xinit /home/pi/alarmdisplay/alarmdisplay.py -- -nocursor
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=alarmdisplay
+SyslogFacility=daemon
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
