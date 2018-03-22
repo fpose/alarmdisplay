@@ -13,6 +13,7 @@ from MapWidget import MapWidget
 from RouteWidget import RouteWidget
 from Map import getRoute
 from AlarmReceiver import AlarmReceiver
+from SocketListener import SocketListener
 from AlarmReport import AlarmReport
 from CecCommand import CecCommand
 from Alarm import Alarm, EinsatzMittel
@@ -251,6 +252,9 @@ class MainWidget(QWidget):
         self.alarmReceiver.finished.connect(self.thread.quit)
         self.thread.started.connect(self.alarmReceiver.receive)
         self.thread.start()
+
+        self.socketListener = SocketListener(self.logger)
+        self.socketListener.receivedAlarm.connect(self.receivedAlarm)
 
         self.cecThread = QThread()
         self.cecThread.start()

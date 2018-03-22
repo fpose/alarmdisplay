@@ -229,7 +229,10 @@ class Alarm:
             logger.info(em.asString())
 
     def title(self):
-        return self.art + self.stichwort + ' ' + self.diagnose
+        if self.art and self.stichwort and self.diagnose:
+            return self.art + self.stichwort + ' ' + self.diagnose
+        else:
+            return ''
 
     def imageBase(self):
         if not self.art:
