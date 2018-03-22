@@ -82,6 +82,8 @@ class MainWidget(QWidget):
         titleLayout.addWidget(self.symbolLabel, 0)
 
         self.titleLabel = QLabel(self)
+        self.titleLabel.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Preferred)
         self.titleLabel.setStyleSheet("""
             color: white;
             font-size: 80px;
@@ -111,6 +113,8 @@ class MainWidget(QWidget):
         locationLayout.addWidget(self.locationSymbolLabel, 0)
 
         self.locationLabel = QLabel(self)
+        self.locationLabel.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Preferred)
         self.locationLabel.setStyleSheet("""
             padding: 10px;
             """)
@@ -131,6 +135,8 @@ class MainWidget(QWidget):
         attentionLayout.addWidget(self.attentionSymbolLabel, 0)
 
         self.attentionLabel = QLabel(self)
+        self.attentionLabel.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Preferred)
         self.attentionLabel.setStyleSheet("""
             padding: 10px;
             font-size: 40px;
@@ -144,6 +150,8 @@ class MainWidget(QWidget):
         attentionLayout.addWidget(self.callerSymbolLabel, 0)
 
         self.callerLabel = QLabel(self)
+        self.callerLabel.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Preferred)
         self.callerLabel.setStyleSheet("""
             padding: 10px;
             font-size: 40px;
@@ -318,7 +326,8 @@ class MainWidget(QWidget):
         self.logger.info('Finished.')
 
     def resizeEvent(self, event):
-        self.logger.debug(event.size())
+        self.logger.debug('Resizing main window to %u x %u.',
+            event.size().width(), event.size().height())
 
     def startTimer(self):
         self.alarmDateTime = QDateTime.currentDateTime()
