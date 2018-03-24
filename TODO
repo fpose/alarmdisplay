@@ -21,12 +21,11 @@ vim: syntax=markdown tw=78 spl=de
 # Alarmdepesche
 
 * Drucker aufwecken
+* Routen-Infos drucken (Länge, Zeit)
 
 # Administration
 
-* Startscript
 * Read-Only-Dateisystem
-* CUPS aufsetzen
 
 # Ideen
 
