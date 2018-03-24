@@ -140,10 +140,27 @@ class AlarmReport:
 
         self.logger.info(u'PDF file %s was created.', pdfTarget)
 
-        printImmediately = False # TODO
-        if printImmediately:
+        printOut = self.config.get("report", "print", fallback = False)
+        if printOut:
             self.logger.info("Printing PDF file.")
-            lpr = subprocess.Popen(['lpr', pdfTarget])
+
+            printCmd = ['lpr']
+            printer = self.config.get("report", "printer", fallback = "")
+            if printer:
+                printCmd.append('-P')
+                printCmd.append(printer)
+            options = self.config.get("report", "print_options", fallback = "")
+            if options:
+                for opt in options.split():
+                    printCmd.append('-o')
+                    printCmd.append(opt)
+            printCmd.append(pdfTarget)
+
+            self.logger.info("Print command: %s", repr(printCmd))
+
+            lpr = subprocess.Popen(printCmd)
             lpr.wait()
             if lpr.returncode != 0:
                 self.logger.error('lpr failed.')
+
+            self.logger.info("Print ready.")
