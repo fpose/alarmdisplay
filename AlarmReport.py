@@ -31,16 +31,35 @@ class AlarmReport:
     def generate(self, alarm, route):
 
         tempDir = tempfile.mkdtemp(prefix = 'alarm-')
+        devNull = open(os.devnull, 'w')
 
         targetPixmap = Map.getTargetPixmap(alarm.lat, alarm.lon,
                 self.map_width, self.map_height,
                 route[0], self.config, self.logger)
-        targetPixmap.save(os.path.join(tempDir, 'target.eps'))
+        targetPixmap.save(os.path.join(tempDir, 'target.png'))
+
+        cmd = ['convert', 'target.png', 'target.eps']
+        self.logger.info(u'Running %s', cmd)
+        convert = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull)
+        convert.wait()
+
+        if convert.returncode != 0:
+            self.logger.error(u'convert failed')
+            return
 
         routePixmap, markerRects = Map.getRoutePixmap(alarm.lat, alarm.lon,
                 self.map_width, self.map_height,
                 route[0], self.config, self.logger)
-        routePixmap.save(os.path.join(tempDir, 'route.eps'))
+        routePixmap.save(os.path.join(tempDir, 'route.png'))
+
+        cmd = ['convert', 'route.png', 'route.eps']
+        self.logger.info(u'Running %s', cmd)
+        convert = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull)
+        convert.wait()
+
+        if convert.returncode != 0:
+            self.logger.error(u'convert failed')
+            return
 
         # Lokale Einheiten FIXME config
         einheit = {
@@ -112,8 +131,6 @@ class AlarmReport:
         latexEnv = os.environ
         self.logger.info(u'TEXINPUTS=%s', inputs)
         latexEnv['TEXINPUTS'] = inputs
-
-        devNull = open(os.devnull, 'w')
 
         cmd = ['latex', '-interaction=batchmode', texPath]
         self.logger.info(u'Running %s', cmd)
