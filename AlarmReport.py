@@ -35,12 +35,12 @@ class AlarmReport:
         targetPixmap = Map.getTargetPixmap(alarm.lat, alarm.lon,
                 self.map_width, self.map_height,
                 route[0], self.config, self.logger)
-        targetPixmap.save(os.path.join(tempDir, 'target.png'))
+        targetPixmap.save(os.path.join(tempDir, 'target.eps'))
 
         routePixmap, markerRects = Map.getRoutePixmap(alarm.lat, alarm.lon,
                 self.map_width, self.map_height,
                 route[0], self.config, self.logger)
-        routePixmap.save(os.path.join(tempDir, 'route.png'))
+        routePixmap.save(os.path.join(tempDir, 'route.eps'))
 
         # Lokale Einheiten FIXME config
         einheit = {
@@ -115,12 +115,11 @@ class AlarmReport:
 
         devNull = open(os.devnull, 'w')
 
-        cmd = ['pdflatex', '-interaction=batchmode', texPath]
+        cmd = ['latex', '-interaction=batchmode', texPath]
         self.logger.info(u'Running %s', cmd)
         latex = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull,
                 env = latexEnv)
         latex.wait()
-        devNull.close()
 
         if latex.returncode != 0:
             logPath = os.path.join(tempDir, texBase) + '.log'
@@ -128,21 +127,32 @@ class AlarmReport:
                     logPath)
             return
 
-        self.logger.info(u'Copying PDF file...')
+
+        cmd = ['dvips', texBase + '.dvi']
+        self.logger.info(u'Running %s', cmd)
+        dvips = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull)
+        dvips.wait()
+        devNull.close()
+
+        if dvips.returncode != 0:
+            self.logger.error(u'DVIPS processing failed.')
+            return
+
+        self.logger.info(u'Copying PS file...')
 
         targetDir = '.' # TODO
-        pdfPath = os.path.join(tempDir, texBase + '.pdf')
-        pdfTarget = os.path.join(targetDir, texBase + '.pdf')
-        shutil.copy(pdfPath, pdfTarget)
+        psPath = os.path.join(tempDir, texBase + '.ps')
+        psTarget = os.path.join(targetDir, texBase + '.ps')
+        shutil.copy(psPath, psTarget)
 
         self.logger.info(u'Deleting temporary directory...')
-        shutil.rmtree(tempDir)
+        #shutil.rmtree(tempDir)
 
-        self.logger.info(u'PDF file %s was created.', pdfTarget)
+        self.logger.info(u'PS file %s was created.', psTarget)
 
         printOut = self.config.get("report", "print", fallback = False)
         if printOut:
-            self.logger.info("Printing PDF file.")
+            self.logger.info("Printing PS file.")
 
             printCmd = ['lpr']
             printer = self.config.get("report", "printer", fallback = "")
@@ -154,7 +164,7 @@ class AlarmReport:
                 for opt in options.split():
                     printCmd.append('-o')
                     printCmd.append(opt)
-            printCmd.append(pdfTarget)
+            printCmd.append(psTarget)
 
             self.logger.info("Print command: %s", repr(printCmd))
 
