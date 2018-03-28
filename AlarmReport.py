@@ -147,7 +147,8 @@ class AlarmReport:
 
         cmd = ['dvips', texBase + '.dvi']
         self.logger.info(u'Running %s', cmd)
-        dvips = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull)
+        dvips = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull,
+                stderr = devNull)
         dvips.wait()
         devNull.close()
 
@@ -163,7 +164,7 @@ class AlarmReport:
         shutil.copy(psPath, psTarget)
 
         self.logger.info(u'Deleting temporary directory...')
-        #shutil.rmtree(tempDir)
+        shutil.rmtree(tempDir)
 
         self.logger.info(u'PS file %s was created.', psTarget)
 
@@ -191,3 +192,28 @@ class AlarmReport:
                 self.logger.error('lpr failed.')
 
             self.logger.info("Print ready.")
+
+    def wakeupPrinter(self):
+        printOut = self.config.get("report", "print", fallback = False)
+        wakeupDoc = self.config.get("report", "wakeup_document", fallback = "")
+
+        if not printOut or not wakeupDoc:
+            return
+
+        self.logger.info("Waking up printer.")
+
+        printCmd = ['lpr']
+        printer = self.config.get("report", "printer", fallback = "")
+        if printer:
+            printCmd.append('-P')
+            printCmd.append(printer)
+        printCmd.append(wakeupDoc)
+
+        self.logger.info("Wakeup command: %s", repr(printCmd))
+
+        lpr = subprocess.Popen(printCmd)
+        lpr.wait()
+        if lpr.returncode != 0:
+            self.logger.error('Wakeup failed.')
+
+        self.logger.info("Wakeup succeeded.")

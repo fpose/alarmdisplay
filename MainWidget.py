@@ -277,6 +277,8 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def processAlarm(self, alarm):
+        self.report.wakeupPrinter()
+
         self.titleLabel.setText(alarm.title())
 
         image = alarm.imageBase()
