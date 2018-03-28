@@ -29,6 +29,7 @@ import datetime
 import pytz
 
 from PyQt5.QtCore import *
+
 #-----------------------------------------------------------------------------
 
 class Alarm:
