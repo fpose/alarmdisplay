@@ -22,6 +22,7 @@ vim: syntax=markdown tw=78 spl=de
 
 * Drucker aufwecken
 * Routen-Infos drucken (Länge, Zeit)
+* Keine schwarze Karte drucken
 
 # Administration
 
