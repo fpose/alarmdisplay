@@ -12,16 +12,21 @@ vim: syntax=markdown tw=78 spl=de
 
 # Alarmierung
 
+* Alarme zusammenführen
+* Warten auf beide Alarmierungswege, dann Ausdruck
+
 * Alarm.fromPager() robuster (mit Rückfall)
 * Route asynchron holen
-* EMail-Abfrage / IMAP-Idle
+* IMAP-Idle nutzen statt polling
 * Letzte Einsätze anzeigen
 * Einsatzdaten bei Alarmierung in Verzeichnis ablegen
 
 # Alarmdepesche
 
-* Drucker aufwecken
+* Einsatzbericht-Formular drucken
 * Routen-Infos drucken (Länge, Zeit)
+
+* Drucker aufwecken ohne Druckauftrag
 * Keine schwarze Karte drucken
 
 # Administration

@@ -13,6 +13,7 @@ from MapWidget import MapWidget
 from RouteWidget import RouteWidget
 from Map import getRoute
 from AlarmReceiver import AlarmReceiver
+from ImapMonitor import ImapMonitor
 from SocketListener import SocketListener
 from AlarmReport import AlarmReport
 from CecCommand import CecCommand
@@ -197,6 +198,8 @@ class MainWidget(QWidget):
 
         self.setLayout(verLayout)
 
+        # Shortcuts ----------------------------------------------------------
+
         action = QAction(self)
         action.setShortcut(QKeySequence("1"))
         action.setShortcutContext(Qt.ApplicationShortcut)
@@ -245,16 +248,26 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleLebenshilfe)
         self.addAction(action)
 
-        self.thread = QThread()
+        # Threads ------------------------------------------------------------
+
+        self.receiverThread = QThread()
         self.alarmReceiver = AlarmReceiver(self.logger)
-        self.alarmReceiver.receivedAlarm.connect(self.receivedAlarm)
-        self.alarmReceiver.moveToThread(self.thread)
-        self.alarmReceiver.finished.connect(self.thread.quit)
-        self.thread.started.connect(self.alarmReceiver.receive)
-        self.thread.start()
+        self.alarmReceiver.receivedAlarm.connect(self.receivedPagerAlarm)
+        self.alarmReceiver.moveToThread(self.receiverThread)
+        self.alarmReceiver.finished.connect(self.receiverThread.quit)
+        self.receiverThread.started.connect(self.alarmReceiver.receive)
+        self.receiverThread.start()
+
+        self.imapThread = QThread()
+        self.imapMonitor = ImapMonitor(self.config, self.logger)
+        self.imapMonitor.receivedAlarm.connect(self.receivedXmlAlarm)
+        self.imapMonitor.moveToThread(self.imapThread)
+        self.imapMonitor.finished.connect(self.imapThread.quit)
+        self.imapThread.started.connect(self.imapMonitor.start)
+        self.imapThread.start()
 
         self.socketListener = SocketListener(self.logger)
-        self.socketListener.receivedAlarm.connect(self.receivedAlarm)
+        self.socketListener.receivedAlarm.connect(self.receivedPagerAlarm)
 
         self.cecThread = QThread()
         self.cecThread.start()
@@ -266,13 +279,28 @@ class MainWidget(QWidget):
 
         self.logger.info('Setup finished.')
 
-    def receivedAlarm(self, pagerStr):
+    def receivedPagerAlarm(self, pagerStr):
         self.logger.info('Received alarm: %s', repr(pagerStr))
 
         self.startTimer()
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
+
+        self.processAlarm(alarm)
+
+    def receivedXmlAlarm(self, xmlContent):
+        self.logger.info('Received XML alarm.')
+
+        self.startTimer()
+
+        alarm = Alarm(self.config)
+
+        try:
+            alarm.fromXml(xmlContent, self.logger)
+        except:
+            self.logger.error('Failed to parse XML:', exc_info = True)
+            return
 
         self.processAlarm(alarm)
 
