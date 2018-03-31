@@ -2,11 +2,11 @@ vim: syntax=markdown tw=78 spl=de
 
 # Anzeige
 
-* Symbol für Einsatzarten / Tragehilfe (K) / etc.
+* Alarmierte Einheiten anzeigen
+* Symbol für Wegerechte
+* Symbol für alle Einsatzarten / Tragehilfe (K) / etc.
 * Symbol für Distanz
 * Symbol für Fahrtdauer
-* Symbol für Wegerechte
-* Alarmierte Einheiten anzeigen
 * Kritischen Pfad ermitteln / Reihenfolge editierbar?
 * Route später über bereits geladene Kacheln zeichnen
 
@@ -14,20 +14,24 @@ vim: syntax=markdown tw=78 spl=de
 
 * Alarme zusammenführen
 * Warten auf beide Alarmierungswege, dann Ausdruck
-
 * Alarm.fromPager() robuster (mit Rückfall)
+
 * Route asynchron holen
 * IMAP-Idle nutzen statt polling
-* Letzte Einsätze anzeigen
 * Einsatzdaten bei Alarmierung in Verzeichnis ablegen
+
+# Idle-Anzeige
+
+* Letzte Einsätze anzeigen
+* Kalender anzeigen
+* Warnlage Wetter / Waldbrand
 
 # Alarmdepesche
 
-* Einsatzbericht-Formular drucken
+* Keine schwarze Karte drucken
 * Routen-Infos drucken (Länge, Zeit)
 
 * Drucker aufwecken ohne Druckauftrag
-* Keine schwarze Karte drucken
 
 # Administration
 
@@ -37,3 +41,4 @@ vim: syntax=markdown tw=78 spl=de
 
 * Ausrückeordnung hinterlegen und anzeigen
 * Zeit bis Überschreiten des Schutzzieles
+* eCall-Daten anzeigen und Rettungskarte drucken
