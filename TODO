@@ -28,6 +28,7 @@ vim: syntax=markdown tw=78 spl=de
 
 # Alarmdepesche
 
+* Nur einmal aufwecken während eines Alarmes
 * Keine schwarze Karte drucken
 * Routen-Infos drucken (Länge, Zeit)
 
