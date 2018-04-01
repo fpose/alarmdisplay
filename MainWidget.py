@@ -30,7 +30,6 @@ class MainWidget(QWidget):
         self.imageDir = self.config.get("display", "image_dir",
                 fallback = "images")
 
-        self.alarmDict = {}
         self.currentAlarm = None
 
         self.elapsedTimer = QTimer(self)
@@ -282,8 +281,6 @@ class MainWidget(QWidget):
     def receivedPagerAlarm(self, pagerStr):
         self.logger.info('Received alarm: %s', repr(pagerStr))
 
-        self.startTimer()
-
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
 
@@ -291,8 +288,6 @@ class MainWidget(QWidget):
 
     def receivedXmlAlarm(self, xmlContent):
         self.logger.info('Received XML alarm.')
-
-        self.startTimer()
 
         alarm = Alarm(self.config)
 
@@ -305,7 +300,15 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def processAlarm(self, alarm):
-        self.report.wakeupPrinter()
+        if not self.currentAlarm or not self.currentAlarm.matches(alarm):
+            self.logger.info("Processing new alarm.")
+            self.startTimer()
+            self.currentAlarm = alarm
+            self.report.wakeupPrinter()
+        else:
+            self.currentAlarm.merge(alarm, self.logger)
+            alarm = self.currentAlarm
+            # FIXME further processing if all alarm sources are present
 
         self.titleLabel.setText(alarm.title())
 
@@ -420,9 +423,8 @@ class MainWidget(QWidget):
         self.cecCommand.switchOff()
 
     def exampleJugend(self):
-        self.startTimer()
-
         alarm = Alarm(self.config)
+        alarm.number = '40001'
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
         alarm.stichwort = '3'
@@ -439,10 +441,8 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def exampleEngels(self):
-        self.startTimer()
-
         alarm = Alarm(self.config)
-        alarm.number = '40001'
+        alarm.number = '40002'
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'H'
         alarm.stichwort = '1'
@@ -461,9 +461,9 @@ class MainWidget(QWidget):
 
     def exampleSack(self):
         self.logger.info('Example Sackstrasse')
-        self.startTimer()
 
         alarm = Alarm(self.config)
+        alarm.number = '40003'
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
         alarm.stichwort = '2'
@@ -479,31 +479,18 @@ class MainWidget(QWidget):
 
     def exampleWolfsgrabenPager(self):
 
-        pagerStr = '21-12-17 11:55:10 LG Reichswalde Geb{udesteuerung #K01;N5175638E0611815; *40000*B2 Kaminbrand**Kleve*Reichswalde*Wolfsgraben*11**'
+        pagerStr = '21-12-17 11:55:10 LG Reichswalde Geb{udesteuerung' + \
+            ' #K01;N5175638E0611815; *40004*B2 Kaminbrand**Kleve*' + \
+            'Reichswalde*Wolfsgraben*11**'
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
-
-        self.alarmDict[alarm.number] = alarm
-
-        if not self.currentAlarm or self.currentAlarm.number != alarm.number:
-            self.startTimer()
-        self.currentAlarm = alarm
 
         self.processAlarm(alarm)
 
     def exampleWolfsgrabenMail(self):
 
-        number = '40000'
-
-        if number in self.alarmDict:
-            alarm = self.alarmDict[number]
-            self.logger.info('Writing into existing alarm %s.', number)
-        else:
-            alarm = Alarm(self.config)
-            self.alarmDict[number] = alarm
-            self.logger.info('Generating new alarm %s.', number)
-
+        alarm = Alarm(self.config)
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
         alarm.stichwort = '2'
@@ -517,7 +504,7 @@ class MainWidget(QWidget):
         alarm.lon = 6.11815
         alarm.meldender = 'Pose'
         alarm.rufnummer = '0179 555 364532'
-        alarm.number = str(number)
+        alarm.number = '1170040004'
         alarm.sondersignal = '1'
         em = EinsatzMittel()
         em.org = 'FW'
@@ -534,16 +521,13 @@ class MainWidget(QWidget):
         em.kennung = '1'
         alarm.einsatzmittel.append(em)
 
-        if not self.currentAlarm or self.currentAlarm.number != alarm.number:
-            self.startTimer()
-        self.currentAlarm = alarm
-
         self.processAlarm(alarm)
 
     def exampleWaldfee(self):
-        pagerStr = r'16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung #K01;N5173170E0606900; *57274*H1 Hilfeleistung*Eichhörnchen auf Baum*Kleve*Reichswalde*Grunewaldstrasse***Waldweg C'
-
-        self.startTimer()
+        pagerStr = '16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung' + \
+            ' #K01;N5173170E0606900; *40005*H1 Hilfeleistung*' + \
+            'Eichhörnchen auf Baum*Kleve*Reichswalde**' + \
+            'Grunewaldstrasse***Waldweg C'
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
@@ -553,35 +537,23 @@ class MainWidget(QWidget):
     def exampleStadtwerkePager(self):
 
         pagerStr = '21-12-17 11:55:10 LG Reichswalde Geb{udesteuerung' + \
-            ' #K01;N5179473E0613985; *40001*B3 Brand Bürogebäude*' + \
+            ' #K01;N5179473E0613985; *40006*B3 Brand Bürogebäude*' + \
             'Stadtwerke Kleve GmbH*Kleve*Kleve*Flutstraße*36**'
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
-
-        self.alarmDict[alarm.number] = alarm
-
-        if not self.currentAlarm or self.currentAlarm.number != alarm.number:
-            self.startTimer()
-        self.currentAlarm = alarm
 
         self.processAlarm(alarm)
 
     def exampleLebenshilfe(self):
 
         pagerStr = '22-03-17 10:12:38 LG Reichswalde  Geb{udesteuerung' + \
-            ' #K01;N5177287E0611253;*15061*B2 Brandmeldeanlage 2' + \
+            ' #K01;N5177287E0611253;*40007*B2 Brandmeldeanlage 2' + \
             ' **Kleve*Materborn*Dorfstrasse*27*KLV 02/103' + \
             '*Materborner Allee - Saalstrasse'
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
-
-        self.alarmDict[alarm.number] = alarm
-
-        if not self.currentAlarm or self.currentAlarm.number != alarm.number:
-            self.startTimer()
-        self.currentAlarm = alarm
 
         self.processAlarm(alarm)
 

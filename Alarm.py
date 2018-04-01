@@ -87,20 +87,6 @@ class Alarm:
         # Holla die Waldfee*Kleve*Reichswalde*Grunewaldstrasse*
         # *KLV 03/124*Hinweis
 
-        #  1) Datum/Uhrzeit TT-MM-YY HH:MM:SS
-        #  2) Einheit, Funktion (RIC)
-        #  3+4) Koordinaten (zuerst entfernt)
-        #  5) Einsatznummer
-        #  6) Einsatzart und Stichwort
-        #  7) Diagnose und Eskalationsstufe
-        #  8) Hinweis (Freitext)
-        #  9) Stadt
-        # 10) Ortsteil
-        # 11) Straße
-        # 12) Hausnummer
-        # 13) Objektplan
-        # 14) Ortshinweis
-
         ma = self.coordRe.search(pagerStr)
         if ma:
             coord = ma.group(1)
@@ -119,6 +105,20 @@ class Alarm:
             return
 
         logger.debug(ma.groups())
+
+        #  1) Datum/Uhrzeit TT-MM-YY HH:MM:SS
+        #  2) Einheit, Funktion (RIC)
+        #  .) Koordinaten (zuerst entfernt)
+        #  3) Einsatznummer
+        #  4) Einsatzart und Stichwort
+        #  5) Diagnose und Eskalationsstufe
+        #  6) Hinweis (Freitext)
+        #  7) Stadt
+        #  8) Ortsteil
+        #  9) Straße
+        # 10) Hausnummer
+        # 11) Objektplan
+        # 12) Ortshinweis
 
         dt_naive = datetime.datetime.strptime(ma.group(1), '%d-%m-%y %H:%M:%S')
         logger.debug('Date naive %s', dt_naive)
@@ -241,6 +241,59 @@ class Alarm:
         logger.info(u'Besonderheit: %s', repr(self.besonderheit))
         for em in self.einsatzmittel:
             logger.info(em.asString())
+
+    def matches(self, other):
+        return self.number and other.number and \
+            self.number[-5 :] == other.number[-5 :]
+
+    def merge(self, other, logger):
+        logger.info('Merging alarms...')
+
+        if other.number:
+            if not self.number or len(self.number) < len(other.number):
+                logger.info('preferring number %s over %s.',
+                    other.number, self.number)
+                self.number = other.number
+
+        # self.datetime
+        # self.lat
+        # self.lon
+
+        stringVars = [
+            'art',
+            'stichwort',
+            'diagnose',
+            'eskalation',
+            'besonderheit',
+            'sondersignal',
+            'meldender',
+            'rufnummer',
+            'plz',
+            'ort',
+            'ortsteil',
+            'strasse',
+            'hausnummer',
+            'ortshinweis',
+            'objektname',
+            'objektnummer'
+            ]
+
+        selfVars = vars(self)
+        otherVars = vars(other)
+        for key in stringVars:
+            if key not in otherVars.keys() or not otherVars[key]:
+                continue
+
+            if not selfVars[key]:
+                logger.info('Setting %s to %s.', key, otherVars[key])
+                selfVars[key] = otherVars[key]
+                continue
+
+            if selfVars[key] != otherVars[key]:
+                logger.info('%s is differing: %s / %s.', key,
+                        repr(selfVars[key]), repr(otherVars[key]))
+
+        logger.info('Merge complete.')
 
     def title(self):
         if self.art and self.stichwort and self.diagnose:
