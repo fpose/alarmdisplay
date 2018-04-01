@@ -40,6 +40,21 @@ class Alarm:
         'H': 'hilfe'
     }
 
+    coordRe = re.compile('#K01;N(\d+)E(\d+);')
+    alarmRe = re.compile( \
+            '.*(\d\d-\d+-\d+ \d+:\d+:\d+)\s+' \
+            '(.*)\s*\*' \
+            '(.*)\*' \
+            '(..)\s+' \
+            '(.*)\*' \
+            '(.*)\*' \
+            '(.*)\*' \
+            '(.*)\*' \
+            '(.*)\*' \
+            '(.*)\*' \
+            '(.*)\*' \
+            '(.*)')
+
     def __init__(self, config, receiveTimeStamp = None):
         self.number = None
         self.datetime = None
@@ -74,7 +89,7 @@ class Alarm:
 
         #  1) Datum/Uhrzeit TT-MM-YY HH:MM:SS
         #  2) Einheit, Funktion (RIC)
-        #  3+4) Koordinaten
+        #  3+4) Koordinaten (zuerst entfernt)
         #  5) Einsatznummer
         #  6) Einsatzart und Stichwort
         #  7) Diagnose und Eskalationsstufe
@@ -85,22 +100,20 @@ class Alarm:
         # 12) Hausnummer
         # 13) Objektplan
         # 14) Ortshinweis
-        regex = \
-                '.*(\d\d-\d+-\d+ \d+:\d+:\d+)\s+' \
-                '(.*)\s*' \
-                '#K01;N(\d+)E(\d+);\s*\*' \
-                '(.*)\*' \
-                '(..)\s+' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)\*' \
-                '(.*)'
-        alarmRe = re.compile(regex)
-        ma = alarmRe.match(pagerStr)
+
+        ma = self.coordRe.search(pagerStr)
+        if ma:
+            coord = ma.group(1)
+            coord = coord[:2] + '.' + coord[2:]
+            self.lat = float(coord)
+            coord = ma.group(2)
+            coord = coord[:2] + '.' + coord[2:]
+            self.lon = float(coord)
+            logger.debug('Coordinates: lon=%f lat=%f', self.lon, self.lat)
+            span = ma.span()
+            pagerStr = pagerStr[: span[0]] + pagerStr[span[1] :]
+
+        ma = self.alarmRe.match(pagerStr)
         if not ma:
             logger.warn('Alarmtext nicht erkannt!')
             return
@@ -117,24 +130,17 @@ class Alarm:
         logger.debug('Date %s', self.datetime)
 
         einheit = ma.group(2).strip() # unused
-        coord = ma.group(3)
-        coord = coord[:2] + '.' + coord[2:]
-        self.lat = float(coord)
-        coord = ma.group(4)
-        coord = coord[:2] + '.' + coord[2:]
-        self.lon = float(coord)
-        logger.debug('Coordinates: lon=%f lat=%f', self.lon, self.lat)
-        self.number = ma.group(5)
-        self.art = ma.group(6)[0]
-        self.stichwort = ma.group(6)[1]
-        self.diagnose = ma.group(7) # Diagnose und Eskalationsstufe
-        self.besonderheit = ma.group(8) # Hinweis (Freitext)
-        self.ort = ma.group(9)
-        self.ortsteil = ma.group(10)
-        self.strasse = ma.group(11)
-        self.hausnummer = ma.group(12)
-        self.objektnummer = ma.group(13)
-        self.ortshinweis = ma.group(14)
+        self.number = ma.group(3)
+        self.art = ma.group(4)[0]
+        self.stichwort = ma.group(4)[1]
+        self.diagnose = ma.group(5) # Diagnose und Eskalationsstufe
+        self.besonderheit = ma.group(6) # Hinweis (Freitext)
+        self.ort = ma.group(7)
+        self.ortsteil = ma.group(8)
+        self.strasse = ma.group(9)
+        self.hausnummer = ma.group(10)
+        self.objektnummer = ma.group(11)
+        self.ortshinweis = ma.group(12)
 
     def fromXml(self, xmlString, logger):
         self.xml = xmlString
