@@ -12,7 +12,6 @@ vim: syntax=markdown tw=78 spl=de
 
 # Alarmierung
 
-* Warten auf beide Alarmierungswege, dann Ausdruck
 * Alarm.fromPager() robuster (mit Rückfall)
 
 * Route asynchron holen

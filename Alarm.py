@@ -80,12 +80,15 @@ class Alarm:
         self.receiveTimeStamp = receiveTimeStamp
         self.xml = None
         self.config = config
+        self.source = None
 
     def fromPager(self, pagerStr, logger):
         # '16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung
         # #K01;N5174110E0608130; *57274*H1 Hilfeleistung*
         # Holla die Waldfee*Kleve*Reichswalde*Grunewaldstrasse*
         # *KLV 03/124*Hinweis
+
+        self.source = 'pager'
 
         ma = self.coordRe.search(pagerStr)
         if ma:
@@ -144,6 +147,7 @@ class Alarm:
 
     def fromXml(self, xmlString, logger):
         self.xml = xmlString
+        self.source = 'xml'
 
         doc = xml.dom.minidom.parseString(xmlString)
         elemDaten = doc.firstChild

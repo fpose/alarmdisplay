@@ -30,13 +30,23 @@ class MainWidget(QWidget):
         self.imageDir = self.config.get("display", "image_dir",
                 fallback = "images")
 
-        self.currentAlarm = None
+        self.alarm = None
+        self.route = ([], None, None)
+        self.seenPager = False
+        self.seenXml = False
+        self.reportDone = False
 
         self.elapsedTimer = QTimer(self)
         self.elapsedTimer.setInterval(1000)
         self.elapsedTimer.setSingleShot(False)
         self.elapsedTimer.timeout.connect(self.elapsedTimeout)
         self.alarmDateTime = None
+
+        self.reportTimer = QTimer(self)
+        self.reportTimer.setInterval( \
+            self.config.get("report", "timeout", fallback = 20) * 1000)
+        self.reportTimer.setSingleShot(True)
+        self.reportTimer.timeout.connect(self.generateReport)
 
         self.simTimer = QTimer(self)
         self.simTimer.setInterval(10000)
@@ -299,20 +309,28 @@ class MainWidget(QWidget):
 
         self.processAlarm(alarm)
 
-    def processAlarm(self, alarm):
-        if not self.currentAlarm or not self.currentAlarm.matches(alarm):
+    def processAlarm(self, newAlarm):
+        if not self.alarm or not self.alarm.matches(newAlarm):
             self.logger.info("Processing new alarm.")
             self.startTimer()
-            self.currentAlarm = alarm
+            self.alarm = newAlarm
+            self.route = ([], None, None)
+            self.seenPager = False
+            self.seenXml = False
+            self.reportDone = False
+            self.reportTimer.start()
             self.report.wakeupPrinter()
         else:
-            self.currentAlarm.merge(alarm, self.logger)
-            alarm = self.currentAlarm
-            # FIXME further processing if all alarm sources are present
+            self.alarm.merge(newAlarm, self.logger)
 
-        self.titleLabel.setText(alarm.title())
+        if newAlarm.source == 'pager':
+            self.seenPager = True
+        elif newAlarm.source == 'xml':
+            self.seenXml = True
 
-        image = alarm.imageBase()
+        self.titleLabel.setText(self.alarm.title())
+
+        image = self.alarm.imageBase()
         if image:
             image += '.svg'
             pixmap = QPixmap(os.path.join(self.imageDir, image))
@@ -320,8 +338,8 @@ class MainWidget(QWidget):
             pixmap = QPixmap()
         self.symbolLabel.setPixmap(pixmap)
 
-        self.locationLabel.setText(alarm.location())
-        self.locationHintLabel.setText(alarm.ortshinweis)
+        self.locationLabel.setText(self.alarm.location())
+        self.locationHintLabel.setText(self.alarm.ortshinweis)
         if self.locationHintLabel.text():
             self.locationHintLabel.show()
         else:
@@ -333,7 +351,7 @@ class MainWidget(QWidget):
             pixmap = QPixmap()
         self.locationSymbolLabel.setPixmap(pixmap)
 
-        self.attentionLabel.setText(alarm.attention())
+        self.attentionLabel.setText(self.alarm.attention())
         if self.attentionLabel.text():
             pixmap = QPixmap(os.path.join(self.imageDir,
                         'emblem-important.svg'))
@@ -346,7 +364,7 @@ class MainWidget(QWidget):
             self.attentionSymbolLabel.hide()
             self.attentionLabel.hide()
 
-        self.callerLabel.setText(alarm.callerInfo())
+        self.callerLabel.setText(self.alarm.callerInfo())
         if self.callerLabel.text():
             pixmap = QPixmap(os.path.join(self.imageDir,
                         'caller.svg'))
@@ -360,31 +378,39 @@ class MainWidget(QWidget):
             self.callerLabel.hide()
 
         self.leftMap.invalidate()
-        self.leftMap.setObjectPlan(alarm.objektnummer)
+        self.leftMap.setObjectPlan(self.alarm.objektnummer)
 
         self.rightMap.invalidate()
 
         QApplication.processEvents()
 
-        route = ([], None, None)
         self.logger.info('Destination map...')
-        self.leftMap.setTarget(alarm.lat, alarm.lon, route)
+        self.leftMap.setTarget(self.alarm.lat, self.alarm.lon, self.route)
         self.logger.info('Route map...')
-        self.rightMap.setTarget(alarm.lat, alarm.lon, route)
+        self.rightMap.setTarget(self.alarm.lat, self.alarm.lon, self.route)
         self.logger.info('Maps ready.')
-        QApplication.processEvents()
 
-        self.logger.info('Route query...')
-        route = getRoute(alarm.lat, alarm.lon, self.config, self.logger)
-        self.logger.info('Destination map...')
-        self.leftMap.setTarget(alarm.lat, alarm.lon, route)
-        self.logger.info('Route map...')
-        self.rightMap.setTarget(alarm.lat, alarm.lon, route)
-        self.logger.info('Route ready.')
-        QApplication.processEvents()
+        if not self.route[0]:
+            QApplication.processEvents()
+            self.logger.info('Route query...')
+            self.route = getRoute(self.alarm.lat, self.alarm.lon, self.config,
+                    self.logger)
+            self.logger.info('Destination map...')
+            self.leftMap.setTarget(self.alarm.lat, self.alarm.lon, self.route)
+            self.logger.info('Route map...')
+            self.rightMap.setTarget(self.alarm.lat, self.alarm.lon,
+                    self.route)
+            self.logger.info('Route ready.')
 
+        if self.seenPager and self.seenXml and not self.reportDone:
+            self.reportTimer.stop()
+            QApplication.processEvents()
+            self.generateReport()
+
+    def generateReport(self):
         self.logger.info('Report...')
-        self.report.generate(alarm, route)
+        self.report.generate(self.alarm, self.route)
+        self.reportDone = True
         self.logger.info('Finished.')
 
     def resizeEvent(self, event):
