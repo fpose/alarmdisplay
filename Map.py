@@ -93,6 +93,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config, logger):
     totProj = MercatorProjection(lllon, lllat, urlon, urlat)
 
     pixmap = QPixmap(width, height)
+    pixmap.fill() # white
     painter = QPainter()
     painter.begin(pixmap)
 
@@ -202,6 +203,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     totProj = MercatorProjection(lllon, lllat, urlon, urlat)
 
     pixmap = QPixmap(width, height)
+    pixmap.fill() # white
     painter = QPainter()
     painter.begin(pixmap)
 
