@@ -16,7 +16,6 @@ vim: syntax=markdown tw=78 spl=de
 
 * Settings neu laden via SIHGUP
 * Pfad für Logfile
-* Zeitzone für use_host_clock
 
 # Alarmierung
 

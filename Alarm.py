@@ -27,6 +27,7 @@ import re
 import xml.dom.minidom
 import datetime
 import pytz
+from tzlocal import get_localzone # $ pip install tzlocal
 
 from PyQt5.QtCore import *
 
@@ -128,7 +129,9 @@ class Alarm:
         useHostClock = self.config.get('pager', 'use_host_clock',
                 fallback = False)
         if useHostClock:
-            self.datetime = datetime.datetime.now()
+            now = datetime.datetime.now()
+            local_tz = get_localzone()
+            self.datetime = local_tz.localize(now)
         else:
             dt_naive = datetime.datetime.strptime(ma.group(1),
                     '%d-%m-%y %H:%M:%S')
