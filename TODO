@@ -9,10 +9,9 @@ vim: syntax=markdown tw=78 spl=de
 * Symbol für Fahrtdauer
 * Kritischen Pfad ermitteln / Reihenfolge editierbar?
 * Route später über bereits geladene Kacheln zeichnen
+* Rand zwischen Karten
 
 # Alarmierung
-
-* Alarm.fromPager() robuster (mit Rückfall)
 
 * Route asynchron holen
 * IMAP-Idle nutzen statt polling

@@ -188,6 +188,20 @@ class MainWidget(QWidget):
             """)
         attentionLayout.addWidget(self.callerLabel, 1)
 
+        # Fallback row -------------------------------------------------------
+
+        self.fallbackLabel = QLabel(self)
+        self.fallbackLabel.setIndent(0)
+        self.fallbackLabel.setWordWrap(True)
+        self.fallbackLabel.setSizePolicy(QSizePolicy.Ignored,
+                QSizePolicy.Preferred)
+        self.fallbackLabel.setStyleSheet("""
+            padding: 10px;
+            font-size: 40px;
+            """)
+
+        verLayout.addWidget(self.fallbackLabel, 0)
+
         # Maps ---------------------------------------------------------------
 
         horLayout = QHBoxLayout(self)
@@ -376,6 +390,12 @@ class MainWidget(QWidget):
             self.callerSymbolLabel.setPixmap(pixmap)
             self.callerSymbolLabel.hide()
             self.callerLabel.hide()
+
+        self.fallbackLabel.setText(self.alarm.fallbackStr)
+        if self.fallbackLabel.text():
+            self.fallbackLabel.show()
+        else:
+            self.fallbackLabel.hide()
 
         self.leftMap.invalidate()
         self.leftMap.setObjectPlan(self.alarm.objektnummer)

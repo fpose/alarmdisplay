@@ -81,6 +81,7 @@ class Alarm:
         self.xml = None
         self.config = config
         self.source = None
+        self.fallbackStr = None
 
     def fromPager(self, pagerStr, logger):
         # '16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung
@@ -105,6 +106,7 @@ class Alarm:
         ma = self.alarmRe.match(pagerStr)
         if not ma:
             logger.warn('Alarmtext nicht erkannt!')
+            self.fallbackStr = pagerStr
             return
 
         logger.debug(ma.groups())
