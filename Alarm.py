@@ -27,7 +27,7 @@ import re
 import xml.dom.minidom
 import datetime
 import pytz
-from tzlocal import get_localzone # $ pip install tzlocal
+from tzlocal import get_localzone
 
 from PyQt5.QtCore import *
 
