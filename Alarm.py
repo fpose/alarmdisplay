@@ -125,13 +125,20 @@ class Alarm:
         # 11) Objektplan
         # 12) Ortshinweis
 
-        dt_naive = datetime.datetime.strptime(ma.group(1), '%d-%m-%y %H:%M:%S')
-        logger.debug('Date naive %s', dt_naive)
-        zoneStr = self.config.get('email', 'time_zone',
-                fallback = 'Europe/Berlin')
-        tz = pytz.timezone(zoneStr)
-        logger.debug('Timezone %s', tz)
-        self.datetime = tz.localize(dt_naive)
+        useHostClock = self.config.get('pager', 'use_host_clock',
+                fallback = False)
+        if useHostClock:
+            self.datetime = datetime.datetime.now()
+        else:
+            dt_naive = datetime.datetime.strptime(ma.group(1),
+                    '%d-%m-%y %H:%M:%S')
+            logger.debug('Date naive %s', dt_naive)
+            zoneStr = self.config.get('pager', 'time_zone',
+                    fallback = 'Europe/Berlin')
+            tz = pytz.timezone(zoneStr)
+            logger.debug('Timezone %s', tz)
+            self.datetime = tz.localize(dt_naive)
+
         logger.debug('Date %s', self.datetime)
 
         einheit = ma.group(2).strip() # unused

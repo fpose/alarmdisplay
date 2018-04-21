@@ -3,23 +3,27 @@ vim: syntax=markdown tw=78 spl=de
 # Anzeige
 
 * Alarmierte Einheiten anzeigen
+* Rand zwischen Karten
+
 * Symbol für Wegerechte
 * Symbol für alle Einsatzarten / Tragehilfe (K) / etc.
 * Symbol für Distanz
 * Symbol für Fahrtdauer
 * Kritischen Pfad ermitteln / Reihenfolge editierbar?
 * Route später über bereits geladene Kacheln zeichnen
-* Rand zwischen Karten
 
 # Allgemein
 
 * Settings neu laden via SIHGUP
+* Pfad für Logfile
+* Zeitzone für use_host_clock
 
 # Alarmierung
 
 * Route asynchron holen
 * IMAP-Idle nutzen statt polling
 * Einsatzdaten bei Alarmierung in Verzeichnis ablegen
+* Fallback-String entfernen, wenn korrekter Alarm nachfolgt
 
 # Idle-Anzeige
 
