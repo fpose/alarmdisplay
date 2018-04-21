@@ -11,6 +11,10 @@ vim: syntax=markdown tw=78 spl=de
 * Route später über bereits geladene Kacheln zeichnen
 * Rand zwischen Karten
 
+# Allgemein
+
+* Settings neu laden via SIHGUP
+
 # Alarmierung
 
 * Route asynchron holen
