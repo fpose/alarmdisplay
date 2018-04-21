@@ -23,6 +23,5 @@ class SocketListener(QtCore.QObject):
             size = self.socket.pendingDatagramSize()
             (data, host, port) = self.socket.readDatagram(size)
             self.logger.info("Received from %s:%i", host.toString(), port)
-            pagerStr = data.decode('latin1')
-            pagerStr = AlarmReceiver.decode(pagerStr)
+            pagerStr = data.decode('utf-8')
             self.receivedAlarm.emit(pagerStr)
