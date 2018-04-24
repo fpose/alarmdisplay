@@ -1,0 +1,29 @@
+------------------------------------------------------------------------------
+
+vim: tw=78 spl=en spell
+
+# Alarm Display
+
+This is an alarm display implementation for fire departments (etc). It has
+been designed for the local circumstances of the Kreis Kleve, North
+Rhine-Westphalia, Germany. It should be adaptable for other areas and
+countries.
+
+## Hardware
+
+The original hardware is a Raspberry Pi with a large display connected via
+HDMI and a digital alarm pager connected via USB.
+
+## Software
+
+The software is written in Python3, using the PyQt libaries for Qt5.
+
+## Features
+
+- Alarm data overview
+- Target map
+- Route map
+- Maps using OpenStreetMap tiles
+- Alarm report document for printer output
+
+------------------------------------------------------------------------------
