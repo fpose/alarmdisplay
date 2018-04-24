@@ -1,5 +1,28 @@
 # -*- coding: utf-8 -*-
 
+#-----------------------------------------------------------------------------
+#
+# Route Display Widget
+#
+# Copyright (C) 2018 Florian Pose
+#
+# This file is part of Alarm Display.
+#
+# Alarm Display is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Alarm Display is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# Alarm Display. If not, see <http://www.gnu.org/licenses/>.
+#
+#-----------------------------------------------------------------------------
+
 import math
 
 from PyQt5.QtWidgets import QFrame
@@ -7,6 +30,8 @@ from PyQt5.QtGui import QPainter, QFontMetrics, QColor
 from PyQt5.QtCore import QRect, Qt, QPoint, QLocale
 
 import Map
+
+#-----------------------------------------------------------------------------
 
 class RouteWidget(QFrame):
 
@@ -88,3 +113,4 @@ class RouteWidget(QFrame):
                 return True
         return False
 
+#-----------------------------------------------------------------------------

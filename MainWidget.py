@@ -1,5 +1,28 @@
 # -*- coding: utf-8 -*-
 
+#-----------------------------------------------------------------------------
+#
+# Main Widget
+#
+# Copyright (C) 2018 Florian Pose
+#
+# This file is part of Alarm Display.
+#
+# Alarm Display is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Alarm Display is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# Alarm Display. If not, see <http://www.gnu.org/licenses/>.
+#
+#-----------------------------------------------------------------------------
+
 import os
 import math
 import subprocess
@@ -18,6 +41,8 @@ from SocketListener import SocketListener
 from AlarmReport import AlarmReport
 from CecCommand import CecCommand
 from Alarm import Alarm, EinsatzMittel
+
+#-----------------------------------------------------------------------------
 
 class MainWidget(QWidget):
 
@@ -256,7 +281,7 @@ class MainWidget(QWidget):
         action = QAction(self)
         action.setShortcut(QKeySequence("6"))
         action.setShortcutContext(Qt.ApplicationShortcut)
-        action.triggered.connect(self.exampleWaldfee)
+        action.triggered.connect(self.exampleWald)
         self.addAction(action)
 
         action = QAction(self)
@@ -548,7 +573,7 @@ class MainWidget(QWidget):
         alarm.ort = 'Kleve'
         alarm.lat = 51.75638
         alarm.lon = 6.11815
-        alarm.meldender = 'Pose'
+        alarm.meldender = 'Müller'
         alarm.rufnummer = '0179 555 364532'
         alarm.number = '1170040004'
         alarm.sondersignal = '1'
@@ -569,7 +594,7 @@ class MainWidget(QWidget):
 
         self.processAlarm(alarm)
 
-    def exampleWaldfee(self):
+    def exampleWald(self):
         pagerStr = '16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung' + \
             ' #K01;N5173170E0606900; *40005*H1 Hilfeleistung*' + \
             'Eichhörnchen auf Baum*Kleve*Reichswalde**' + \
@@ -603,3 +628,4 @@ class MainWidget(QWidget):
 
         self.processAlarm(alarm)
 
+#-----------------------------------------------------------------------------
