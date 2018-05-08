@@ -4,6 +4,7 @@ syntax: glob
 __pycache__
 alarm*.pdf
 alarm*.ps
+alarm_db
 alarmdisplay.conf
 alarmdisplay.log
 report/*.aux
