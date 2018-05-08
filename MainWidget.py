@@ -235,7 +235,8 @@ class MainWidget(QWidget):
 
         self.leftMap = MapWidget(self, self.config, self.logger)
         self.leftMap.setStyleSheet("""
-            font-size: 40px;
+            font-size: 60px;
+            color: #cc0000;
             """)
         horLayout.addWidget(self.leftMap, 3)
 

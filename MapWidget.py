@@ -83,7 +83,7 @@ class MapWidget(QFrame):
             fm = QFontMetrics(painter.font())
             rect = fm.boundingRect(txt)
             rect = fm.boundingRect(rect, 0, txt)
-            rect.adjust(-pad, 0, pad, 0)
+            rect.adjust(-pad, -pad, pad, pad)
 
             imageDir = self.config.get("display", "image_dir",
                 fallback = "images")
@@ -93,7 +93,7 @@ class MapWidget(QFrame):
             rect.adjust(0, 0, iconSize.width(), 0)
 
             rect.moveBottomLeft(QPoint(margin, self.height() - margin))
-            painter.fillRect(rect, QColor(255, 255, 255, 192))
+            painter.fillRect(rect, QColor(220, 220, 150, 225))
 
             iconRect = QRect(rect)
             iconRect.setWidth(iconSize.width())
