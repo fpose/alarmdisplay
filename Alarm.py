@@ -24,6 +24,7 @@
 #
 #-----------------------------------------------------------------------------
 
+import os
 import re
 import xml.dom.minidom
 import datetime
@@ -83,6 +84,7 @@ class Alarm:
         self.xml = None
         self.config = config
         self.source = None
+        self.pager = None
         self.fallbackStr = None
 
     def fromPager(self, pagerStr, logger):
@@ -91,6 +93,7 @@ class Alarm:
         # Hinweis*Stadt*Ortsteil*Straße*
         # *Objektplan*Ortshinweis
 
+        self.pager = pagerStr
         self.source = 'pager'
 
         ma = self.coordRe.search(pagerStr)
@@ -258,6 +261,28 @@ class Alarm:
         logger.info(u'Besonderheit: %s', repr(self.besonderheit))
         for em in self.einsatzmittel:
             logger.info(em.asString())
+
+    def save(self):
+        path = self.config.get('db', 'path', fallback = None)
+        if not path:
+            return
+
+        contents = None
+        if self.source == 'pager':
+            ext = '.dme'
+            contents = self.pager
+        elif self.source == 'xml':
+            ext = '.xml'
+            contents = self.xml
+
+        if not contents:
+            return
+
+        fileName = self.datetime.strftime('%Y-%m-%d-%H-%M-%S') + ext
+
+        f = open(os.path.join(path, fileName), 'w', encoding = 'utf-8')
+        f.write(contents)
+        f.close()
 
     def matches(self, other):
         return self.number and other.number and \

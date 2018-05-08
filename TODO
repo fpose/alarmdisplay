@@ -20,7 +20,6 @@ vim: syntax=markdown tw=78 spl=de
 
 * Route asynchron holen
 * IMAP-Idle nutzen statt polling
-* Einsatzdaten bei Alarmierung in Verzeichnis ablegen
 * Fallback-String entfernen, wenn korrekter Alarm nachfolgt
 
 # Idle-Anzeige

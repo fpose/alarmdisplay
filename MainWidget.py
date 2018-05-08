@@ -351,6 +351,11 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def processAlarm(self, newAlarm):
+        try:
+            newAlarm.save()
+        except:
+            self.logger.error('Failed to save alarm:', exc_info = True)
+
         if not self.alarm or not self.alarm.matches(newAlarm):
             self.logger.info("Processing new alarm.")
             self.startTimer()
@@ -597,9 +602,9 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def exampleWald(self):
-        pagerStr = '16-12-17 18:55:10 LG Reichswalde Geb{udesteuerung' + \
+        pagerStr = '16-12-17 18:55:10 LG Reichswalde Gebäudesteuerung' + \
             ' #K01;N5173170E0606900; *40005*H1 Hilfeleistung*' + \
-            'Eichhörnchen auf Baum*Kleve*Reichswalde**' + \
+            'Eichhörnchen auf Baum*Kleve*Reichswalde*' + \
             'Grunewaldstrasse***Waldweg C'
 
         alarm = Alarm(self.config)
@@ -609,7 +614,7 @@ class MainWidget(QWidget):
 
     def exampleStadtwerkePager(self):
 
-        pagerStr = '21-12-17 11:55:10 LG Reichswalde Geb{udesteuerung' + \
+        pagerStr = '21-12-17 11:55:10 LG Reichswalde Gebäudesteuerung' + \
             ' #K01;N5179473E0613985; *40006*B3 Brand Bürogebäude*' + \
             'Stadtwerke Kleve GmbH*Kleve*Kleve*Flutstraße*36**'
 
@@ -620,7 +625,7 @@ class MainWidget(QWidget):
 
     def exampleLebenshilfe(self):
 
-        pagerStr = '22-03-17 10:12:38 LG Reichswalde  Geb{udesteuerung' + \
+        pagerStr = '22-03-17 10:12:38 LG Reichswalde  Gebäudesteuerung' + \
             ' #K01;N5177287E0611253;*40007*B2 Brandmeldeanlage 2' + \
             ' **Kleve*Materborn*Dorfstrasse*27*KLV 02/103' + \
             '*Materborner Allee - Saalstrasse'
