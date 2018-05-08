@@ -2,7 +2,7 @@
 
 #-----------------------------------------------------------------------------
 #
-# Idle Widget
+# History Widget
 #
 # Copyright (C) 2018 Florian Pose
 #
@@ -31,59 +31,43 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from HistoryWidget import *
+from MapWidget import MapWidget
 
 #-----------------------------------------------------------------------------
 
-class IdleWidget(QWidget):
+class HistoryWidget(QWidget):
 
-    def __init__(self, main):
-        super(IdleWidget, self).__init__()
+    def __init__(self, config, logger):
+        super(HistoryWidget, self).__init__()
 
-        self.main = main
-        self.config = main.config
-        self.logger = main.logger
+        self.config = config
+        self.logger = logger
 
-        self.imageDir = self.config.get("display", "image_dir",
-                fallback = "images")
+        path = self.config.get("db", "path", fallback = None)
+
+        horLayout = QHBoxLayout(self)
+        horLayout.setSpacing(0)
+        horLayout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(horLayout)
 
         verLayout = QVBoxLayout(self)
         verLayout.setSpacing(0)
         verLayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(verLayout)
+        horLayout.addLayout(verLayout)
 
-        titleLayout = QHBoxLayout(self)
-        titleLayout.setSpacing(0)
-        verLayout.addLayout(titleLayout, 0)
-
-        self.symbolLabel = QLabel(self)
-        self.symbolLabel.setStyleSheet("""
-            background-color: rgb(0, 0, 0);
-            padding: 10px;
-            """)
-        titleLayout.addWidget(self.symbolLabel, 0)
-
-        self.titleLabel = QLabel(self)
-        self.titleLabel.setSizePolicy(QSizePolicy.Ignored,
-                QSizePolicy.Preferred)
-        self.titleLabel.setStyleSheet("""
-            color: white;
+        self.targetMap = MapWidget(self, self.config, self.logger)
+        self.targetMap.setStyleSheet("""
             font-size: 60px;
-            background-color: rgb(0, 0, 120);
-            padding: 10px;
+            color: #cc0000;
             """)
-        self.titleLabel.setText(self.config.get("display", "title",
-                fallback = "Alarmdisplay"))
-        titleLayout.addWidget(self.titleLabel, 1)
+        horLayout.addWidget(self.targetMap, 3)
 
-        self.stackedWidget = QStackedWidget(self)
-        verLayout.addWidget(self.stackedWidget)
-
-        self.historyWidget = HistoryWidget(self.config, self.logger)
-        self.stackedWidget.addWidget(self.historyWidget)
+        label = QLabel(self)
+        label.setText('Einsatz')
+        horLayout.addWidget(label)
 
     def resizeEvent(self, event):
-        self.logger.debug('Resizing idle widget to %u x %u.',
+        self.logger.debug('Resizing history widget to %u x %u.',
             event.size().width(), event.size().height())
 
 #-----------------------------------------------------------------------------
