@@ -230,6 +230,7 @@ class MainWidget(QWidget):
         # Maps ---------------------------------------------------------------
 
         horLayout = QHBoxLayout(self)
+        horLayout.setSpacing(2)
         verLayout.addLayout(horLayout, 2)
 
         self.leftMap = MapWidget(self, self.config, self.logger)
