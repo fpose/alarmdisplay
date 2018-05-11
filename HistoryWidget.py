@@ -166,7 +166,7 @@ class HistoryWidget(QWidget):
             alarm.load(path, self.logger)
 
             if len(self.alarms) and self.alarms[-1].matches(alarm):
-                self.alarms[-1].merge(alarm)
+                self.alarms[-1].merge(alarm, self.logger)
             else:
                 self.alarms.append(alarm)
                 index += 1
@@ -195,6 +195,7 @@ class HistoryWidget(QWidget):
             alarm = self.alarms[self.index]
             self.targetMap.setTarget(alarm.lat, alarm.lon, ([],))
             self.cycleTimer.start()
+            self.updateStyles()
 
     def cycle(self):
         self.index += 1

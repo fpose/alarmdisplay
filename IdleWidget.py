@@ -91,6 +91,9 @@ class IdleWidget(QWidget):
         self.historyWidget = HistoryWidget(self.config, self.logger)
         self.stackedWidget.addWidget(self.historyWidget)
 
+    def update(self):
+        self.historyWidget.update()
+
     def resizeEvent(self, event):
         self.logger.debug('Resizing idle widget to %u x %u.',
             event.size().width(), event.size().height())

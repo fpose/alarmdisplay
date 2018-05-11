@@ -74,6 +74,13 @@ class MainWidget(QWidget):
         self.simTimer.timeout.connect(self.simTimeout)
         #self.simTimer.start()
 
+        self.idleTimer = QTimer(self)
+        idleTimeout = self.config.getint("display", "idle_timeout",
+                fallback = 30)
+        self.idleTimer.setInterval(idleTimeout * 60000)
+        self.idleTimer.setSingleShot(True)
+        self.idleTimer.timeout.connect(self.idleTimeout)
+
         self.screenTimer = QTimer(self)
         screenTimeout = self.config.getint("display", "screen_timeout",
                 fallback = 0)
@@ -273,8 +280,8 @@ class MainWidget(QWidget):
 
     def startTimer(self):
         self.alarmDateTime = QDateTime.currentDateTime()
-        self.logger.debug('Screen timeout: %u ms',
-                self.screenTimer.interval())
+        if self.idleTimer.interval() > 0:
+            self.idleTimer.start()
         if self.screenTimer.interval() > 0:
             self.screenTimer.start()
         self.alarmWidget.startTimer(self.alarmDateTime)
@@ -283,6 +290,10 @@ class MainWidget(QWidget):
 
     def simTimeout(self):
         self.exampleJugend()
+
+    def idleTimeout(self):
+        self.stackedWidget.setCurrentWidget(self.idleWidget)
+        self.idleWidget.update()
 
     def screenTimeout(self):
         self.cecCommand.switchOff()
