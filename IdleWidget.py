@@ -32,6 +32,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from HistoryWidget import *
+from helpers import *
 
 #-----------------------------------------------------------------------------
 
@@ -58,9 +59,17 @@ class IdleWidget(QWidget):
 
         self.symbolLabel = QLabel(self)
         self.symbolLabel.setStyleSheet("""
-            background-color: rgb(0, 0, 0);
+            background-color: rgb(0, 0, 120);
             padding: 10px;
             """)
+        logo = self.config.get("display", "logo", fallback = None)
+        if logo:
+            pixmap = QPixmap(os.path.join(self.imageDir, logo))
+            pixmap = pixmap.scaledToWidth(100,
+                    mode = Qt.SmoothTransformation)
+            print(pixmap.size())
+            self.symbolLabel.setPixmap(pixmap)
+
         titleLayout.addWidget(self.symbolLabel, 0)
 
         self.titleLabel = QLabel(self)

@@ -35,6 +35,7 @@ from PyQt5.QtSvg import QSvgRenderer
 
 from MapWidget import MapWidget
 from Alarm import Alarm
+from helpers import *
 
 #-----------------------------------------------------------------------------
 
@@ -51,7 +52,7 @@ class HistoryWidget(QWidget):
 
         self.cycleTimer = QTimer(self)
         self.cycleTimer.setInterval( \
-            self.config.get("idle", "cycle_period", fallback = 5) * 1000)
+            self.config.get("idle", "cycle_period", fallback = 10) * 1000)
         self.cycleTimer.setSingleShot(False)
         self.cycleTimer.timeout.connect(self.cycle)
 
@@ -77,7 +78,7 @@ class HistoryWidget(QWidget):
         label.setIndent(0)
         label.setStyleSheet("""
             font-size: 50px;
-            padding: 10px 10px 10px 80px;
+            padding: 10px 10px 10px 60px;
             """)
         verLayout.addWidget(label)
 
@@ -132,8 +133,8 @@ class HistoryWidget(QWidget):
         if section == 'title':
             style += 'font-size: 40px;'
         if section == 'desc':
-            style += 'font-size: 30px;'
-            style += 'padding: 0px 0px 20px 80px;'
+            style += 'font-size: 25px;'
+            style += 'padding: 0px 0px 20px 60px;'
             style += 'alignment: top;'
 
         if index == self.index:
@@ -181,8 +182,7 @@ class HistoryWidget(QWidget):
             image = alarm.imageBase()
             if image:
                 image += '.svg'
-                pixmap = self.pixmapFromSvg(60,
-                        os.path.join(self.imageDir, image))
+                pixmap = pixmapFromSvg(os.path.join(self.imageDir, image), 40)
             else:
                 pixmap = QPixmap()
             self.symbolLabels[index].setPixmap(pixmap)
@@ -205,22 +205,5 @@ class HistoryWidget(QWidget):
         self.targetMap.setTarget(alarm.lat, alarm.lon, ([],))
 
         self.updateStyles()
-
-    def pixmapFromSvg(self, width, path):
-        renderer = QSvgRenderer(path)
-
-        svgSize = renderer.defaultSize()
-        height = svgSize.height() / svgSize.width() * width
-
-        pixmap = QPixmap(QSize(width, height))
-        painter = QPainter()
-
-        pixmap.fill(Qt.transparent)
-
-        painter.begin(pixmap)
-        renderer.render(painter)
-        painter.end()
-
-        return pixmap
 
 #-----------------------------------------------------------------------------
