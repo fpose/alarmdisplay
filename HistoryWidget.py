@@ -138,7 +138,12 @@ class HistoryWidget(QWidget):
             style += 'alignment: top;'
 
         if index == self.index:
-            style += 'background-color: #404080;'
+            style += 'background-color: #5050a0;'
+        else:
+            if index % 2:
+                style += 'background-color: #101020;'
+            else:
+                style += 'background-color: #202040;'
 
         return style
 
