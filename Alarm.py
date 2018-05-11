@@ -57,6 +57,7 @@ class Alarm:
             '(.*)\*' \
             '(.*)\*' \
             '(.*)')
+    dateRe = re.compile('\d\d\d\d-\d\d-\d\d-\d\d-\d\d-\d\d')
 
     def __init__(self, config, receiveTimeStamp = None):
         self.number = None
@@ -87,7 +88,7 @@ class Alarm:
         self.pager = None
         self.fallbackStr = None
 
-    def fromPager(self, pagerStr, logger):
+    def fromPager(self, pagerStr, logger, dateTime = None):
         # '16-12-17 18:55:10 DME-Text
         # #K01;N5174110E0608130; *57274*H1 Hilfeleistung*
         # Hinweis*Stadt*Ortsteil*Straße*
@@ -130,21 +131,24 @@ class Alarm:
         # 11) Objektplan
         # 12) Ortshinweis
 
-        useHostClock = self.config.get('pager', 'use_host_clock',
-                fallback = False)
-        if useHostClock:
-            now = datetime.datetime.now()
-            local_tz = get_localzone()
-            self.datetime = local_tz.localize(now)
+        if dateTime:
+            self.datetime = dateTime
         else:
-            dt_naive = datetime.datetime.strptime(ma.group(1),
-                    '%d-%m-%y %H:%M:%S')
-            logger.debug('Date naive %s', dt_naive)
-            zoneStr = self.config.get('pager', 'time_zone',
-                    fallback = 'Europe/Berlin')
-            tz = pytz.timezone(zoneStr)
-            logger.debug('Timezone %s', tz)
-            self.datetime = tz.localize(dt_naive)
+            useHostClock = self.config.get('pager', 'use_host_clock',
+                    fallback = False)
+            if useHostClock:
+                now = datetime.datetime.now()
+                local_tz = get_localzone()
+                self.datetime = local_tz.localize(now)
+            else:
+                dt_naive = datetime.datetime.strptime(ma.group(1),
+                        '%d-%m-%y %H:%M:%S')
+                logger.debug('Date naive %s', dt_naive)
+                zoneStr = self.config.get('pager', 'time_zone',
+                        fallback = 'Europe/Berlin')
+                tz = pytz.timezone(zoneStr)
+                logger.debug('Timezone %s', tz)
+                self.datetime = tz.localize(dt_naive)
 
         logger.debug('Date %s', self.datetime)
 
@@ -283,6 +287,20 @@ class Alarm:
         f = open(os.path.join(path, fileName), 'w', encoding = 'utf-8')
         f.write(contents)
         f.close()
+
+    def load(self, path, logger):
+        f = open(path, 'r', encoding = 'utf-8')
+        contents = f.read()
+        f.close()
+
+        ma = self.dateRe.search(path)
+        dateTime = datetime.datetime.strptime(ma.group(), '%Y-%m-%d-%H-%M-%S')
+
+        if path.endswith('.dme'):
+            self.fromPager(contents, logger, dateTime = dateTime)
+
+        if path.endswith('.xml'):
+           self.fromXml(contents, logger)
 
     def matches(self, other):
         return self.number and other.number and \
