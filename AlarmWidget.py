@@ -60,8 +60,9 @@ class AlarmWidget(QWidget):
         verLayout.setSpacing(0)
         verLayout.setContentsMargins(0, 0, 0, 0)
 
-        titleLayout = QHBoxLayout(self)
+        titleLayout = QHBoxLayout()
         titleLayout.setSpacing(0)
+        verLayout.addLayout(titleLayout, 0)
 
         self.symbolLabel = QLabel(self)
         self.symbolLabel.setStyleSheet("""
@@ -90,10 +91,9 @@ class AlarmWidget(QWidget):
             """)
         titleLayout.addWidget(self.timerLabel, 0)
 
-        verLayout.addLayout(titleLayout, 0)
-
-        locationLayout = QHBoxLayout(self)
+        locationLayout = QHBoxLayout()
         locationLayout.setSpacing(0)
+        verLayout.addLayout(locationLayout, 0)
 
         self.locationSymbolLabel = QLabel(self)
         self.locationSymbolLabel.setStyleSheet("""
@@ -101,8 +101,9 @@ class AlarmWidget(QWidget):
             """)
         locationLayout.addWidget(self.locationSymbolLabel, 0)
 
-        innerLocationLayout = QVBoxLayout(self)
+        innerLocationLayout = QVBoxLayout()
         innerLocationLayout.setSpacing(0)
+        locationLayout.addLayout(innerLocationLayout, 1)
 
         self.locationLabel = QLabel(self)
         self.locationLabel.setIndent(0)
@@ -123,13 +124,9 @@ class AlarmWidget(QWidget):
             """)
         innerLocationLayout.addWidget(self.locationHintLabel, 1)
 
-        locationLayout.addLayout(innerLocationLayout, 1)
-
-        verLayout.addLayout(locationLayout, 0)
-
         # Attention row ------------------------------------------------------
 
-        attentionLayout = QHBoxLayout(self)
+        attentionLayout = QHBoxLayout()
         attentionLayout.setSpacing(0)
         verLayout.addLayout(attentionLayout, 0)
 
@@ -181,7 +178,7 @@ class AlarmWidget(QWidget):
 
         # Maps ---------------------------------------------------------------
 
-        horLayout = QHBoxLayout(self)
+        horLayout = QHBoxLayout()
         horLayout.setSpacing(2)
         verLayout.addLayout(horLayout, 2)
 
@@ -197,8 +194,6 @@ class AlarmWidget(QWidget):
             font-size: 40px;
             """)
         horLayout.addWidget(self.rightMap, 3)
-
-        self.setLayout(verLayout)
 
     def startTimer(self, alarmDateTime):
         self.alarmDateTime = alarmDateTime

@@ -61,9 +61,8 @@ class HistoryWidget(QWidget):
         horLayout = QHBoxLayout(self)
         horLayout.setSpacing(0)
         horLayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(horLayout)
 
-        verLayout = QVBoxLayout(self)
+        verLayout = QVBoxLayout()
         verLayout.setSpacing(0)
         verLayout.setContentsMargins(0, 0, 0, 0)
         horLayout.addLayout(verLayout, 1)
@@ -90,7 +89,7 @@ class HistoryWidget(QWidget):
         self.index = 0
 
         for i in range(0, 5):
-            itemLayout = QHBoxLayout(self)
+            itemLayout = QHBoxLayout()
             itemLayout.setSpacing(0)
             itemLayout.setContentsMargins(0, 0, 0, 0)
             verLayout.addLayout(itemLayout)

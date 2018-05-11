@@ -58,9 +58,8 @@ class IdleWidget(QWidget):
         verLayout = QVBoxLayout(self)
         verLayout.setSpacing(0)
         verLayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(verLayout)
 
-        titleLayout = QHBoxLayout(self)
+        titleLayout = QHBoxLayout()
         titleLayout.setSpacing(0)
         verLayout.addLayout(titleLayout, 0)
 

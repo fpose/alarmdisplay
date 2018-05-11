@@ -63,7 +63,6 @@ class WeatherWidget(QWidget):
         horLayout = QHBoxLayout(self)
         horLayout.setSpacing(0)
         horLayout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(horLayout)
 
         label = QLabel(self)
         label.setAlignment(Qt.AlignCenter)
