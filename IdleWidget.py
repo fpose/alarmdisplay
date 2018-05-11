@@ -48,6 +48,12 @@ class IdleWidget(QWidget):
         self.imageDir = self.config.get("display", "image_dir",
                 fallback = "images")
 
+        self.clockTimer = QTimer(self)
+        self.clockTimer.setInterval(100)
+        self.clockTimer.setSingleShot(False)
+        self.clockTimer.timeout.connect(self.clockTimeout)
+        self.clockTimer.start()
+
         verLayout = QVBoxLayout(self)
         verLayout.setSpacing(0)
         verLayout.setContentsMargins(0, 0, 0, 0)
@@ -85,6 +91,16 @@ class IdleWidget(QWidget):
                 fallback = "Alarmdisplay"))
         titleLayout.addWidget(self.titleLabel, 1)
 
+        self.clockLabel = QLabel(self)
+        self.clockLabel.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        self.clockLabel.setStyleSheet("""
+            color: white;
+            font-size: 80px;
+            background-color: rgb(0, 0, 120);
+            padding: 10px;
+            """)
+        titleLayout.addWidget(self.clockLabel, 0)
+
         self.stackedWidget = QStackedWidget(self)
         verLayout.addWidget(self.stackedWidget)
 
@@ -97,5 +113,11 @@ class IdleWidget(QWidget):
     def resizeEvent(self, event):
         self.logger.debug('Resizing idle widget to %u x %u.',
             event.size().width(), event.size().height())
+
+    def clockTimeout(self):
+        now = datetime.datetime.now()
+        clockStr = now.strftime('%H:%M:%S')
+        if self.clockLabel.text() != clockStr:
+            self.clockLabel.setText(clockStr)
 
 #-----------------------------------------------------------------------------
