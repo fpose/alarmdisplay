@@ -26,10 +26,12 @@
 import os
 import math
 import datetime
+import babel.dates
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtSvg import QSvgRenderer
 
 from MapWidget import MapWidget
 from Alarm import Alarm
@@ -43,6 +45,9 @@ class HistoryWidget(QWidget):
 
         self.config = config
         self.logger = logger
+
+        self.imageDir = self.config.get("display", "image_dir",
+                fallback = "images")
 
         self.cycleTimer = QTimer(self)
         self.cycleTimer.setInterval( \
@@ -67,17 +72,37 @@ class HistoryWidget(QWidget):
             """)
         horLayout.addWidget(self.targetMap, 1)
 
+        label = QLabel(self)
+        label.setText('Letzte Einsätze')
+        label.setIndent(0)
+        label.setStyleSheet("""
+            font-size: 50px;
+            padding: 10px 10px 10px 80px;
+            """)
+        verLayout.addWidget(label)
+
+        self.symbolLabels = []
         self.titleLabels = []
         self.descLabels = []
         self.index = 0
 
         for i in range(0, 5):
+            itemLayout = QHBoxLayout(self)
+            itemLayout.setSpacing(0)
+            itemLayout.setContentsMargins(0, 0, 0, 0)
+            verLayout.addLayout(itemLayout)
+
             label = QLabel(self)
-            verLayout.addWidget(label)
+            itemLayout.addWidget(label, 0)
+            self.symbolLabels.append(label)
+
+            label = QLabel(self)
+            label.setIndent(0)
+            itemLayout.addWidget(label, 1)
             self.titleLabels.append(label)
 
             label = QLabel(self)
-            label.setAlignment(Qt.AlignTop)
+            label.setIndent(0)
             verLayout.addWidget(label)
             self.descLabels.append(label)
 
@@ -86,6 +111,9 @@ class HistoryWidget(QWidget):
 
     def updateStyles(self):
         for i in range(0, 5):
+            label = self.symbolLabels[i]
+            label.setStyleSheet(self.style(i, 'symbol'))
+
             label = self.titleLabels[i]
             label.setStyleSheet(self.style(i, 'title'))
 
@@ -97,12 +125,16 @@ class HistoryWidget(QWidget):
             event.size().width(), event.size().height())
 
     def style(self, index, section):
-        style = 'padding: 10px;'
+        style = ''
 
+        if section == 'symbol':
+            style += 'padding: 0px 10px 0px 10px;'
         if section == 'title':
             style += 'font-size: 40px;'
-        else:
+        if section == 'desc':
             style += 'font-size: 30px;'
+            style += 'padding: 0px 0px 20px 80px;'
+            style += 'alignment: top;'
 
         if index == self.index:
             style += 'background-color: #404080;'
@@ -138,9 +170,22 @@ class HistoryWidget(QWidget):
                 self.alarms.append(alarm)
                 index += 1
 
+        now = datetime.datetime.now()
+
         index = 0
         for alarm in self.alarms:
-            dateStr = alarm.datetime.strftime('%A, %d. %B %Y, %H:%M')
+            dateStr = alarm.datetime.strftime('%A, %d. %B, %H:%M')
+            delta = alarm.datetime - now
+            dateStr += ' (' + babel.dates.format_timedelta(delta,
+                    add_direction = True) + ')'
+            image = alarm.imageBase()
+            if image:
+                image += '.svg'
+                pixmap = self.pixmapFromSvg(60,
+                        os.path.join(self.imageDir, image))
+            else:
+                pixmap = QPixmap()
+            self.symbolLabels[index].setPixmap(pixmap)
             self.titleLabels[index].setText(alarm.title())
             self.descLabels[index].setText(dateStr + '\n' + alarm.location())
             index += 1
@@ -160,5 +205,22 @@ class HistoryWidget(QWidget):
         self.targetMap.setTarget(alarm.lat, alarm.lon, ([],))
 
         self.updateStyles()
+
+    def pixmapFromSvg(self, width, path):
+        renderer = QSvgRenderer(path)
+
+        svgSize = renderer.defaultSize()
+        height = svgSize.height() / svgSize.width() * width
+
+        pixmap = QPixmap(QSize(width, height))
+        painter = QPainter()
+
+        pixmap.fill(Qt.transparent)
+
+        painter.begin(pixmap)
+        renderer.render(painter)
+        painter.end()
+
+        return pixmap
 
 #-----------------------------------------------------------------------------
