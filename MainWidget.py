@@ -117,6 +117,7 @@ class MainWidget(QWidget):
         layout.addWidget(self.stackedWidget)
 
         self.idleWidget = IdleWidget(self)
+        self.idleWidget.start()
         self.stackedWidget.addWidget(self.idleWidget)
 
         self.alarmWidget = AlarmWidget(self)
@@ -248,6 +249,7 @@ class MainWidget(QWidget):
         elif newAlarm.source == 'xml':
             self.seenXml = True
 
+        self.idleWidget.stop()
         self.stackedWidget.setCurrentWidget(self.alarmWidget)
         self.alarmWidget.processAlarm(self.alarm)
 
@@ -293,7 +295,7 @@ class MainWidget(QWidget):
 
     def idleTimeout(self):
         self.stackedWidget.setCurrentWidget(self.idleWidget)
-        self.idleWidget.update()
+        self.idleWidget.start()
 
     def screenTimeout(self):
         self.cecCommand.switchOff()

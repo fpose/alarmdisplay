@@ -32,6 +32,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from HistoryWidget import *
+from WeatherWidget import *
 from helpers import *
 
 #-----------------------------------------------------------------------------
@@ -73,7 +74,6 @@ class IdleWidget(QWidget):
             pixmap = QPixmap(os.path.join(self.imageDir, logo))
             pixmap = pixmap.scaledToWidth(100,
                     mode = Qt.SmoothTransformation)
-            print(pixmap.size())
             self.symbolLabel.setPixmap(pixmap)
 
         titleLayout.addWidget(self.symbolLabel, 0)
@@ -105,10 +105,24 @@ class IdleWidget(QWidget):
         verLayout.addWidget(self.stackedWidget)
 
         self.historyWidget = HistoryWidget(self.config, self.logger)
+        self.historyWidget.finished.connect(self.historyFinished)
         self.stackedWidget.addWidget(self.historyWidget)
 
-    def update(self):
-        self.historyWidget.update()
+        self.weatherWidget = WeatherWidget(self.config, self.logger)
+        self.weatherWidget.finished.connect(self.start)
+        self.stackedWidget.addWidget(self.weatherWidget)
+
+    def start(self):
+        self.stackedWidget.setCurrentWidget(self.historyWidget)
+        self.historyWidget.start()
+
+    def stop(self):
+        self.historyWidget.stop()
+        self.weatherWidget.stop()
+
+    def historyFinished(self):
+        self.stackedWidget.setCurrentWidget(self.weatherWidget)
+        self.weatherWidget.start()
 
     def resizeEvent(self, event):
         self.logger.debug('Resizing idle widget to %u x %u.',
@@ -119,5 +133,6 @@ class IdleWidget(QWidget):
         clockStr = now.strftime('%H:%M:%S')
         if self.clockLabel.text() != clockStr:
             self.clockLabel.setText(clockStr)
+
 
 #-----------------------------------------------------------------------------

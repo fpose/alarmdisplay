@@ -41,6 +41,8 @@ from helpers import *
 
 class HistoryWidget(QWidget):
 
+    finished = pyqtSignal()
+
     def __init__(self, config, logger):
         super(HistoryWidget, self).__init__()
 
@@ -107,9 +109,6 @@ class HistoryWidget(QWidget):
             verLayout.addWidget(label)
             self.descLabels.append(label)
 
-        self.update()
-        self.updateStyles()
-
     def updateStyles(self):
         for i in range(0, 5):
             label = self.symbolLabels[i]
@@ -147,7 +146,7 @@ class HistoryWidget(QWidget):
 
         return style
 
-    def update(self):
+    def start(self):
         self.cycleTimer.stop()
 
         path = self.config.get("db", "path", fallback = None)
@@ -202,10 +201,15 @@ class HistoryWidget(QWidget):
             self.cycleTimer.start()
             self.updateStyles()
 
+    def stop(self):
+        self.cycleTimer.stop()
+
     def cycle(self):
         self.index += 1
         if self.index >= len(self.alarms):
             self.index = 0
+            self.cycleTimer.stop()
+            self.finished.emit()
 
         alarm = self.alarms[self.index]
         self.targetMap.setTarget(alarm.lat, alarm.lon, ([],))

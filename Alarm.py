@@ -105,7 +105,6 @@ class Alarm:
             coord = ma.group(2)
             coord = coord[:2] + '.' + coord[2:]
             self.lon = float(coord)
-            logger.debug('Coordinates: lon=%f lat=%f', self.lon, self.lat)
             span = ma.span()
             pagerStr = pagerStr[: span[0]] + pagerStr[span[1] :]
 
@@ -114,8 +113,6 @@ class Alarm:
             logger.warn('Alarmtext nicht erkannt!')
             self.fallbackStr = pagerStr
             return
-
-        logger.debug(ma.groups())
 
         #  1) Datum/Uhrzeit TT-MM-YY HH:MM:SS
         #  2) Einheit, Funktion (RIC)
@@ -143,14 +140,10 @@ class Alarm:
             else:
                 dt_naive = datetime.datetime.strptime(ma.group(1),
                         '%d-%m-%y %H:%M:%S')
-                logger.debug('Date naive %s', dt_naive)
                 zoneStr = self.config.get('pager', 'time_zone',
                         fallback = 'Europe/Berlin')
                 tz = pytz.timezone(zoneStr)
-                logger.debug('Timezone %s', tz)
                 self.datetime = tz.localize(dt_naive)
-
-        logger.debug('Date %s', self.datetime)
 
         einheit = ma.group(2).strip() # unused
         self.number = ma.group(3)
