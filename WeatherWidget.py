@@ -94,7 +94,7 @@ class WeatherWidget(QWidget):
             except:
                 self.logger.error("Failed to set data.", exc_info = True)
         else:
-            self.logger.error("Error occured: " + er)
+            self.logger.error("Failed to get weather data:")
             self.logger.error(reply.errorString())
 
     def resizeEvent(self, event):
