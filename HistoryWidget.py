@@ -43,6 +43,8 @@ class HistoryWidget(QWidget):
 
     finished = pyqtSignal()
 
+    historySize = 5
+
     def __init__(self, config, logger):
         super(HistoryWidget, self).__init__()
 
@@ -88,7 +90,7 @@ class HistoryWidget(QWidget):
         self.descLabels = []
         self.index = 0
 
-        for i in range(0, 5):
+        for i in range(0, self.historySize):
             itemLayout = QHBoxLayout()
             itemLayout.setSpacing(0)
             itemLayout.setContentsMargins(0, 0, 0, 0)
@@ -109,7 +111,7 @@ class HistoryWidget(QWidget):
             self.descLabels.append(label)
 
     def updateStyles(self):
-        for i in range(0, 5):
+        for i in range(0, self.historySize):
             label = self.symbolLabels[i]
             label.setStyleSheet(self.style(i, 'symbol'))
 
@@ -161,7 +163,7 @@ class HistoryWidget(QWidget):
 
         self.alarms = []
         index = 0
-        while index < 5 and len(paths) > 0:
+        while index < self.historySize and len(paths) > 0:
             path = paths[0]
             paths = paths[1:]
 
