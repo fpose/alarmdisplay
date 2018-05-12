@@ -267,17 +267,24 @@ class Alarm:
         contents = None
         if self.source == 'pager':
             ext = '.dme'
-            contents = self.pager
+            contents = self.pager # str
+            encoding = 'utf-8'
+            binary = ''
         elif self.source == 'xml':
             ext = '.xml'
-            contents = self.xml
+            contents = self.xml # bytes
+            encoding = None
+            binary = 'b'
 
         if not contents:
             return
 
-        fileName = self.datetime.strftime('%Y-%m-%d-%H-%M-%S') + ext
+        local_tz = get_localzone()
+        fileDateTime = self.datetime.astimezone(local_tz)
+        fileName = fileDateTime.strftime('%Y-%m-%d-%H-%M-%S') + ext
 
-        f = open(os.path.join(path, fileName), 'w', encoding = 'utf-8')
+        f = open(os.path.join(path, fileName), 'w' + binary,
+                encoding = encoding)
         f.write(contents)
         f.close()
 
@@ -287,7 +294,10 @@ class Alarm:
         f.close()
 
         ma = self.dateRe.search(path)
-        dateTime = datetime.datetime.strptime(ma.group(), '%Y-%m-%d-%H-%M-%S')
+        dt_naive = datetime.datetime.strptime(ma.group(),
+                '%Y-%m-%d-%H-%M-%S')
+        local_tz = get_localzone()
+        dateTime = local_tz.localize(dt_naive)
 
         if path.endswith('.dme'):
             self.fromPager(contents, logger, dateTime = dateTime)

@@ -27,6 +27,7 @@ import os
 import math
 import datetime
 import babel.dates
+from tzlocal import get_localzone
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -168,7 +169,11 @@ class HistoryWidget(QWidget):
             paths = paths[1:]
 
             alarm = Alarm(self.config)
-            alarm.load(path, self.logger)
+            try:
+                alarm.load(path, self.logger)
+            except:
+                self.logger.error('Failed to load alarm:', exc_info = True)
+                continue
 
             if len(self.alarms) and self.alarms[-1].matches(alarm):
                 self.alarms[-1].merge(alarm, self.logger)
@@ -176,7 +181,8 @@ class HistoryWidget(QWidget):
                 self.alarms.append(alarm)
                 index += 1
 
-        now = datetime.datetime.now()
+        local_tz = get_localzone()
+        now = local_tz.localize(datetime.datetime.now())
 
         index = 0
         for alarm in self.alarms:
