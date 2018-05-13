@@ -86,13 +86,13 @@ class WeatherWidget(QWidget):
         er = reply.error()
         if er == QNetworkReply.NoError:
             bytes_string = reply.readAll()
-            self.logger.info("Received weather response.")
             pixmap = QPixmap()
             try:
                 pixmap.loadFromData(bytes_string)
                 self.imageLabel.setPixmap(pixmap)
             except:
-                self.logger.error("Failed to set data.", exc_info = True)
+                self.logger.error("Failed to set weather data.",
+                        exc_info = True)
         else:
             self.logger.error("Failed to get weather data:")
             self.logger.error(reply.errorString())
