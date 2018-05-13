@@ -146,17 +146,17 @@ class Alarm:
                 self.datetime = tz.localize(dt_naive)
 
         einheit = ma.group(2).strip() # unused
-        self.number = ma.group(3)
+        self.number = ma.group(3).strip()
         self.art = ma.group(4)[0]
         self.stichwort = ma.group(4)[1]
-        self.diagnose = ma.group(5) # Diagnose und Eskalationsstufe
-        self.besonderheit = ma.group(6) # Hinweis (Freitext)
-        self.ort = ma.group(7)
-        self.ortsteil = ma.group(8)
-        self.strasse = ma.group(9)
-        self.hausnummer = ma.group(10)
-        self.objektnummer = ma.group(11)
-        self.ortshinweis = ma.group(12)
+        self.diagnose = ma.group(5).strip() # Diagnose und Eskalationsstufe
+        self.besonderheit = ma.group(6).strip() # Hinweis (Freitext)
+        self.ort = ma.group(7).strip()
+        self.ortsteil = ma.group(8).strip()
+        self.strasse = ma.group(9).strip()
+        self.hausnummer = ma.group(10).strip()
+        self.objektnummer = ma.group(11).strip()
+        self.ortshinweis = ma.group(12).strip()
 
     def fromXml(self, xmlString, logger):
         self.xml = xmlString
@@ -309,13 +309,15 @@ class Alarm:
         return self.number and other.number and \
             self.number[-5 :] == other.number[-5 :]
 
-    def merge(self, other, logger):
-        logger.info('Merging alarms...')
+    def merge(self, other, logger = None):
+        if logger:
+            logger.info('Merging alarms...')
 
         if other.number:
             if not self.number or len(self.number) < len(other.number):
-                logger.info('preferring number %s over %s.',
-                    other.number, self.number)
+                if logger:
+                    logger.info('preferring number %s over %s.',
+                        other.number, self.number)
                 self.number = other.number
 
         # self.datetime
@@ -348,15 +350,18 @@ class Alarm:
                 continue
 
             if not selfVars[key]:
-                logger.info('Setting %s to %s.', key, otherVars[key])
+                if logger:
+                    logger.info('Setting %s to %s.', key, otherVars[key])
                 selfVars[key] = otherVars[key]
                 continue
 
             if selfVars[key] != otherVars[key]:
-                logger.info('%s is differing: %s / %s.', key,
-                        repr(selfVars[key]), repr(otherVars[key]))
+                if logger:
+                    logger.info('%s is differing: %s / %s.', key,
+                            repr(selfVars[key]), repr(otherVars[key]))
 
-        logger.info('Merge complete.')
+        if logger:
+            logger.info('Merge complete.')
 
     def title(self):
         if self.art and self.stichwort and self.diagnose:

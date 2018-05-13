@@ -177,7 +177,7 @@ class HistoryWidget(QWidget):
                 continue
 
             if len(self.alarms) and self.alarms[-1].matches(alarm):
-                self.alarms[-1].merge(alarm, self.logger)
+                self.alarms[-1].merge(alarm)
             else:
                 self.alarms.append(alarm)
                 index += 1
