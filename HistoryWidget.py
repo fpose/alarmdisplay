@@ -71,6 +71,7 @@ class HistoryWidget(QWidget):
         horLayout.addLayout(verLayout, 1)
 
         self.targetMap = MapWidget(self, self.config, self.logger)
+        self.targetMap.maxCacheEntries = self.historySize
         self.targetMap.setStyleSheet("""
             font-size: 60px;
             color: #cc0000;

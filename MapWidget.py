@@ -40,6 +40,10 @@ class MapWidget(QFrame):
 
         self.config = config
         self.logger = logger
+
+        self.maxCacheEntries = 1
+        self.cache = []
+
         self.invalidate()
 
     def invalidate(self):
@@ -63,13 +67,34 @@ class MapWidget(QFrame):
         if not self.lat_deg or not self.lon_deg:
             self.pixmap = None
         else:
-            self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
-                    self.contentsRect().width(), self.contentsRect().height(),
-                    self.route, self.config, self.logger)
+            cachedPixmap = self.searchCache()
+            if cachedPixmap:
+                self.pixmap = cachedPixmap
+            else:
+                self.pixmap = Map.getTargetPixmap(self.lat_deg, self.lon_deg,
+                        self.contentsRect().width(),
+                        self.contentsRect().height(),
+                        self.route, self.config, self.logger)
+                self.updateCache()
         self.update()
+
+    def updateCache(self):
+        if self.maxCacheEntries <= 0:
+            self.cache = []
+            return
+        if len(self.cache) > self.maxCacheEntries - 1:
+            self.cache = self.cache[0 : self.maxCacheEntries - 1]
+        self.cache.insert(0, (self.lat_deg, self.lon_deg, self.pixmap))
+
+    def searchCache(self):
+        for lat_deg, lon_deg, pixmap in self.cache:
+            if lat_deg == self.lat_deg and lon_deg == self.lon_deg:
+                return pixmap
+        return None
 
     def resizeEvent(self, event):
         self.logger.debug("MapWidget resize %s", event.size())
+        self.cache = [] # invalidate cache on resize
         self.updateMap()
 
     def paintEvent(self, event):
