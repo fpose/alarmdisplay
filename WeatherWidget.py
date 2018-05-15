@@ -40,16 +40,22 @@ class WeatherWidget(QWidget):
 
     finished = pyqtSignal()
 
+    weatherUrl = "https://www.dwd.de/DWD/warnungen/warnstatus/SchilderEM.jpg"
+    forestUrl = "https://www.dwd.de/DWD/warnungen/agrar/wbx/wbx_stationen.png"
+
     def __init__(self, config, logger):
         super(WeatherWidget, self).__init__()
 
         self.config = config
         self.logger = logger
 
+        self.index = 0
+        self.pixmaps = [QPixmap(), QPixmap()]
+
         self.updateTimer = QTimer(self)
         self.updateTimer.setInterval(5 * 60000)
         self.updateTimer.setSingleShot(False)
-        self.updateTimer.timeout.connect(self.request)
+        self.updateTimer.timeout.connect(self.requestWeather)
         self.updateTimer.start()
 
         self.viewTimer = QTimer(self)
@@ -69,27 +75,46 @@ class WeatherWidget(QWidget):
         horLayout.addWidget(label)
         self.imageLabel = label
 
-        self.request()
+        self.requestWeather()
+        self.requestForest()
 
     def start(self):
+        self.index = 0
         self.viewTimer.start()
+        self.updatePixmap()
+
+    def updatePixmap(self):
+        if self.index <= len(self.pixmaps):
+            self.imageLabel.setPixmap(self.pixmaps[self.index])
+        else:
+            self.imageLabel.setPixmap(QPixmap())
 
     def stop(self):
         self.viewTimer.stop()
 
-    def request(self):
-        url = "https://www.dwd.de/DWD/warnungen/warnstatus/SchilderEM.jpg"
-        req = QNetworkRequest(QUrl(url))
+    def requestWeather(self):
+        req = QNetworkRequest(QUrl(self.weatherUrl))
+        self.networkAccessManager.get(req)
+
+    def requestForest(self):
+        req = QNetworkRequest(QUrl(self.forestUrl))
         self.networkAccessManager.get(req)
 
     def handleResponse(self, reply):
+        req = reply.request()
         er = reply.error()
         if er == QNetworkReply.NoError:
             bytes_string = reply.readAll()
             pixmap = QPixmap()
             try:
                 pixmap.loadFromData(bytes_string)
-                self.imageLabel.setPixmap(pixmap)
+                if req.url() == QUrl(self.weatherUrl):
+                    index = 0
+                else:
+                    index = 1
+                    #pixmap.setMask(pixmap.createHeuristicMask());
+                self.pixmaps[index] = pixmap
+                self.updatePixmap()
             except:
                 self.logger.error("Failed to set weather data.",
                         exc_info = True)
@@ -102,7 +127,11 @@ class WeatherWidget(QWidget):
             event.size().width(), event.size().height())
 
     def viewTimeout(self):
-        self.finished.emit()
-
+        self.index += 1
+        if self.index < len(self.pixmaps):
+            self.imageLabel.setPixmap(self.pixmaps[self.index])
+            self.viewTimer.start()
+        else:
+            self.finished.emit()
 
 #-----------------------------------------------------------------------------
