@@ -17,6 +17,10 @@ vim: syntax=markdown tw=78 spl=de
 
 * Settings neu laden via SIHGUP
 * Pfad für Logfile
+* Option to disable clock display
+* Option to set clock based on pager alarm
+* Option to disable weather display (if no internet connection)
+* Toggle idle display on signal
 
 # Alarmierung
 
