@@ -64,7 +64,7 @@ class MainWidget(QWidget):
 
         self.reportTimer = QTimer(self)
         self.reportTimer.setInterval( \
-            self.config.get("report", "timeout", fallback = 20) * 1000)
+            self.config.getint("report", "timeout", fallback = 20) * 1000)
         self.reportTimer.setSingleShot(True)
         self.reportTimer.timeout.connect(self.generateReport)
 

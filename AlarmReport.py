@@ -193,7 +193,7 @@ class AlarmReport:
 
         self.logger.info(u'PS file %s was created.', psTarget)
 
-        printOut = self.config.get("report", "print", fallback = False)
+        printOut = self.config.getboolean("report", "print", fallback = False)
         if printOut:
             self.logger.info("Printing PS file.")
 
@@ -219,8 +219,9 @@ class AlarmReport:
             self.logger.info("Print ready.")
 
     def wakeupPrinter(self):
-        printOut = self.config.get("report", "print", fallback = False)
-        wakeupDoc = self.config.get("report", "wakeup_document", fallback = "")
+        printOut = self.config.getboolean("report", "print", fallback = False)
+        wakeupDoc = self.config.get("report", "wakeup_document",
+                fallback = "")
 
         if not printOut or not wakeupDoc:
             return

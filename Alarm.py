@@ -131,7 +131,7 @@ class Alarm:
         if dateTime:
             self.datetime = dateTime
         else:
-            useHostClock = self.config.get('pager', 'use_host_clock',
+            useHostClock = self.config.getboolean('pager', 'use_host_clock',
                     fallback = False)
             if useHostClock:
                 now = datetime.datetime.now()
