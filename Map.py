@@ -322,27 +322,42 @@ def getRoute(dest_lat_deg, dest_lon_deg, config, logger):
     try:
         request = http.request('GET', url, headers = headers, timeout = 5.0)
     except:
+        logger.error('Route request failed.', exc_info = True)
         return ([], None, None)
 
-    logger.debug('Status %u', request.status)
+    logger.debug('Received route response with status %u.', request.status)
 
-    data = json.loads(request.data.decode('utf-8'))
+    try:
+        content = request.data.decode('utf-8')
+    except:
+        logger.error('Failed to decode route response data.', exc_info = True)
+        return ([], None, None)
+
+    try:
+        data = json.loads(content)
+    except:
+        logger.error('Failed to load route JSON.', exc_info = True)
+        return ([], None, None)
+
     #logger.debug(json.dumps(data, sort_keys=True, indent = 4,
     #    separators = (',', ': ')))
 
     try:
         route = data["routes"][0]["geometry"]
     except:
+        logger.error('Route is empty.')
         route = []
 
     try:
         distance = float(data["routes"][0]["summary"]["distance"])
     except:
+        logger.error('Distance is empty.')
         distance = None
 
     try:
         duration = float(data["routes"][0]["summary"]["duration"])
     except:
+        logger.error('Duration is empty.')
         duration = None
 
     return (route, distance, duration)
