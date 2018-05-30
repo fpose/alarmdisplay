@@ -84,7 +84,7 @@ class WeatherWidget(QWidget):
         self.updatePixmap()
 
     def updatePixmap(self):
-        if self.index <= len(self.pixmaps):
+        if self.index < len(self.pixmaps):
             self.imageLabel.setPixmap(self.pixmaps[self.index])
         else:
             self.imageLabel.setPixmap(QPixmap())
@@ -129,7 +129,7 @@ class WeatherWidget(QWidget):
     def viewTimeout(self):
         self.index += 1
         if self.index < len(self.pixmaps):
-            self.imageLabel.setPixmap(self.pixmaps[self.index])
+            self.updatePixmap()
             self.viewTimer.start()
         else:
             self.finished.emit()
