@@ -35,6 +35,7 @@ vim: syntax=markdown tw=78 spl=de
 # Alarmdepesche
 
 * Routen-Infos drucken (Länge, Zeit)
+* Store documents to directory (with timestamp)
 
 * Drucker aufwecken ohne Druckauftrag
 
