@@ -87,6 +87,8 @@ class MainWidget(QWidget):
         self.screenTimer.setInterval(screenTimeout * 60000)
         self.screenTimer.setSingleShot(True)
         self.screenTimer.timeout.connect(self.screenTimeout)
+        if self.screenTimer.interval() > 0:
+            self.screenTimer.start()
 
         self.logger.info('Setting up X server...')
 

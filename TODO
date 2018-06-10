@@ -2,8 +2,6 @@ vim: syntax=markdown tw=78 spl=de
 
 # Anzeige
 
-* Initial screen timeout
-
 * Alarmierte Einheiten anzeigen
 * Symbol für Wegerechte
 * Symbol für alle Einsatzarten / Tragehilfe (K) / etc.
