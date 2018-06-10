@@ -16,7 +16,6 @@ vim: syntax=markdown tw=78 spl=de
 
 # Allgemein
 
-* Pfad für Logfile
 * Option to disable clock display
 
 * Settings neu laden via SIGHUP

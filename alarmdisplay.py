@@ -58,7 +58,8 @@ if __name__ == '__main__':
     streamHandler.setFormatter(formatter)
     logger.addHandler(streamHandler)
 
-    logPath = 'alarmdisplay.log'
+    logPath = config.get("display", "log_path",
+            fallback = "/var/log/alarmdisplay.log")
     fileHandler = logging.FileHandler(logPath)
     fileHandler.setLevel(logging.DEBUG)
     fileHandler.setFormatter(formatter)
