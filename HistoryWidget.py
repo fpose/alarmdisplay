@@ -57,7 +57,8 @@ class HistoryWidget(QWidget):
 
         self.cycleTimer = QTimer(self)
         self.cycleTimer.setInterval( \
-            self.config.getint("idle", "cycle_period", fallback = 10) * 1000)
+            self.config.getint("idle", "history_period", fallback = 10) \
+            * 1000)
         self.cycleTimer.setSingleShot(False)
         self.cycleTimer.timeout.connect(self.cycle)
 

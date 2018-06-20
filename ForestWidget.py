@@ -2,7 +2,7 @@
 
 #-----------------------------------------------------------------------------
 #
-# Weather Widget
+# Forest Fire Warning Map Widget
 #
 # Copyright (C) 2018 Florian Pose
 #
@@ -33,14 +33,16 @@ from PyQt5.QtNetwork import *
 
 #-----------------------------------------------------------------------------
 
-class WeatherWidget(QWidget):
+class ForestWidget(QWidget):
 
     finished = pyqtSignal()
 
-    url = "https://www.dwd.de/DWD/warnungen/warnstatus/SchilderEM.jpg"
+    urls = ["https://www.dwd.de/DWD/warnungen/agrar/wbx/wbx_stationen.png",
+            "https://www.dwd.de/DWD/warnungen/agrar/wbx/wbx_stationen1.png",
+            "https://www.dwd.de/DWD/warnungen/agrar/wbx/wbx_stationen2.png"]
 
     def __init__(self, config, logger):
-        super(WeatherWidget, self).__init__()
+        super(ForestWidget, self).__init__()
 
         self.config = config
         self.logger = logger
@@ -59,14 +61,26 @@ class WeatherWidget(QWidget):
         self.networkAccessManager = QNetworkAccessManager()
         self.networkAccessManager.finished.connect(self.handleResponse)
 
-        horLayout = QHBoxLayout(self)
+        verLayout = QVBoxLayout(self)
+        verLayout.setSpacing(0)
+        verLayout.setContentsMargins(0, 0, 0, 0)
+
+        titleLabel = QLabel(self)
+        titleLabel.setAlignment(Qt.AlignCenter)
+        titleLabel.setText("Waldbrandgefahrenindex")
+        verLayout.addWidget(titleLabel)
+
+        horLayout = QHBoxLayout()
         horLayout.setSpacing(0)
         horLayout.setContentsMargins(0, 0, 0, 0)
+        verLayout.addLayout(horLayout)
 
-        label = QLabel(self)
-        label.setAlignment(Qt.AlignCenter)
-        horLayout.addWidget(label)
-        self.imageLabel = label
+        self.imageLabels = []
+        for url in self.urls:
+            label = QLabel(self)
+            label.setAlignment(Qt.AlignCenter)
+            horLayout.addWidget(label)
+            self.imageLabels.append(label)
 
         self.request()
 
@@ -77,8 +91,9 @@ class WeatherWidget(QWidget):
         self.viewTimer.stop()
 
     def request(self):
-        req = QNetworkRequest(QUrl(self.url))
-        self.networkAccessManager.get(req)
+        for idx in range(len(self.urls)):
+            req = QNetworkRequest(QUrl(self.urls[idx]))
+            self.networkAccessManager.get(req)
 
     def handleResponse(self, reply):
         req = reply.request()
@@ -88,16 +103,18 @@ class WeatherWidget(QWidget):
             pixmap = QPixmap()
             try:
                 pixmap.loadFromData(bytes_string)
-                self.imageLabel.setPixmap(pixmap)
+                for idx in range(len(self.urls)):
+                    if req.url() == QUrl(self.urls[idx]):
+                        self.imageLabels[idx].setPixmap(pixmap)
             except:
-                self.logger.error("Failed to set weather data.",
+                self.logger.error("Failed to set forest data.",
                         exc_info = True)
         else:
-            self.logger.error("Failed to get weather data:")
+            self.logger.error("Failed to get forest data:")
             self.logger.error(reply.errorString())
 
     def resizeEvent(self, event):
-        self.logger.debug('Resizing weather widget to %u x %u.',
+        self.logger.debug('Resizing forest widget to %u x %u.',
             event.size().width(), event.size().height())
 
     def viewTimeout(self):

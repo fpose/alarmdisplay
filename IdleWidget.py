@@ -33,6 +33,7 @@ from PyQt5.QtCore import *
 
 from HistoryWidget import *
 from WeatherWidget import *
+from ForestWidget import *
 from helpers import *
 
 #-----------------------------------------------------------------------------
@@ -104,24 +105,38 @@ class IdleWidget(QWidget):
         verLayout.addWidget(self.stackedWidget)
 
         self.historyWidget = HistoryWidget(self.config, self.logger)
-        self.historyWidget.finished.connect(self.historyFinished)
+        self.historyWidget.finished.connect(self.cycle)
         self.stackedWidget.addWidget(self.historyWidget)
 
-        self.weatherWidget = WeatherWidget(self.config, self.logger)
-        self.weatherWidget.finished.connect(self.start)
-        self.stackedWidget.addWidget(self.weatherWidget)
+        if self.config.getboolean("idle", "weather", fallback = True):
+            self.weatherWidget = WeatherWidget(self.config, self.logger)
+            self.weatherWidget.finished.connect(self.cycle)
+            self.stackedWidget.addWidget(self.weatherWidget)
+
+        if self.config.getboolean("idle", "forest", fallback = True):
+            self.forestWidget = ForestWidget(self.config, self.logger)
+            self.forestWidget.finished.connect(self.cycle)
+            self.stackedWidget.addWidget(self.forestWidget)
 
     def start(self):
-        self.stackedWidget.setCurrentWidget(self.historyWidget)
-        self.historyWidget.start()
+        index = 0
+        self.stackedWidget.setCurrentIndex(index)
+        widget = self.stackedWidget.widget(index)
+        widget.start()
+
+    def cycle(self):
+        index = self.stackedWidget.currentIndex()
+        index += 1
+        if index >= self.stackedWidget.count():
+            index = 0
+        self.stackedWidget.setCurrentIndex(index)
+        widget = self.stackedWidget.widget(index)
+        widget.start()
 
     def stop(self):
-        self.historyWidget.stop()
-        self.weatherWidget.stop()
-
-    def historyFinished(self):
-        self.stackedWidget.setCurrentWidget(self.weatherWidget)
-        self.weatherWidget.start()
+        for index in range(len(self.stackedWidget.count())):
+            widget = self.stackedWidget.widget(index)
+            widget.stop()
 
     def resizeEvent(self, event):
         self.logger.debug('Resizing idle widget to %u x %u.',
