@@ -55,7 +55,7 @@ class WeatherWidget(QWidget):
         self.updateTimer = QTimer(self)
         self.updateTimer.setInterval(5 * 60000)
         self.updateTimer.setSingleShot(False)
-        self.updateTimer.timeout.connect(self.requestWeather)
+        self.updateTimer.timeout.connect(self.request)
         self.updateTimer.start()
 
         self.viewTimer = QTimer(self)
@@ -75,8 +75,7 @@ class WeatherWidget(QWidget):
         horLayout.addWidget(label)
         self.imageLabel = label
 
-        self.requestWeather()
-        self.requestForest()
+        self.request()
 
     def start(self):
         self.index = 0
@@ -91,6 +90,10 @@ class WeatherWidget(QWidget):
 
     def stop(self):
         self.viewTimer.stop()
+
+    def request(self):
+        self.requestWeather()
+        self.requestForest()
 
     def requestWeather(self):
         req = QNetworkRequest(QUrl(self.weatherUrl))
