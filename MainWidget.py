@@ -175,6 +175,12 @@ class MainWidget(QWidget):
         action.triggered.connect(self.exampleLebenshilfe)
         self.addAction(action)
 
+        action = QAction(self)
+        action.setShortcut(QKeySequence("9"))
+        action.setShortcutContext(Qt.ApplicationShortcut)
+        action.triggered.connect(self.exampleHuissen)
+        self.addAction(action)
+
         # Threads ------------------------------------------------------------
 
         self.receiverThread = QThread()
@@ -434,6 +440,22 @@ class MainWidget(QWidget):
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
+
+        self.processAlarm(alarm)
+
+    def exampleHuissen(self):
+
+        f = open("alarm_db/2018-06-24-04-13-11.xml", "rb")
+        xmlContent = f.read()
+        f.close()
+
+        alarm = Alarm(self.config)
+
+        try:
+            alarm.fromXml(xmlContent, self.logger)
+        except:
+            self.logger.error('Failed to parse XML:', exc_info = True)
+            return
 
         self.processAlarm(alarm)
 
