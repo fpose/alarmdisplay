@@ -134,7 +134,7 @@ class IdleWidget(QWidget):
         widget.start()
 
     def stop(self):
-        for index in range(len(self.stackedWidget.count())):
+        for index in range(self.stackedWidget.count()):
             widget = self.stackedWidget.widget(index)
             widget.stop()
 
