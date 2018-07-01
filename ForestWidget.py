@@ -68,22 +68,26 @@ class ForestWidget(QWidget):
         titleLabel = QLabel(self)
         titleLabel.setAlignment(Qt.AlignCenter)
         titleLabel.setText("Waldbrandgefahrenindex")
-        verLayout.addWidget(titleLabel)
+        verLayout.addWidget(titleLabel, 2)
 
         horLayout = QHBoxLayout()
         horLayout.setSpacing(0)
         horLayout.setContentsMargins(0, 0, 0, 0)
-        verLayout.addLayout(horLayout)
+        verLayout.addLayout(horLayout, 6)
 
         self.imageLabels = []
+        self.pixmaps = []
         for url in self.urls:
             label = QLabel(self)
             label.setAlignment(Qt.AlignCenter)
             horLayout.addWidget(label)
             self.imageLabels.append(label)
 
+            pixmap = QPixmap()
+            self.pixmaps.append(pixmap)
+
         spacerWidget = QWidget(self)
-        verLayout.addWidget(spacerWidget)
+        verLayout.addWidget(spacerWidget, 1)
 
         self.request()
 
@@ -108,7 +112,8 @@ class ForestWidget(QWidget):
                 pixmap.loadFromData(bytes_string)
                 for idx in range(len(self.urls)):
                     if req.url() == QUrl(self.urls[idx]):
-                        self.imageLabels[idx].setPixmap(pixmap)
+                        self.pixmaps[idx] = pixmap
+                        self.updatePixmaps()
             except:
                 self.logger.error("Failed to set forest data.",
                         exc_info = True)
@@ -116,9 +121,19 @@ class ForestWidget(QWidget):
             self.logger.error("Failed to get forest data:")
             self.logger.error(reply.errorString())
 
+    def updatePixmaps(self):
+        for idx in range(len(self.urls)):
+            pixmap = self.pixmaps[idx]
+            if pixmap.isNull():
+                continue
+            label = self.imageLabels[idx]
+            scaledPix = pixmap.scaledToHeight(label.height())
+            label.setPixmap(scaledPix)
+
     def resizeEvent(self, event):
         self.logger.debug('Resizing forest widget to %u x %u.',
             event.size().width(), event.size().height())
+        self.updatePixmaps()
 
     def viewTimeout(self):
         self.finished.emit()
