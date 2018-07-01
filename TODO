@@ -10,7 +10,6 @@ vim: syntax=markdown tw=78 spl=de
 * Draw route over loaded tiles
 * Show revision / date
 * Splash Screen
-* Show symbols for alarm sources
 
 # Allgemein
 

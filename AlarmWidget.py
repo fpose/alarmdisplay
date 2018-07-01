@@ -105,6 +105,10 @@ class AlarmWidget(QWidget):
         innerLocationLayout.setSpacing(0)
         locationLayout.addLayout(innerLocationLayout, 1)
 
+        sourceLayout = QVBoxLayout()
+        sourceLayout.setSpacing(0)
+        locationLayout.addLayout(sourceLayout, 0)
+
         self.locationLabel = QLabel(self)
         self.locationLabel.setIndent(0)
         self.locationLabel.setSizePolicy(QSizePolicy.Ignored,
@@ -123,6 +127,12 @@ class AlarmWidget(QWidget):
             font-size: 40px;
             """)
         innerLocationLayout.addWidget(self.locationHintLabel, 1)
+
+        self.pagerLabel = QLabel(self)
+        sourceLayout.addWidget(self.pagerLabel, 1)
+
+        self.xmlLabel = QLabel(self)
+        sourceLayout.addWidget(self.xmlLabel, 1)
 
         # Attention row ------------------------------------------------------
 
@@ -268,6 +278,18 @@ class AlarmWidget(QWidget):
         self.leftMap.setObjectPlan(self.alarm.objektnummer)
 
         self.rightMap.invalidate()
+
+        if 'xml' in alarm.sources:
+            pixmap = QPixmap(os.path.join(self.imageDir, 'xml.svg'))
+        else:
+            pixmap = QPixmap()
+        self.xmlLabel.setPixmap(pixmap)
+
+        if 'pager' in alarm.sources:
+            pixmap = QPixmap(os.path.join(self.imageDir, 'pager.svg'))
+        else:
+            pixmap = QPixmap()
+        self.pagerLabel.setPixmap(pixmap)
 
     def resizeEvent(self, event):
         self.logger.debug('Resizing alarm widget to %u x %u.',

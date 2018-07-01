@@ -85,6 +85,7 @@ class Alarm:
         self.xml = None
         self.config = config
         self.source = None
+        self.sources = set()
         self.pager = None
         self.fallbackStr = None
 
@@ -96,6 +97,7 @@ class Alarm:
 
         self.pager = pagerStr
         self.source = 'pager'
+        self.sources.add(self.source)
 
         ma = self.coordRe.search(pagerStr)
         if ma:
@@ -161,6 +163,7 @@ class Alarm:
     def fromXml(self, xmlString, logger):
         self.xml = xmlString
         self.source = 'xml'
+        self.sources.add(self.source)
 
         doc = xml.dom.minidom.parseString(xmlString)
         elemDaten = doc.firstChild
@@ -359,6 +362,9 @@ class Alarm:
                 if logger:
                     logger.info('%s is differing: %s / %s.', key,
                             repr(selfVars[key]), repr(otherVars[key]))
+
+        # merge sources
+        self.sources = self.sources.union(other.sources)
 
         if logger:
             logger.info('Merge complete.')

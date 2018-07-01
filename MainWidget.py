@@ -310,6 +310,8 @@ class MainWidget(QWidget):
 
     def exampleJugend(self):
         alarm = Alarm(self.config)
+        alarm.source = 'xml'
+        alarm.sources.add(alarm.source)
         alarm.number = '40001'
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
@@ -328,6 +330,8 @@ class MainWidget(QWidget):
 
     def exampleEngels(self):
         alarm = Alarm(self.config)
+        alarm.source = 'xml'
+        alarm.sources.add(alarm.source)
         alarm.number = '40002'
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'H'
@@ -349,6 +353,8 @@ class MainWidget(QWidget):
         self.logger.info('Example Sackstrasse')
 
         alarm = Alarm(self.config)
+        alarm.source = 'xml'
+        alarm.sources.add(alarm.source)
         alarm.number = '40003'
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
@@ -377,6 +383,8 @@ class MainWidget(QWidget):
     def exampleWolfsgrabenMail(self):
 
         alarm = Alarm(self.config)
+        alarm.source = 'xml'
+        alarm.sources.add(alarm.source)
         alarm.datetime = datetime.datetime.now()
         alarm.art = 'B'
         alarm.stichwort = '2'
