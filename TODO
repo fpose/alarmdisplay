@@ -2,49 +2,44 @@ vim: syntax=markdown tw=78 spl=de
 
 # Anzeige
 
-* Alarmierte Einheiten anzeigen
-* Symbol für Wegerechte
-* Symbol für alle Einsatzarten / Tragehilfe (K) / etc.
-* Symbol für Distanz
-* Symbol für Fahrtdauer
-* Kritischen Pfad ermitteln / Reihenfolge editierbar?
-* Route später über bereits geladene Kacheln zeichnen
-* Revision / Datum anzeigen
+* Show alarmed resources
+* Symbol for rights-of-way
+* Symbols for all alarm types
+* Symbol for distance
+* Symbol for route time
+* Draw route over loaded tiles
+* Show revision / date
 * Splash Screen
 
 # Allgemein
 
 * Option to disable clock display
-
-* Settings neu laden via SIGHUP
+* Reload settings on SIGHUP
 * Option to set clock based on pager alarm
-* Option to disable weather display (if no internet connection)
 * Toggle idle display on signal
 
-# Alarmierung
+# Alarm
 
-* Route asynchron holen
-* IMAP-Idle nutzen statt polling
-* Fallback-String entfernen, wenn korrekter Alarm nachfolgt
+* Fetch route asynchronously
+* Use IMAP Idle instead of polling
+* Remove fallback string if correct alarm follows
 
-# Idle-Anzeige
+# Idle View
 
-* Kalender anzeigen
-* Warnlage Waldbrand (3 Karten plus Überschrift)
+* Show calendar data via CalDAV
 
-# Alarmdepesche
+# Alarm Report
 
-* Routen-Infos drucken (Länge, Zeit)
+* Print route information (distance, time)
 * Store documents to directory (with timestamp)
 
-* Drucker aufwecken ohne Druckauftrag
+* Wakeup printer without print job
 
 # Administration
 
-* Read-Only-Dateisystem
+* Readonly filesystem
 
 # Ideen
 
-* Ausrückeordnung hinterlegen und anzeigen
-* Zeit bis Überschreiten des Schutzzieles
-* eCall-Daten anzeigen und Rettungskarte drucken
+* Show remaining time
+* Show eCall data
