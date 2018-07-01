@@ -73,7 +73,7 @@ class ForestWidget(QWidget):
         horLayout = QHBoxLayout()
         horLayout.setSpacing(0)
         horLayout.setContentsMargins(0, 0, 0, 0)
-        verLayout.addLayout(horLayout, 6)
+        verLayout.addLayout(horLayout, 10)
 
         self.imageLabels = []
         self.pixmaps = []
