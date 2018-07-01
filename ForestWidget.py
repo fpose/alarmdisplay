@@ -82,6 +82,9 @@ class ForestWidget(QWidget):
             horLayout.addWidget(label)
             self.imageLabels.append(label)
 
+        spacerWidget = QWidget(self)
+        verLayout.addWidget(spacerWidget)
+
         self.request()
 
     def start(self):
