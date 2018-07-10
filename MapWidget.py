@@ -67,7 +67,11 @@ class MapWidget(QFrame):
         if not self.lat_deg or not self.lon_deg:
             self.pixmap = None
         else:
-            cachedPixmap = self.searchCache()
+            if self.route: # avoid caching if route is set
+                cachedPixmap = None
+            else:
+                cachedPixmap = self.searchCache()
+
             if cachedPixmap:
                 self.pixmap = cachedPixmap
             else:
