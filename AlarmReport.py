@@ -169,7 +169,6 @@ class AlarmReport:
                     logPath)
             return
 
-
         cmd = ['dvips', texBase + '.dvi']
         self.logger.info(u'Running %s', cmd)
         dvips = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull,
@@ -181,17 +180,8 @@ class AlarmReport:
             self.logger.error(u'DVIPS processing failed.')
             return
 
-        self.logger.info(u'Copying PS file...')
-
-        targetDir = '.' # TODO
         psPath = os.path.join(tempDir, texBase + '.ps')
-        psTarget = os.path.join(targetDir, texBase + '.ps')
-        shutil.copy(psPath, psTarget)
-
-        self.logger.info(u'Deleting temporary directory...')
-        shutil.rmtree(tempDir)
-
-        self.logger.info(u'PS file %s was created.', psTarget)
+        self.logger.info(u'PS file %s was created.', psPath)
 
         printOut = self.config.getboolean("report", "print", fallback = False)
         if printOut:
@@ -207,7 +197,7 @@ class AlarmReport:
                 for opt in options.split():
                     printCmd.append('-o')
                     printCmd.append(opt)
-            printCmd.append(psTarget)
+            printCmd.append(psPath)
 
             self.logger.info("Print command: %s", repr(printCmd))
 
@@ -217,6 +207,17 @@ class AlarmReport:
                 self.logger.error('lpr failed.')
 
             self.logger.info("Print ready.")
+
+        self.logger.info(u'Copying PS file...')
+
+        targetDir = self.config.get("report", "output_dir", fallback = ".")
+
+        psTarget = os.path.join(targetDir, alarm.dateString() + '.ps')
+        shutil.copy(psPath, psTarget)
+        self.logger.info(u'PS file copied to %s.', psTarget)
+
+        self.logger.info(u'Deleting temporary directory.')
+        shutil.rmtree(tempDir)
 
     def wakeupPrinter(self):
         printOut = self.config.getboolean("report", "print", fallback = False)

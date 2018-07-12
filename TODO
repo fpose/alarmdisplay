@@ -1,6 +1,15 @@
 vim: syntax=markdown tw=78 spl=de
 
-# Anzeige
+# General
+
+* Catch and log global exceptions
+* Option to disable clock display
+* Reload settings on SIGHUP
+* Option to set clock based on pager alarm
+* Toggle idle display on signal
+* Restart after screen timeout to overcome memory leaks
+
+# Alarm Screen
 
 * Show alarmed resources
 * Symbol for rights-of-way
@@ -11,28 +20,20 @@ vim: syntax=markdown tw=78 spl=de
 * Show revision / date
 * Splash Screen
 
-# Allgemein
-
-* Catch and log global exceptions
-* Option to disable clock display
-* Reload settings on SIGHUP
-* Option to set clock based on pager alarm
-* Toggle idle display on signal
-
-# Alarm
+# Alarm Processing
 
 * Fetch route asynchronously
 * Use IMAP Idle instead of polling
 * Remove fallback string if correct alarm follows
 
-# Idle View
+# Idle Screen
 
 * Show calendar data via CalDAV
 
 # Alarm Report
 
 * Print route information (distance, time)
-* Store documents to directory (with timestamp)
+* Local unit names in config
 
 * Wakeup printer without print job
 
@@ -40,7 +41,7 @@ vim: syntax=markdown tw=78 spl=de
 
 * Readonly filesystem
 
-# Ideen
+# Ideas
 
 * Show remaining time
 * Show eCall data

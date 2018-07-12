@@ -282,14 +282,16 @@ class Alarm:
         if not contents:
             return
 
-        local_tz = get_localzone()
-        fileDateTime = self.datetime.astimezone(local_tz)
-        fileName = fileDateTime.strftime('%Y-%m-%d-%H-%M-%S') + ext
-
+        fileName = self.dateString() + ext
         f = open(os.path.join(path, fileName), 'w' + binary,
                 encoding = encoding)
         f.write(contents)
         f.close()
+
+    def dateString(self):
+        local_tz = get_localzone()
+        dt = self.datetime.astimezone(local_tz)
+        return dt.strftime('%Y-%m-%d-%H-%M-%S')
 
     def load(self, path, logger):
         f = open(path, 'r', encoding = 'utf-8')

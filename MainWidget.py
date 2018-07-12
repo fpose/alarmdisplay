@@ -280,7 +280,10 @@ class MainWidget(QWidget):
 
     def generateReport(self):
         self.logger.info('Report...')
-        self.report.generate(self.alarm, self.route)
+        try:
+            self.report.generate(self.alarm, self.route)
+        except:
+            self.logger.error('Report failed:', exc_info = True)
         self.reportDone = True
         self.logger.info('Finished.')
 
