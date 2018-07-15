@@ -23,7 +23,6 @@ vim: syntax=markdown tw=78 spl=de
 # Alarm Processing
 
 * Fetch route asynchronously
-* Use IMAP Idle instead of polling
 * Remove fallback string if correct alarm follows
 
 # Idle Screen

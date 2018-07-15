@@ -24,7 +24,7 @@
 #-----------------------------------------------------------------------------
 
 import time
-import imaplib
+from imapclient import IMAPClient
 import email
 
 from PyQt5 import QtCore
@@ -70,32 +70,32 @@ class ImapMonitor(QtCore.QObject):
 
     def imapCycle(self):
         self.logger.info('Connecting to %s...', repr(self.imapHost))
-        imap = imaplib.IMAP4_SSL(self.imapHost)
+        imap = IMAPClient(self.imapHost)
 
         self.logger.info('Logging in...')
         imap.login(self.imapUser, self.imapPass)
 
         self.logger.info('Selecting INBOX...')
-        ret = imap.select("INBOX")
-        num = ret[1][0]
-        self.logger.info(u'Mailbox mit %s Nachrichten ausgewählt.', num)
+        ret = imap.select_folder("INBOX")
+        num = ret[b'EXISTS']
+        self.logger.info(u'Selected mailbox with %s messages.', num)
+
+        self.logger.info(u'Starting IMAP idle mode.')
+        imap.idle()
 
         while self.run:
             try:
-                time.sleep(5)
-            except IOError:
-                pass
-
-            (retcode, response) = imap.recent()
-
-            if len(response) != 1:
-                self.logger.error(u'Ungültige Antwort: %s', len(response))
+                # Wait for an IDLE response
+                responses = imap.idle_check(timeout = 60 * 5)
+            except:
+                self.logger.error('IMAP error:', exc_info = True)
                 break
 
-            if response[0] == None or int(response[0]) == 0:
-                continue
-
+            imap.idle_done()
             self.fetchNewMails(imap)
+
+            self.logger.info(u'Starting IMAP idle mode.')
+            imap.idle()
 
         imap.close()
         imap.logout()
@@ -103,45 +103,46 @@ class ImapMonitor(QtCore.QObject):
 #-----------------------------------------------------------------------------
 
     def fetchNewMails(self, imap):
-        (retcode, messages) = imap.search(None, '(UNSEEN)')
+        messageIds = imap.search('UNSEEN')
 
-        for num in messages[0].split():
+        if len(messageIds) == 0:
+            return
 
-            self.logger.info(u'Hole Nachricht %s...', num)
-            result, data = imap.fetch(num, '(RFC822)')
+        self.logger.info(u'Fetching messages %s...', messageIds)
+        messages = imap.fetch(messageIds, 'RFC822')
+
+        for messageId in messageIds:
+            imapMessage = messages[messageId]
 
             try:
-                imap.store(num, '+FLAGS', '\\Seen')
-                self.logger.info(u'Nachricht als gelesen markiert.')
+                imap.set_flags(messageId, '\\Seen')
+                self.logger.info(u'Marked message as seen.')
             except:
-                self.logger.error(u'Konnte Nachricht nicht als gelesen' + \
-                    ' markieren:', exc_info = True)
+                self.logger.error(u'Failed to mark message as seen:',
+                        exc_info = True)
 
-            for response_part in data:
-                if not isinstance(response_part, tuple):
+            content = imapMessage[b'RFC822']
+
+            msg = email.message_from_bytes(content)
+
+            if 'From' in msg:
+                self.logger.info(u'From: %s', msg['From'])
+
+            if 'subject' in msg:
+                self.logger.info(u'Subject: %s', msg['subject'])
+
+            for part in msg.walk():
+                if part.get_content_maintype() == 'multipart':
+                    continue
+                if part.get('Content-Disposition') is None:
                     continue
 
-                msg = email.message_from_bytes(response_part[1])
+                fileName = part.get_filename()
 
-                self.logger.info(u'Von: %s', msg['From'])
+                if fileName == None or not fileName.endswith('xml'):
+                    continue
 
-                subject = u''
-                if 'subject' in msg:
-                    subject = msg['subject']
-                self.logger.info(u'Betreff: %s', subject)
-
-                for part in msg.walk():
-                    if part.get_content_maintype() == 'multipart':
-                        continue
-                    if part.get('Content-Disposition') is None:
-                        continue
-
-                    fileName = part.get_filename()
-
-                    if fileName == None or not fileName.endswith('xml'):
-                        continue
-
-                    xmlContent = part.get_payload(decode = True)
-                    self.receivedAlarm.emit(xmlContent)
+                xmlContent = part.get_payload(decode = True)
+                self.receivedAlarm.emit(xmlContent)
 
 #-----------------------------------------------------------------------------
