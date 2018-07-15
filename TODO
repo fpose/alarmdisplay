@@ -24,6 +24,7 @@ vim: syntax=markdown tw=78 spl=de
 
 * Fetch route asynchronously
 * Remove fallback string if correct alarm follows
+* process check_idle() response and stay in idle mode
 
 # Idle Screen
 

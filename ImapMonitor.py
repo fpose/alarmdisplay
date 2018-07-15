@@ -87,14 +87,13 @@ class ImapMonitor(QtCore.QObject):
             try:
                 # Wait for an IDLE response
                 responses = imap.idle_check(timeout = 60 * 5)
+                # TODO: process response and stay in idle mode
             except:
                 self.logger.error('IMAP error:', exc_info = True)
                 break
 
             imap.idle_done()
             self.fetchNewMails(imap)
-
-            self.logger.info(u'Starting IMAP idle mode.')
             imap.idle()
 
         imap.close()
