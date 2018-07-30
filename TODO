@@ -32,6 +32,7 @@ vim: syntax=markdown tw=78 spl=de
 
 # Alarm Report
 
+* Make logo configurable
 * Print route information (distance, time)
 * Local unit names in config
 
