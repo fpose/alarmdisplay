@@ -105,11 +105,13 @@ class HistoryWidget(QWidget):
 
             label = QLabel(self)
             label.setIndent(0)
+            label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
             itemLayout.addWidget(label, 1)
             self.titleLabels.append(label)
 
             label = QLabel(self)
             label.setIndent(0)
+            label.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Preferred)
             verLayout.addWidget(label)
             self.descLabels.append(label)
 
