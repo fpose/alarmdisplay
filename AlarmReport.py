@@ -103,6 +103,13 @@ class AlarmReport:
             }
 
         variables = {}
+
+        logo = self.config.get("report", "logo", fallback = None)
+        if logo:
+            variables['logo'] = logo
+        else:
+            variables['logo'] = ''
+
         variables['title'] = escapeLaTeX(alarm.title())
         variables['address'] = escapeLaTeX(alarm.address())
         variables['object_name'] = escapeLaTeX(alarm.objektname)

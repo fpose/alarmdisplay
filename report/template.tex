@@ -59,7 +59,9 @@ cheetahVarStartToken = @
 %\noindent\fcolorbox{red}{gray}{%
 \begin{minipage}[t]{.19\textwidth}
     \hfill
-    \raisebox{-12mm}{\includegraphics[height=18mm]{wappen-reichswalde}}
+#if @logo
+    \raisebox{-12mm}{\includegraphics[height=18mm]{@logo}}
+#end if
 \end{minipage}
 %}
 
