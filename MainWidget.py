@@ -27,6 +27,7 @@ import os
 import math
 import subprocess
 import datetime
+from tzlocal import get_localzone
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -316,7 +317,9 @@ class MainWidget(QWidget):
         alarm.source = 'xml'
         alarm.sources.add(alarm.source)
         alarm.number = '40001'
-        alarm.datetime = datetime.datetime.now()
+        now = datetime.datetime.now()
+        local_tz = get_localzone()
+        alarm.datetime = local_tz.localize(now)
         alarm.art = 'B'
         alarm.stichwort = '3'
         alarm.diagnose = 'Wohnungsbrand'
@@ -336,7 +339,9 @@ class MainWidget(QWidget):
         alarm.source = 'xml'
         alarm.sources.add(alarm.source)
         alarm.number = '40002'
-        alarm.datetime = datetime.datetime.now()
+        now = datetime.datetime.now()
+        local_tz = get_localzone()
+        alarm.datetime = local_tz.localize(now)
         alarm.art = 'H'
         alarm.stichwort = '1'
         alarm.diagnose = 'Tierrettung'
@@ -359,7 +364,9 @@ class MainWidget(QWidget):
         alarm.source = 'xml'
         alarm.sources.add(alarm.source)
         alarm.number = '40003'
-        alarm.datetime = datetime.datetime.now()
+        now = datetime.datetime.now()
+        local_tz = get_localzone()
+        alarm.datetime = local_tz.localize(now)
         alarm.art = 'B'
         alarm.stichwort = '2'
         alarm.diagnose = 'Garagenbrand'
@@ -388,7 +395,9 @@ class MainWidget(QWidget):
         alarm = Alarm(self.config)
         alarm.source = 'xml'
         alarm.sources.add(alarm.source)
-        alarm.datetime = datetime.datetime.now()
+        now = datetime.datetime.now()
+        local_tz = get_localzone()
+        alarm.datetime = local_tz.localize(now)
         alarm.art = 'B'
         alarm.stichwort = '2'
         alarm.diagnose = 'Kaminbrand'
