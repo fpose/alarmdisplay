@@ -63,7 +63,7 @@ class AlarmReport:
                 route[0], self.config, self.logger)
         targetPixmap.save(os.path.join(tempDir, 'target.png'))
 
-        cmd = ['convert', 'target.png', 'target.eps']
+        cmd = ['convert', 'target.png', 'eps3:target.eps']
         self.logger.info(u'Running %s', cmd)
         convert = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull)
         convert.wait()
@@ -77,7 +77,7 @@ class AlarmReport:
                 route[0], self.config, self.logger)
         routePixmap.save(os.path.join(tempDir, 'route.png'))
 
-        cmd = ['convert', 'route.png', 'route.eps']
+        cmd = ['convert', 'route.png', 'eps3:route.eps']
         self.logger.info(u'Running %s', cmd)
         convert = subprocess.Popen(cmd, cwd = tempDir, stdout = devNull)
         convert.wait()
