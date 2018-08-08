@@ -204,6 +204,10 @@ class AlarmReport:
                 for opt in options.split():
                     printCmd.append('-o')
                     printCmd.append(opt)
+            copies = self.config.getint("report", "copies", fallback = 1)
+            if copies != 1:
+                printCmd.append('-#')
+                printCmd.append(str(copies))
             printCmd.append(psPath)
 
             self.logger.info("Print command: %s", repr(printCmd))
