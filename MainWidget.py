@@ -240,6 +240,11 @@ class MainWidget(QWidget):
         except:
             self.logger.error('Failed to save alarm:', exc_info = True)
 
+        try:
+            newAlarm.forward(self.logger)
+        except:
+            self.logger.error('Failed to forward alarm:', exc_info = True)
+
         if not self.alarm or not self.alarm.matches(newAlarm):
             self.logger.info("Processing new alarm.")
             self.startTimer()
