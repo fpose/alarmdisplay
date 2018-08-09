@@ -38,7 +38,7 @@ class SocketListener(QtCore.QObject):
         super(SocketListener, self).__init__()
         self.logger = logger
 
-        self.socket = QtNetwork.QUdpSocket(self);
+        self.socket = QtNetwork.QUdpSocket(self)
         self.socket.bind(QtNetwork.QHostAddress.Any, 11211)
         self.socket.readyRead.connect(self.readSocket)
 
