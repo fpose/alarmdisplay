@@ -243,7 +243,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
         pos = QPoint(originX + px[0], originY + totHeight - px[1])
         poly.append(pos)
     pen = QPen()
-    pen.setWidth(config.getint("route_map", "route_width", fallback = 5))
+    pen.setWidth(config.getint("route_map", "route_width", fallback = 10))
     pen.setColor(QColor(config.get("maps", "route_color",
         fallback = "#400000c0")))
     painter.setPen(pen)
