@@ -34,6 +34,7 @@ from PyQt5.QtCore import *
 from HistoryWidget import *
 from WeatherWidget import *
 from ForestWidget import *
+from WaterLevelWidget import *
 from helpers import *
 
 #-----------------------------------------------------------------------------
@@ -117,6 +118,11 @@ class IdleWidget(QWidget):
             self.forestWidget = ForestWidget(self.config, self.logger)
             self.forestWidget.finished.connect(self.cycle)
             self.stackedWidget.addWidget(self.forestWidget)
+
+        if self.config.get("idle", "water_url", fallback = ''):
+            self.waterLevelWidget = WaterLevelWidget(self.config, self.logger)
+            self.waterLevelWidget.finished.connect(self.cycle)
+            self.stackedWidget.addWidget(self.waterLevelWidget)
 
     def start(self):
         index = 0

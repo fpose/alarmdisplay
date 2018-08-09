@@ -31,7 +31,6 @@ vim: syntax=markdown tw=78 spl=en spell
 
 # Idle Screen
 
-* Show water level information
 * Show calendar data via CalDAV
 * Switch screen on automatically at certain times (configurable)
 
