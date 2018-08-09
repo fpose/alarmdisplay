@@ -1,4 +1,4 @@
-vim: syntax=markdown tw=78 spl=de
+vim: syntax=markdown tw=78 spl=en spell
 
 # General
 
@@ -8,38 +8,42 @@ vim: syntax=markdown tw=78 spl=de
 * Option to set clock based on pager alarm
 * Toggle idle display on signal
 * Restart after screen timeout to overcome memory leaks
+* Avoid fetching route without internet connection
+* Show revision / date
+* Splash Screen
 
 # Alarm Screen
 
-* Show alarmed resources
+* Show alarmed resources/units
 * Symbol for rights-of-way
 * Symbols for all alarm types
 * Symbol for distance
 * Symbol for route time
 * Draw route over loaded tiles
-* Show revision / date
-* Splash Screen
 
 # Alarm Processing
 
+* Forward alarms to satellite systems
 * Fetch route asynchronously
-* Remove fallback string if correct alarm follows
+* Respect route extent during route map zoom calculation
+* Remove fall-back string if correct alarm follows
 * process check_idle() response and stay in idle mode
 
 # Idle Screen
 
+* Show water level information
 * Show calendar data via CalDAV
+* Switch screen on automatically at certain times (configurable)
 
 # Alarm Report
 
 * Print route information (distance, time)
-* Local unit names in config
-
+* Local resource/unit names in configuration file
 * Wakeup printer without print job
 
 # Administration
 
-* Readonly filesystem
+* Read-only file system
 
 # Ideas
 
