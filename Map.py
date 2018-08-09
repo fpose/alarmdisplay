@@ -305,6 +305,10 @@ def getRoute(dest_lat_deg, dest_lon_deg, config, logger):
             fallback = 51.76059)
     api_key = config.get("route", "ors_api_key", fallback = "")
 
+    if not api_key:
+        # Abort, if no API key given
+        return ([], None, None)
+
     headers = {
       'Accept': 'text/json; charset=utf-8'
     }

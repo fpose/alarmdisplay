@@ -8,7 +8,6 @@ vim: syntax=markdown tw=78 spl=en spell
 * Option to set clock based on pager alarm
 * Toggle idle display on signal
 * Restart after screen timeout to overcome memory leaks
-* Avoid fetching route without internet connection
 * Show revision / date
 * Splash Screen
 
