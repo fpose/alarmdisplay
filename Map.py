@@ -143,7 +143,7 @@ def getTargetPixmap(lat_deg, lon_deg, width, height, route, config, logger):
     marker = QPixmap()
     imageDir = config.get("display", "image_dir", fallback = "images")
     marker.load(os.path.join(imageDir, config.get("maps",
-        "destination_marker", fallback = "marker1.png")))
+        "destination_marker", fallback = "marker_dest.png")))
     markerOffset = QPoint(marker.width() / 2, marker.height())
     painter.drawPixmap(center - markerOffset, marker)
     painter.end()
@@ -267,7 +267,7 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     markerRects.append(markerRect)
 
     marker.load(os.path.join(imageDir, config.get("maps",
-        "destination_marker", fallback = "marker1.png")))
+        "destination_marker", fallback = "marker_dest.png")))
     markerOffset = QPoint(marker.width() / 2, marker.height())
     coord = totProj(dest_lon_deg, dest_lat_deg)
     px = np.array(coord) / mpp
