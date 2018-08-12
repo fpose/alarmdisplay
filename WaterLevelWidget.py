@@ -57,14 +57,24 @@ class WaterLevelWidget(QWidget):
         self.networkAccessManager = QNetworkAccessManager()
         self.networkAccessManager.finished.connect(self.handleResponse)
 
-        horLayout = QHBoxLayout(self)
-        horLayout.setSpacing(0)
-        horLayout.setContentsMargins(0, 0, 0, 0)
+        verLayout = QVBoxLayout(self)
+        verLayout.setSpacing(0)
+        verLayout.setContentsMargins(0, 0, 0, 0)
+
+        titleLabel = QLabel(self)
+        titleLabel.setAlignment(Qt.AlignCenter)
+        titleLabel.setText("Pegelstände")
+        verLayout.addWidget(titleLabel, 2)
 
         label = QLabel(self)
         label.setAlignment(Qt.AlignCenter)
-        horLayout.addWidget(label)
+        verLayout.addWidget(label, 10)
         self.imageLabel = label
+
+        spacerWidget = QWidget(self)
+        verLayout.addWidget(spacerWidget, 1)
+
+        self.pixmap = QPixmap()
 
         self.request()
 
@@ -85,20 +95,24 @@ class WaterLevelWidget(QWidget):
         er = reply.error()
         if er == QNetworkReply.NoError:
             bytes_string = reply.readAll()
-            pixmap = QPixmap()
             try:
-                pixmap.loadFromData(bytes_string)
-                self.imageLabel.setPixmap(pixmap)
+                self.pixmap.loadFromData(bytes_string)
             except:
                 self.logger.error("Failed to set water level data.",
                         exc_info = True)
         else:
             self.logger.error("Failed to get water level data:")
             self.logger.error(reply.errorString())
+        self.updatePixmaps()
+
+    def updatePixmaps(self):
+        scaledPix = self.pixmap.scaledToHeight(self.imageLabel.height())
+        self.imageLabel.setPixmap(scaledPix)
 
     def resizeEvent(self, event):
         self.logger.debug('Resizing water level widget to %u x %u.',
             event.size().width(), event.size().height())
+        self.updatePixmaps()
 
     def viewTimeout(self):
         self.finished.emit()
