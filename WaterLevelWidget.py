@@ -106,7 +106,8 @@ class WaterLevelWidget(QWidget):
         self.updatePixmaps()
 
     def updatePixmaps(self):
-        scaledPix = self.pixmap.scaledToHeight(self.imageLabel.height())
+        scaledPix = self.pixmap.scaledToHeight(self.imageLabel.height(),
+                Qt.SmoothTransformation)
         self.imageLabel.setPixmap(scaledPix)
 
     def resizeEvent(self, event):

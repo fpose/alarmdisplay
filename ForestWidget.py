@@ -127,7 +127,8 @@ class ForestWidget(QWidget):
             if pixmap.isNull():
                 continue
             label = self.imageLabels[idx]
-            scaledPix = pixmap.scaledToHeight(label.height())
+            scaledPix = pixmap.scaledToHeight(label.height(),
+                    Qt.SmoothTransformation)
             label.setPixmap(scaledPix)
 
     def resizeEvent(self, event):
