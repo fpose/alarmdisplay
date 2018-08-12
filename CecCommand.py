@@ -54,9 +54,9 @@ class CecCommand(QtCore.QObject):
             cec = subprocess.Popen(args, stdin = subprocess.PIPE)
             cec.communicate(input = cecCommand.encode('UTF-8'))
         except OSError as e:
-            self.logger.error('CEC wakeup failed: %s', e)
+            self.logger.error('CEC command failed: %s', e)
         except:
-            self.logger.error('CEC wakeup failed.')
+            self.logger.error('CEC command failed.')
 
         self.logger.info('CEC command finished.')
 
