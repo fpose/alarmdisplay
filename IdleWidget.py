@@ -52,7 +52,7 @@ class IdleWidget(QWidget):
                 fallback = "images")
 
         self.clockTimer = QTimer(self)
-        self.clockTimer.setInterval(100)
+        self.clockTimer.setInterval(1000)
         self.clockTimer.setSingleShot(False)
         self.clockTimer.timeout.connect(self.clockTimeout)
         self.clockTimer.start()
