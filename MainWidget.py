@@ -205,13 +205,14 @@ class MainWidget(QWidget):
 
         self.cecThread = QThread()
         self.cecThread.start()
-
         self.cecCommand = CecCommand(self.logger)
         self.cecCommand.moveToThread(self.cecThread)
 
         self.report = AlarmReport(self.config, self.logger)
 
         self.logger.info('Setup finished.')
+
+    #-------------------------------------------------------------------------
 
     def receivedPagerAlarm(self, pagerStr):
         self.logger.info('Received alarm: %s', repr(pagerStr))
@@ -316,6 +317,8 @@ class MainWidget(QWidget):
 
     def screenTimeout(self):
         self.cecCommand.switchOff()
+
+    #-------------------------------------------------------------------------
 
     def exampleJugend(self):
         alarm = Alarm(self.config)
