@@ -71,7 +71,6 @@ class RouteWidget(QFrame):
         self.update()
 
     def resizeEvent(self, event):
-        self.logger.debug("RouteWidget resize %s", event.size())
         self.updateMap()
 
     def paintEvent(self, event):

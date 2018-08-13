@@ -144,10 +144,6 @@ class IdleWidget(QWidget):
             widget = self.stackedWidget.widget(index)
             widget.stop()
 
-    def resizeEvent(self, event):
-        self.logger.debug('Resizing idle widget to %u x %u.',
-            event.size().width(), event.size().height())
-
     def clockTimeout(self):
         now = datetime.datetime.now()
         clockStr = now.strftime('%H:%M:%S')

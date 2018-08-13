@@ -126,10 +126,6 @@ class HistoryWidget(QWidget):
             label = self.descLabels[i]
             label.setStyleSheet(self.style(i, 'desc'))
 
-    def resizeEvent(self, event):
-        self.logger.debug('Resizing history widget to %u x %u.',
-            event.size().width(), event.size().height())
-
     def style(self, index, section):
         style = ''
 

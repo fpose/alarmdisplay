@@ -132,8 +132,6 @@ class ForestWidget(QWidget):
             label.setPixmap(scaledPix)
 
     def resizeEvent(self, event):
-        self.logger.debug('Resizing forest widget to %u x %u.',
-            event.size().width(), event.size().height())
         self.updatePixmaps()
 
     def viewTimeout(self):

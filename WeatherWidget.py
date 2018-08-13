@@ -96,10 +96,6 @@ class WeatherWidget(QWidget):
             self.logger.error("Failed to get weather data:")
             self.logger.error(reply.errorString())
 
-    def resizeEvent(self, event):
-        self.logger.debug('Resizing weather widget to %u x %u.',
-            event.size().width(), event.size().height())
-
     def viewTimeout(self):
         self.finished.emit()
 

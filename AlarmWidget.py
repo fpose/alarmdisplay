@@ -291,10 +291,6 @@ class AlarmWidget(QWidget):
             pixmap = QPixmap()
         self.pagerLabel.setPixmap(pixmap)
 
-    def resizeEvent(self, event):
-        self.logger.debug('Resizing alarm widget to %u x %u.',
-            event.size().width(), event.size().height())
-
     def elapsedTimeout(self):
         now = QDateTime.currentDateTime()
         diffMs = self.alarmDateTime.msecsTo(now)

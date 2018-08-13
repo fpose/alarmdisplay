@@ -294,10 +294,6 @@ class MainWidget(QWidget):
         self.reportDone = True
         self.logger.info('Finished.')
 
-    def resizeEvent(self, event):
-        self.logger.debug('Resizing main window to %u x %u.',
-            event.size().width(), event.size().height())
-
     def startTimer(self):
         self.alarmDateTime = QDateTime.currentDateTime()
         if self.idleTimer.interval() > 0:

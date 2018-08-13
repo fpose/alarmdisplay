@@ -97,7 +97,6 @@ class MapWidget(QFrame):
         return None
 
     def resizeEvent(self, event):
-        self.logger.debug("MapWidget resize %s", event.size())
         self.cache = [] # invalidate cache on resize
         self.updateMap()
 
