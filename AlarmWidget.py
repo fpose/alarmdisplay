@@ -33,6 +33,7 @@ from PyQt5.QtCore import *
 
 from MapWidget import MapWidget
 from RouteWidget import RouteWidget
+from helpers import *
 
 #-----------------------------------------------------------------------------
 
@@ -216,6 +217,17 @@ class AlarmWidget(QWidget):
         self.logger.info('Route map...')
         self.rightMap.setTarget(self.alarm.lat, self.alarm.lon, route)
 
+    def setHourGlass(self, state):
+        if state:
+            path = os.path.join(self.imageDir, 'hourglass.svg')
+            pixmap = pixmapFromSvg(path, 60)
+            self.timerLabel.setPixmap(pixmap)
+            self.timerLabel.setText('')
+        else:
+            self.timerLabel.setPixmap(QPixmap())
+
+        QApplication.processEvents()
+
     def processAlarm(self, alarm):
         self.alarm = alarm
 
@@ -292,6 +304,9 @@ class AlarmWidget(QWidget):
         self.pagerLabel.setPixmap(pixmap)
 
     def elapsedTimeout(self):
+        pixmap = self.timerLabel.pixmap()
+        if pixmap and not pixmap.isNull():
+            return
         now = QDateTime.currentDateTime()
         diffMs = self.alarmDateTime.msecsTo(now)
         seconds = math.floor(diffMs / 1000)

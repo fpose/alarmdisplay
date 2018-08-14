@@ -236,6 +236,9 @@ class MainWidget(QWidget):
         self.processAlarm(alarm)
 
     def processAlarm(self, newAlarm):
+
+        self.alarmWidget.setHourGlass(True)
+
         try:
             newAlarm.save()
         except:
@@ -285,7 +288,11 @@ class MainWidget(QWidget):
             QApplication.processEvents()
             self.generateReport()
 
+        self.alarmWidget.setHourGlass(False)
+
     def generateReport(self):
+        self.alarmWidget.setHourGlass(True)
+
         self.logger.info('Report...')
         try:
             self.report.generate(self.alarm, self.route)
@@ -293,6 +300,8 @@ class MainWidget(QWidget):
             self.logger.error('Report failed:', exc_info = True)
         self.reportDone = True
         self.logger.info('Finished.')
+
+        self.alarmWidget.setHourGlass(False)
 
     def startTimer(self):
         self.alarmDateTime = QDateTime.currentDateTime()
