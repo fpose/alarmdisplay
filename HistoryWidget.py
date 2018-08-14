@@ -24,7 +24,6 @@
 #-----------------------------------------------------------------------------
 
 import os
-import math
 import datetime
 import babel.dates
 from tzlocal import get_localzone

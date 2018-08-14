@@ -24,7 +24,6 @@
 #-----------------------------------------------------------------------------
 
 import os
-import math
 import datetime
 
 from PyQt5.QtGui import *
@@ -35,7 +34,6 @@ from HistoryWidget import *
 from WeatherWidget import *
 from ForestWidget import *
 from WaterLevelWidget import *
-from helpers import *
 
 #-----------------------------------------------------------------------------
 
