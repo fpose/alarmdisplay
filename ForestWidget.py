@@ -120,6 +120,7 @@ class ForestWidget(QWidget):
         else:
             self.logger.error("Failed to get forest data:")
             self.logger.error(reply.errorString())
+        reply.deleteLater()
 
     def updatePixmaps(self):
         for idx in range(len(self.urls)):

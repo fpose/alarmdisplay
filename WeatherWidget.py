@@ -95,6 +95,7 @@ class WeatherWidget(QWidget):
         else:
             self.logger.error("Failed to get weather data:")
             self.logger.error(reply.errorString())
+        reply.deleteLater()
 
     def viewTimeout(self):
         self.finished.emit()

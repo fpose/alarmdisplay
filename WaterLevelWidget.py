@@ -104,6 +104,7 @@ class WaterLevelWidget(QWidget):
             self.logger.error("Failed to get water level data:")
             self.logger.error(reply.errorString())
         self.updatePixmaps()
+        reply.deleteLater()
 
     def updatePixmaps(self):
         scaledPix = self.pixmap.scaledToHeight(self.imageLabel.height(),
