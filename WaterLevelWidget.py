@@ -95,8 +95,10 @@ class WaterLevelWidget(QWidget):
         er = reply.error()
         if er == QNetworkReply.NoError:
             bytes_string = reply.readAll()
+            pixmap = QPixmap()
             try:
-                self.pixmap.loadFromData(bytes_string)
+                pixmap.loadFromData(bytes_string)
+                self.pixmap = pixmap
             except:
                 self.logger.error("Failed to set water level data.",
                         exc_info = True)
