@@ -8,6 +8,7 @@ vim: syntax=markdown tw=78 spl=en spell
 * Option to set clock based on pager alarm
 * Toggle idle display on signal
 * Restart after screen timeout to overcome memory leaks
+* Installation script
 * Show revision / date
 * Splash Screen
 
@@ -23,10 +24,15 @@ vim: syntax=markdown tw=78 spl=en spell
 # Alarm Processing
 
 * Forward alarms to satellite systems
-* Fetch route asynchronously
-* Respect route extent during route map zoom calculation
 * Remove fall-back string if correct alarm follows
 * process check_idle() response and stay in idle mode
+
+# Routing
+
+* Fetch route asynchronously
+* Respect route extent during route map zoom calculation
+* Use emergency routing algorithm
+* Respect local route agreements
 
 # Idle Screen
 
