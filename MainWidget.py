@@ -28,6 +28,8 @@ import math
 import subprocess
 import datetime
 from tzlocal import get_localzone
+import re
+import time
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -90,6 +92,39 @@ class MainWidget(QWidget):
         self.screenTimer.timeout.connect(self.screenTimeout)
         if self.screenTimer.interval() > 0:
             self.screenTimer.start()
+
+        # Presence -----------------------------------------------------------
+
+        self.presenceTimer = QTimer(self)
+        self.presenceTimer.setInterval(1000)
+        self.presenceTimer.setSingleShot(False)
+        self.presenceTimer.timeout.connect(self.checkPresence)
+        self.presenceTimer.start()
+
+        self.switchOnTimes = []
+        self.switchOffTimes = []
+
+        if self.config.has_section('presence'):
+            onRe = re.compile('on[0-9]+')
+            offRe = re.compile('off[0-9]+')
+
+            for key, value in self.config.items('presence'):
+                ma = onRe.fullmatch(key)
+                if ma:
+                    tup = self.parsePresence(key, value)
+                    if tup:
+                        self.switchOnTimes.append(tup)
+                    continue
+                ma = offRe.fullmatch(key)
+                if ma:
+                    tup = self.parsePresence(key, value)
+                    if tup:
+                        self.switchOffTimes.append(tup)
+                    continue
+
+        self.updateNextSwitchTimes()
+
+        # Appearance ---------------------------------------------------------
 
         self.logger.info('Setting up X server...')
 
@@ -211,6 +246,70 @@ class MainWidget(QWidget):
         self.report = AlarmReport(self.config, self.logger)
 
         self.logger.info('Setup finished.')
+
+    #-------------------------------------------------------------------------
+
+    def parsePresence(self, key, value):
+        dateRe = re.compile('(\S+)\s(\d+):(\d+)')
+        ma = dateRe.fullmatch(value)
+        if not ma:
+            logger.error("Invalid date spec for %s: %s", key, value)
+            return
+
+        hour = int(ma.group(2))
+        if hour >= 24:
+            logger.error("Invalid hour in %s: %s", key, hour)
+            return
+
+        minute = int(ma.group(3))
+        if minute >= 60:
+            logger.error("Invalid minute in %s: %s", key, minute)
+            return
+
+        try:
+            tm = time.strptime(ma.group(1), '%a')
+        except:
+            logger.error("Invalid week day in %s: %s", key, ma.group(1))
+            return
+
+        weekDay = tm.tm_wday
+        return (weekDay, hour, minute)
+
+    def updateNextSwitchTimes(self):
+        self.nextSwitchOn = self.findNextEvent(self.switchOnTimes)
+        self.logger.info("Next switch on: %s", self.nextSwitchOn)
+        self.nextSwitchOff = self.findNextEvent(self.switchOffTimes)
+        self.logger.info("Next switch off: %s", self.nextSwitchOff)
+
+    def findNextEvent(self, tups):
+        nextDt = None
+        now = datetime.datetime.now()
+        for tup in tups:
+            date = now.date()
+            dayDiff = (tup[0] - date.weekday() + 7) % 7
+            date = date + datetime.timedelta(days = dayDiff)
+            dt = datetime.datetime(date.year, date.month, date.day,
+                    tup[1], tup[2])
+            if dt < now:
+                dt = dt + datetime.timedelta(days = 7)
+            if not nextDt or nextDt > dt:
+                nextDt = dt
+        return nextDt
+
+    def checkPresence(self):
+        now = datetime.datetime.now()
+        update = False
+        if now >= self.nextSwitchOn:
+            update = True
+            self.cecCommand.switchOn()
+        elif now >= self.nextSwitchOff:
+            update = True
+            # only switch off, if no alarm active
+            alarm = self.idleTimer.isActive() or self.screenTimer.isActive()
+            if not alarm:
+                self.cecCommand.switchOff()
+        if update:
+            self.updateNextSwitchTimes()
 
     #-------------------------------------------------------------------------
 
