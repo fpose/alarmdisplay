@@ -2,6 +2,7 @@ vim: syntax=markdown tw=78 spl=en spell
 
 # General
 
+* IMAP credentials in separate file
 * Catch and log global exceptions
 * Option to disable clock display
 * Reload settings on SIGHUP
