@@ -12,6 +12,8 @@ vim: syntax=markdown tw=78 spl=en spell
 * Installation script
 * Show revision / date
 * Splash Screen
+* Fix no-presence-section bug
+* Remove stack trace on IMAP disconnect
 
 # Alarm Screen
 
