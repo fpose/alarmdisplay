@@ -206,6 +206,8 @@ class HistoryWidget(QWidget):
             self.targetMap.setTarget(alarm.lat, alarm.lon, ([],))
             self.cycleTimer.start()
             self.updateStyles()
+        else:
+            self.finished.emit()
 
     def stop(self):
         self.cycleTimer.stop()
