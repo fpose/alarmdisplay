@@ -25,6 +25,7 @@
 
 import os
 import datetime
+import re
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -34,6 +35,7 @@ from HistoryWidget import *
 from WeatherWidget import *
 from ForestWidget import *
 from WaterLevelWidget import *
+from CalendarWidget import *
 
 #-----------------------------------------------------------------------------
 
@@ -121,6 +123,19 @@ class IdleWidget(QWidget):
             self.waterLevelWidget = WaterLevelWidget(self.config, self.logger)
             self.waterLevelWidget.finished.connect(self.cycle)
             self.stackedWidget.addWidget(self.waterLevelWidget)
+
+        hasCalendars = False
+        if self.config.has_section('idle'):
+            calRe = re.compile('calendar[0-9]+')
+            for key, value in self.config.items('idle'):
+                ma = calRe.fullmatch(key)
+                if ma:
+                    hasCalendars = True
+                    break
+        if hasCalendars:
+            self.calendarWidget = CalendarWidget(self.config, self.logger)
+            self.calendarWidget.finished.connect(self.cycle)
+            self.stackedWidget.addWidget(self.calendarWidget)
 
     def start(self):
         index = 0
