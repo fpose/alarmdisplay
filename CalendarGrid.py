@@ -47,24 +47,39 @@ class CalendarGrid(QFrame):
         painter = QPainter(self)
         margin = 25
         pad = 10
+        ind = 50
         cr = self.contentsRect()
         size = cr.size()
-        boxWidth = (size.width() - 2 * margin - 6 * pad) / 7
+        boxWidth = (size.width() - 2 * margin - ind - 6 * pad) / 7
         boxHeight = boxWidth / 1.618
 
         date = datetime.date.today()
+        prevMonth = date.month - 1
         top = cr.top() + margin
 
         while True:
-            col = date.weekday()
-            rect = QRect(cr.left() + margin + col * (boxWidth + pad),
+            if not date.weekday():
+                top += boxHeight + pad
+            if prevMonth != date.month:
+                top += boxHeight + pad
+
+            rect = QRect(cr.left() + margin + ind + \
+                    date.weekday() * (boxWidth + pad),
                     top, boxWidth, boxHeight)
 
             if rect.bottom() > cr.bottom() - margin:
                 break
 
+            if prevMonth != date.month:
+                monRect = QRect(cr.left() + margin, top,
+                        ind, boxHeight)
+                painter.drawText(monRect, Qt.AlignCenter, date.strftime('%b'))
+            elif not date.weekday():
+                monRect = QRect(cr.left() + margin, top, ind, boxHeight)
+                painter.drawText(monRect, Qt.AlignCenter, date.strftime('%V'))
+
             if date in self.busyDays:
-                color = QColor(100, 100, 150)
+                color = QColor(200, 100, 100)
             elif date.weekday() > 4:
                 color = QColor(0, 0, 120)
             else:
@@ -75,9 +90,5 @@ class CalendarGrid(QFrame):
 
             prevMonth = date.month
             date += datetime.timedelta(days = 1)
-            if not date.weekday():
-                top += boxHeight + pad
-            if prevMonth != date.month:
-                top += 2 * pad
 
 #-----------------------------------------------------------------------------
