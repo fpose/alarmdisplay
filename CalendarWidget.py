@@ -170,6 +170,7 @@ class CalendarWidget(QWidget):
             return ''
 
     def start(self):
+        self.viewTimer.start()
         text = ''
         date = None
         tz = get_localzone()
@@ -195,7 +196,7 @@ class CalendarWidget(QWidget):
         self.listLabel.setText(text)
 
     def stop(self):
-        pass
+        self.viewTimer.stop()
 
     def viewTimeout(self):
         self.finished.emit()
