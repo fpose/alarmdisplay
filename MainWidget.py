@@ -299,10 +299,10 @@ class MainWidget(QWidget):
     def checkPresence(self):
         now = datetime.datetime.now()
         update = False
-        if now >= self.nextSwitchOn:
+        if self.nextSwitchOn and now >= self.nextSwitchOn:
             update = True
             self.cecCommand.switchOn()
-        elif now >= self.nextSwitchOff:
+        elif self.nextSwitchOff and now >= self.nextSwitchOff:
             update = True
             # only switch off, if no alarm active
             alarm = self.idleTimer.isActive() or self.screenTimer.isActive()
