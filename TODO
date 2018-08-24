@@ -8,11 +8,10 @@ vim: syntax=markdown tw=78 spl=en spell
 * Reload settings on SIGHUP
 * Option to set clock based on pager alarm
 * Toggle idle display on signal
-* Restart after screen timeout to overcome memory leaks
 * Installation script
 * Show revision / date
 * Splash Screen
-* Remove stack trace on IMAP disconnect
+* Avoid stack trace on IMAP disconnect
 
 # Alarm Screen
 
