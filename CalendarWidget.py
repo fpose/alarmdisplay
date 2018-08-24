@@ -34,6 +34,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
+from CalendarGrid import *
+
 #-----------------------------------------------------------------------------
 
 class CalendarWidget(QWidget):
@@ -78,8 +80,11 @@ class CalendarWidget(QWidget):
         horLayout.setContentsMargins(0, 0, 0, 0)
         verLayout.addLayout(horLayout, 7)
 
-        self.calWidget = QLabel(self)
-        horLayout.addWidget(self.calWidget, 1)
+        self.grid = CalendarGrid(self, self.config, self.logger)
+        self.grid.setStyleSheet("""
+            font-size: 20px;
+            """)
+        horLayout.addWidget(self.grid, 1)
 
         self.listLabel = QLabel(self)
         self.listLabel.setIndent(0)
@@ -130,6 +135,20 @@ class CalendarWidget(QWidget):
             tz = get_localzone()
             self.events = sorted(events, key = lambda e: self.localDt(e, tz))
 
+            busyDays = set()
+            for event in self.events:
+                if 'DTSTART' in event:
+                    dt = event['DTSTART'].dt
+                    if isinstance(dt, datetime.datetime):
+                        dt = dt.astimezone(tz)
+                        date = dt.date()
+                    else:
+                        date = dt
+                    if date not in busyDays:
+                        busyDays.add(date)
+            self.grid.busyDays = busyDays
+            self.grid.update()
+
     def loadEvents(self, url, start, end):
         client = caldav.DAVClient(url)
         calendar = caldav.Calendar(client = client, url = url)
@@ -167,11 +186,11 @@ class CalendarWidget(QWidget):
                     date = dt
                     text += '(ganztägig) | '
             if 'SUMMARY' in event:
-                 text += event['SUMMARY']
+                 text += event['SUMMARY'] + '\n'
             if 'LOCATION' in event:
-                 self.logger.info("Ort: %s" % (event['LOCATION']))
+                 text += 'Ort: %s\n' % (event['LOCATION'])
             if 'DESCRIPTION' in event:
-                 self.logger.info("Details: %s" % (event['DESCRIPTION']))
+                 text += event['DESCRIPTION'] + '\n'
             text += '\n'
         self.listLabel.setText(text)
 
