@@ -35,6 +35,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from CalendarGrid import *
+from CalendarList import *
 
 #-----------------------------------------------------------------------------
 
@@ -86,15 +87,12 @@ class CalendarWidget(QWidget):
             """)
         horLayout.addWidget(self.grid, 1)
 
-        self.listLabel = QLabel(self)
-        self.listLabel.setIndent(0)
-        self.listLabel.setSizePolicy(QSizePolicy.Ignored,
-                QSizePolicy.Ignored)
-        self.listLabel.setStyleSheet("""
+        self.listWidget = CalendarList(self, self.config, self.logger)
+        self.listWidget.setStyleSheet("""
             font-size: 20px;
             padding: 10px 10px 10px 10px;
             """)
-        horLayout.addWidget(self.listLabel, 2)
+        horLayout.addWidget(self.listWidget, 2)
 
         self.events = []
         self.calendars = []
@@ -108,8 +106,7 @@ class CalendarWidget(QWidget):
                 self.logger.info("Using calendar %s", value)
                 self.calendars.append(value)
 
-        if self.calendars:
-            self.request()
+        self.request()
 
     def localDt(self, event, tz):
         if 'DTSTART' not in event:
@@ -149,6 +146,9 @@ class CalendarWidget(QWidget):
             self.grid.busyDays = busyDays
             self.grid.update()
 
+            self.listWidget.events = self.events
+            self.listWidget.update()
+
     def loadEvents(self, url, start, end):
         client = caldav.DAVClient(url)
         calendar = caldav.Calendar(client = client, url = url)
@@ -163,37 +163,8 @@ class CalendarWidget(QWidget):
                     self.logger.error('Skipping %s', repr(e))
         return events
 
-    def dateLine(self, curDate, nextDate):
-        if not curDate or nextDate > curDate:
-            return nextDate.strftime('\n%A, %d. %B\n')
-        else:
-            return ''
-
     def start(self):
         self.viewTimer.start()
-        text = ''
-        date = None
-        tz = get_localzone()
-        for event in self.events:
-            if 'DTSTART' in event:
-                dt = event['DTSTART'].dt
-                if isinstance(dt, datetime.datetime):
-                    dtl = dt.astimezone(tz)
-                    text += self.dateLine(date, dtl.date())
-                    date = dtl.date()
-                    text += dtl.strftime('%H:%M Uhr | ')
-                else:
-                    text += self.dateLine(date, dt)
-                    date = dt
-                    text += '(ganztägig) | '
-            if 'SUMMARY' in event:
-                 text += event['SUMMARY'] + '\n'
-            if 'LOCATION' in event:
-                 text += 'Ort: %s\n' % (event['LOCATION'])
-            if 'DESCRIPTION' in event:
-                 text += event['DESCRIPTION'] + '\n'
-            text += '\n'
-        self.listLabel.setText(text)
 
     def stop(self):
         self.viewTimer.stop()

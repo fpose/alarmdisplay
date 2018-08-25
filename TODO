@@ -35,10 +35,6 @@ vim: syntax=markdown tw=78 spl=en spell
 * Use emergency routing algorithm
 * Respect local route agreements
 
-# Idle Screen
-
-* Improve calendar display
-
 # Alarm Report
 
 * Print route information (distance, time)
