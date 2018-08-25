@@ -59,7 +59,9 @@ class CalendarList(QFrame):
         textRect = fm.boundingRect(textRect, 0, wholeDay)
         timeWidth = textRect.width() + 20
 
-        date = None
+        fm = QFontMetrics(painter.font())
+
+        prevDate = None
         tz = get_localzone()
         for event in self.events:
             if 'DTSTART' not in event:
@@ -68,80 +70,79 @@ class CalendarList(QFrame):
             dt = event['DTSTART'].dt
             if isinstance(dt, datetime.datetime):
                 dtl = dt.astimezone(tz)
-                (top, abort) = self.dateLine(date, dtl.date(), painter, top)
-                date = dtl.date()
+                eventDate = dtl.date()
                 timeText = dtl.strftime('%H:%M Uhr')
             else:
-                (top, abort) = self.dateLine(date, dt, painter, top)
-                date = dt
+                eventDate = dt
                 timeText = wholeDay
 
-            if abort:
-                break
+            dateText = ''
+            if not prevDate or eventDate > prevDate:
+                dateText = eventDate.strftime('%A, %d. %B')
+                top += 10
+                rect = fm.boundingRect(dateText)
+                rect = fm.boundingRect(rect, 0, dateText)
+                dateRect = QRect(cr.left(), top, cr.width(), rect.height())
+                top += dateRect.height()
+            prevDate = eventDate
 
             summaryHeight = 0
             if 'SUMMARY' in event:
-                text = event['SUMMARY']
-                font = painter.font()
-                font.setBold(True)
-                fm = QFontMetrics(font)
-                rect = QRect(cr.left() + timeWidth, top,
+                summary = event['SUMMARY']
+                boldFont = painter.font()
+                boldFont.setBold(True)
+                boldMetrics = QFontMetrics(boldFont)
+                sumRect = QRect(cr.left() + timeWidth, top,
                         cr.width() - timeWidth, cr.height() - top)
-                rect = fm.boundingRect(rect, Qt.TextWordWrap, text)
-                painter.save()
-                painter.setFont(font)
-                painter.drawText(rect, Qt.TextWordWrap, text)
-                painter.restore()
-                summaryHeight = rect.height()
+                sumRect = boldMetrics.boundingRect(sumRect, Qt.TextWordWrap,
+                        summary)
+                summaryHeight = sumRect.height()
 
-            text = ''
+            detailText = ''
             if 'LOCATION' in event:
                 loc = event['LOCATION']
                 if loc:
-                    if text:
-                        text += '\n'
-                    text += 'Ort: %s' % (loc)
+                    if detailText:
+                        detailText += '\n'
+                    detailText += 'Ort: %s' % (loc)
             if 'DESCRIPTION' in event:
                 desc = event['DESCRIPTION']
                 if desc:
-                    if text:
-                        text += '\n'
-                    text += desc
+                    if detailText:
+                        detailText += '\n'
+                    detailText += desc
 
-            fm = QFontMetrics(painter.font())
-            rect = QRect(cr.left() + timeWidth, top + summaryHeight,
+            detailRect = QRect(cr.left() + timeWidth, top + summaryHeight,
                     cr.width() - timeWidth, cr.height() - top - summaryHeight)
-            textRect = fm.boundingRect(rect, Qt.TextWordWrap, text)
+            detailRect = fm.boundingRect(detailRect, Qt.TextWordWrap,
+                    detailText)
 
             timeRect = QRect(cr.left(), top, timeWidth,
-                    summaryHeight + textRect.height())
+                    summaryHeight + detailRect.height())
+
             if timeRect.bottom() > cr.bottom():
                 break
+
+            # actual drawing
+
+            if dateText:
+                painter.fillRect(dateRect, QColor(0, 0, 120))
+                painter.drawText(dateRect, Qt.AlignLeft, dateText)
+
+            if summary:
+                painter.save()
+                painter.setFont(boldFont)
+                painter.drawText(sumRect, Qt.TextWordWrap, summary)
+                painter.restore()
+
             painter.drawText(timeRect, Qt.AlignLeft, timeText)
 
             top += summaryHeight
-            if text:
-                painter.drawText(rect, Qt.AlignLeft, text)
-                top += textRect.height()
+            if detailText:
+                painter.drawText(detailRect, Qt.AlignLeft, detailText)
+                top += detailRect.height()
 
             painter.drawLine(timeRect.right() - 10, timeRect.top(),
                     timeRect.right() - 10, top)
-
-    def dateLine(self, curDate, nextDate, painter, top):
-        if curDate and nextDate <= curDate:
-            return (top, False)
-
-        text = nextDate.strftime('%A, %d. %B')
-        cr = self.contentsRect()
-        top += 10 # gap
-        fm = QFontMetrics(painter.font())
-        textRect = fm.boundingRect(text)
-        textRect = fm.boundingRect(textRect, 0, text)
-        rect = QRect(cr.left(), top, cr.width(), textRect.height())
-        if rect.bottom() >= cr.bottom():
-            return (top, True)
-        painter.fillRect(rect, QColor(0, 0, 120))
-        painter.drawText(rect, Qt.AlignLeft, text)
-        return (top + rect.height(), False)
 
 #-----------------------------------------------------------------------------
