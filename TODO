@@ -30,6 +30,7 @@ vim: syntax=markdown tw=78 spl=en spell
 
 # Routing
 
+* Configure minimum/maximum zoom levels
 * Fetch route asynchronously
 * Respect route extent during route map zoom calculation
 * Use emergency routing algorithm
