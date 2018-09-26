@@ -196,8 +196,15 @@ class HistoryWidget(QWidget):
             else:
                 pixmap = QPixmap()
             self.symbolLabels[index].setPixmap(pixmap)
-            self.titleLabels[index].setText(alarm.title())
-            self.descLabels[index].setText(dateStr + '\n' + alarm.location())
+            title = alarm.title()
+            if not title:
+                title = alarm.fallbackStr
+            self.titleLabels[index].setText(title)
+            desc = dateStr
+            loc = alarm.location()
+            if loc:
+                desc += '\n' + loc
+            self.descLabels[index].setText(desc)
             index += 1
 
         self.index = 0
