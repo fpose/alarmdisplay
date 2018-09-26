@@ -100,6 +100,15 @@ class Alarm:
         self.source = 'pager'
         self.sources.add(self.source)
 
+        useHostClock = self.config.getboolean('pager', 'use_host_clock',
+                fallback = False)
+        if dateTime:
+            self.datetime = dateTime
+        elif useHostClock:
+            now = datetime.datetime.now()
+            local_tz = get_localzone()
+            self.datetime = local_tz.localize(now)
+
         ma = self.coordRe.search(pagerStr)
         if ma:
             coord = ma.group(1)
@@ -131,22 +140,13 @@ class Alarm:
         # 11) Objektplan
         # 12) Ortshinweis
 
-        if dateTime:
-            self.datetime = dateTime
-        else:
-            useHostClock = self.config.getboolean('pager', 'use_host_clock',
-                    fallback = False)
-            if useHostClock:
-                now = datetime.datetime.now()
-                local_tz = get_localzone()
-                self.datetime = local_tz.localize(now)
-            else:
-                dt_naive = datetime.datetime.strptime(ma.group(1),
-                        '%d-%m-%y %H:%M:%S')
-                zoneStr = self.config.get('pager', 'time_zone',
-                        fallback = 'Europe/Berlin')
-                tz = pytz.timezone(zoneStr)
-                self.datetime = tz.localize(dt_naive)
+        if not dateTime and not useHostClock:
+            dt_naive = datetime.datetime.strptime(ma.group(1),
+                    '%d-%m-%y %H:%M:%S')
+            zoneStr = self.config.get('pager', 'time_zone',
+                    fallback = 'Europe/Berlin')
+            tz = pytz.timezone(zoneStr)
+            self.datetime = tz.localize(dt_naive)
 
         einheit = ma.group(2).strip() # unused
         self.number = ma.group(3).strip()
