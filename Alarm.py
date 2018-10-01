@@ -229,6 +229,8 @@ class Alarm:
                 self.parseObjekt(child)
             elif child.localName == 'koordinaten':
                 c = content(child)
+                if not c:
+                    continue
                 #POINT (6.16825119 51.80245845)
                 m = re.search('\((.*)\s+(.*)\)', c)
                 if m:
@@ -236,9 +238,13 @@ class Alarm:
                         self.lon = float(m.group(1))
                         self.lat = float(m.group(2))
                     except:
-                        logger.error(u'Unbekanntes Koordinaten-Format: %s', c)
+                        if logger:
+                            logger.error( \
+                                    u'Unbekanntes Koordinaten-Format "%s"', c)
                 else:
-                    logger.error(u'Unbekanntes Koordinaten-Format: %s', c)
+                    if logger:
+                        logger.error(u'Unbekanntes Koordinaten-Format: "%s"',
+                                c)
 
     def parseObjekt(self, elem):
         for child in elem.childNodes:
