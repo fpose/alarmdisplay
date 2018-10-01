@@ -90,7 +90,7 @@ class Alarm:
         self.pager = None
         self.fallbackStr = None
 
-    def fromPager(self, pagerStr, logger, dateTime = None):
+    def fromPager(self, pagerStr, logger = None, dateTime = None):
         # '16-12-17 18:55:10 DME-Text
         # #K01;N5174110E0608130; *57274*H1 Hilfeleistung*
         # Hinweis*Stadt*Ortsteil*Straße*
@@ -122,7 +122,8 @@ class Alarm:
 
         ma = self.alarmRe.match(pagerStr)
         if not ma:
-            logger.warn('Alarmtext nicht erkannt!')
+            if logger:
+                logger.warn('Alarmtext nicht erkannt!')
             self.fallbackStr = pagerStr
             return
 
@@ -161,7 +162,7 @@ class Alarm:
         self.objektnummer = ma.group(11).strip()
         self.ortshinweis = ma.group(12).strip()
 
-    def fromXml(self, xmlString, logger):
+    def fromXml(self, xmlString, logger = None):
         self.xml = xmlString
         self.source = 'xml'
         self.sources.add(self.source)
