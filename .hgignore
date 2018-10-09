@@ -6,6 +6,7 @@ alarm*.pdf
 alarm*.ps
 alarm_db
 alarmdisplay.conf
+alarmdisplay.cred
 alarmdisplay.log
 report/*.aux
 report/*.log
