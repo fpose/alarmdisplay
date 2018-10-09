@@ -323,7 +323,7 @@ class Alarm:
         dt = self.datetime.astimezone(local_tz)
         return dt.strftime('%Y-%m-%d-%H-%M-%S')
 
-    def load(self, path, logger):
+    def load(self, path, logger = None):
         f = open(path, 'r', encoding = 'utf-8')
         contents = f.read()
         f.close()

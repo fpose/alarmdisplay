@@ -169,9 +169,12 @@ class HistoryWidget(QWidget):
 
             alarm = Alarm(self.config)
             try:
-                alarm.load(path, self.logger)
+                alarm.load(path)
             except:
-                self.logger.error('Failed to load alarm:', exc_info = True)
+                continue
+
+            if alarm.fallbackStr:
+                # ignore incomplete or invalid alarms in history
                 continue
 
             if len(self.alarms) and self.alarms[-1].matches(alarm):
