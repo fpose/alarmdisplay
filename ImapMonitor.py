@@ -46,6 +46,19 @@ class ImapMonitor(QtCore.QObject):
         self.imapHost = config.get('email', 'imap_host', fallback = None)
         self.imapUser = config.get('email', 'imap_user', fallback = None)
         self.imapPass = config.get('email', 'imap_pass', fallback = None)
+        self.imapCred = config.get('email', 'imap_cred', fallback = None)
+
+        if self.imapCred:
+            credFile = open(self.imapCred, 'r')
+            lines = credFile.readlines()
+            credFile.close()
+            if len(lines) != 2:
+                self.logger.error('Credentials file needs two lines!')
+            else:
+                if not self.imapUser:
+                    self.imapUser = lines[0].strip()
+                if not self.imapPass:
+                    self.imapPass = lines[1].strip()
 
         if not self.imapHost or not self.imapUser or not self.imapPass:
             self.run = False

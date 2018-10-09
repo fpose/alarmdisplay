@@ -2,7 +2,6 @@ vim: syntax=markdown tw=78 spl=en spell
 
 # General
 
-* IMAP credentials in separate file
 * Catch and log global exceptions
 * Option to disable clock display
 * Reload settings on SIGHUP
@@ -15,6 +14,7 @@ vim: syntax=markdown tw=78 spl=en spell
 
 # Alarm Screen
 
+* Show abort of alarm
 * Show alarmed resources/units
 * Symbol for rights-of-way
 * Symbols for all alarm types
@@ -24,15 +24,16 @@ vim: syntax=markdown tw=78 spl=en spell
 
 # Alarm Processing
 
-* Forward alarms to satellite systems
+* Forward XML alarms to satellite systems
+
 * Remove fall-back string if correct alarm follows
 * process check_idle() response and stay in idle mode
 
 # Routing
 
 * Configure minimum/maximum zoom levels
-* Fetch route asynchronously
 * Respect route extent during route map zoom calculation
+
 * Use emergency routing algorithm
 * Respect local route agreements
 
@@ -40,7 +41,6 @@ vim: syntax=markdown tw=78 spl=en spell
 
 * Print route information (distance, time)
 * Local resource/unit names in configuration file
-* Wakeup printer without print job
 
 # Administration
 
