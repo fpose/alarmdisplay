@@ -27,7 +27,13 @@ cheetahVarStartToken = @
 
 %-----------------------------------------------------------------------------
 
-\documentclass[parskip=half,12pt,DIV=15]{scrartcl}
+\documentclass[
+    parskip=half-,
+    12pt,
+    DIV=18,
+    headheight=20mm,
+    headsepline
+]{scrartcl}
 
 \usepackage{graphicx}
 \usepackage[utf8]{inputenc}
@@ -35,37 +41,14 @@ cheetahVarStartToken = @
 \usepackage{lmodern}
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{scrpage2}
+%\usepackage{showframe}
 
 \renewcommand\familydefault{\sfdefault}
+\renewcommand\headfont{\normalfont}
 
 %-----------------------------------------------------------------------------
 
 \newcommand{\alarmreport}[1]{
-
-%\noindent\fcolorbox{red}{gray}{%
-\begin{minipage}[t]{.79\textwidth}
-#if @image
-\raisebox{-1mm}{%
-    \includegraphics[height=10mm]{@image}%
-}
-#end if
-\Huge
-\textbf{@title}
-
-@address
-\end{minipage}
-%}
-\hfill
-%\noindent\fcolorbox{red}{gray}{%
-\begin{minipage}[t]{.19\textwidth}
-    \hfill
-#if @logo
-    \raisebox{-12mm}{\includegraphics[height=18mm]{@logo}}
-#end if
-\end{minipage}
-%}
-
-\rule{\textwidth}{.5pt}
 
 \begin{tabular}{rp{120mm}}
 #if @object_name
@@ -105,8 +88,27 @@ Alarmierte Einheiten & \raggedright \textbf{%
 \begin{document}
 
 \pagestyle{scrheadings}
-\ofoot{@number}
+
+\ihead{
+#if @image
+\raisebox{-1mm}{%
+    \includegraphics[height=10mm]{@image}%
+}
+#end if
+\Large
+\textbf{@title}
+
+@address
+}
+
+\ohead{
+#if @logo
+    \raisebox{-12mm}{\includegraphics[height=18mm]{@logo}}
+#end if
+}
+
 \ifoot{@datetime}
+\ofoot{@number}
 
 %-----------------------------------------------------------------------------
 
