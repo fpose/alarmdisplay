@@ -236,7 +236,8 @@ class MainWidget(QWidget):
         self.imapThread.start()
 
         self.socketListener = SocketListener(self.logger)
-        self.socketListener.receivedAlarm.connect(self.receivedPagerAlarm)
+        self.socketListener.pagerAlarm.connect(self.receivedPagerAlarm)
+        self.socketListener.xmlAlarm.connect(self.receivedXmlAlarm)
 
         self.cecThread = QThread()
         self.cecThread.start()

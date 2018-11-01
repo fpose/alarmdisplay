@@ -23,8 +23,6 @@
 #
 #-----------------------------------------------------------------------------
 
-from AlarmReceiver import AlarmReceiver
-
 from PyQt5 import QtCore
 from PyQt5 import QtNetwork
 
@@ -32,23 +30,53 @@ from PyQt5 import QtNetwork
 
 class SocketListener(QtCore.QObject):
 
-    receivedAlarm = QtCore.pyqtSignal(str)
+    pagerAlarm = QtCore.pyqtSignal(str)
+    xmlAlarm = QtCore.pyqtSignal(bytes)
 
     def __init__(self, logger):
         super(SocketListener, self).__init__()
         self.logger = logger
 
-        self.socket = QtNetwork.QUdpSocket(self)
-        self.socket.bind(QtNetwork.QHostAddress.Any, 11211)
-        self.socket.readyRead.connect(self.readSocket)
+        self.udpSocket = QtNetwork.QUdpSocket(self)
+        self.udpSocket.bind(QtNetwork.QHostAddress.Any, 11211)
+        self.udpSocket.readyRead.connect(self.readUdpSocket)
 
-    def readSocket(self):
+        self.tcpServer = QtNetwork.QTcpServer(self)
+        self.tcpServer.listen(QtNetwork.QHostAddress.Any, 11211)
+        self.tcpServer.newConnection.connect(self.tcpConnection)
+
+        self.tcpConnection = None
+        self.tcpData = b''
+
+    def readUdpSocket(self):
         self.logger.info('Datagram received.')
-        while self.socket.hasPendingDatagrams():
-            size = self.socket.pendingDatagramSize()
-            (data, host, port) = self.socket.readDatagram(size)
+        while self.udpSocket.hasPendingDatagrams():
+            size = self.udpSocket.pendingDatagramSize()
+            (data, host, port) = self.udpSocket.readDatagram(size)
             self.logger.info("Received from %s:%i", host.toString(), port)
             pagerStr = data.decode('utf-8')
-            self.receivedAlarm.emit(pagerStr)
+            self.pagerAlarm.emit(pagerStr)
+
+    def tcpConnection(self):
+        self.logger.info('New connection from TCP client.')
+        if self.tcpConnection:
+            self.tcpConnection.disconnectFromHost()
+        self.tcpConnection = self.tcpServer.nextPendingConnection()
+        self.tcpConnection.readyRead.connect(self.tcpReadyRead)
+        self.tcpConnection.disconnected.connect(self.tcpDisconnected)
+        self.tcpConnection.error.connect(self.tcpError)
+        self.tcpData = b''
+
+    def tcpReadyRead(self):
+        self.tcpData += self.tcpConnection.readAll().data()
+
+    def tcpDisconnected(self):
+        self.xmlAlarm.emit(self.tcpData)
+        self.logger.info('Closing connection to TCP client.')
+        self.tcpConnection = None
+        self.tcpData = b''
+
+    def tcpError(self):
+        self.tcpConnection.close()
 
 #-----------------------------------------------------------------------------
