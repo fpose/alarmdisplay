@@ -464,10 +464,12 @@ class Alarm:
         for em in self.einsatzmittel:
             if ignore(em):
                 continue
+            if em.zusatz == u'':
+                continue # leer
             if em.zusatz in zusatz:
                 continue # schon gesehen
             if em.zusatz not in einheit:
-                logger.error(u'Unbekannter Zusatz %s!', em.zusatz)
+                logger.error(u'Unbekannter Zusatz "%s"!', em.zusatz)
                 continue
             zusatz.append(em.zusatz)
 
