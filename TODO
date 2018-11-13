@@ -26,6 +26,7 @@ vim: syntax=markdown tw=78 spl=en spell
 
 * Forward XML alarms to satellite systems
 
+* Process chemical hazards
 * Remove fall-back string if correct alarm follows
 * process check_idle() response and stay in idle mode
 
