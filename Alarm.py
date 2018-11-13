@@ -60,6 +60,9 @@ class Alarm:
             '(.*)')
     dateRe = re.compile('\d\d\d\d-\d\d-\d\d-\d\d-\d\d-\d\d')
 
+    # <o_nummer>[My ignored object name] KLV 06/666</o_nummer>
+    objectNumberRe = re.compile('\s*(\[.*\])\s*(.*)')
+
     def __init__(self, config, receiveTimeStamp = None):
         self.number = None
         self.datetime = None
@@ -227,7 +230,7 @@ class Alarm:
             elif child.localName == 'hausnummer':
                 self.hausnummer = content(child)
             elif child.localName == 'objekt':
-                self.parseObjekt(child)
+                self.parseObjekt(child, logger)
             elif child.localName == 'koordinaten':
                 c = content(child)
                 if not c:
@@ -247,14 +250,21 @@ class Alarm:
                         logger.error(u'Unbekanntes Koordinaten-Format: "%s"',
                                 c)
 
-    def parseObjekt(self, elem):
+    def parseObjekt(self, elem, logger):
         for child in elem.childNodes:
             if child.nodeType != child.ELEMENT_NODE:
                 continue
             if child.localName == 'o_name':
                 self.objektname = content(child)
             elif child.localName == 'o_nummer':
-                self.objektnummer = content(child)
+                o_num = content(child)
+                m = self.objectNumberRe.fullmatch(o_num)
+                if m:
+                    self.objektnummer = m.group(2)
+                else:
+                    self.objektnummer = o_num
+                if logger:
+                    logger.error(u'onum: "%s" "%s"', o_num, self.objektnummer)
 
     def parseEinsatzMittel(self, elem, logger):
         for child in elem.childNodes:
