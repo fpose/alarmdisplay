@@ -67,14 +67,22 @@ class WeatherWidget(QWidget):
         label.setAlignment(Qt.AlignCenter)
         horLayout.addWidget(label)
         self.imageLabel = label
+        self.timeStamp = QDateTime()
 
         self.request()
 
     def start(self):
-        self.viewTimer.start()
+        if self.dataValid():
+            self.viewTimer.start()
+        else:
+            self.finished.emit()
 
     def stop(self):
         self.viewTimer.stop()
+
+    def dataValid(self):
+        now = QDateTime.currentDateTime()
+        return self.timeStamp.isValid() and self.timeStamp.daysTo(now) == 0
 
     def request(self):
         req = QNetworkRequest(QUrl(self.url))
@@ -89,12 +97,10 @@ class WeatherWidget(QWidget):
             try:
                 pixmap.loadFromData(bytes_string)
                 self.imageLabel.setPixmap(pixmap)
+                self.timeStamp = QDateTime.currentDateTime()
             except:
                 self.logger.error("Failed to set weather data.",
                         exc_info = True)
-        else:
-            self.logger.error("Failed to get weather data:")
-            self.logger.error(reply.errorString())
         reply.deleteLater()
 
     def viewTimeout(self):
