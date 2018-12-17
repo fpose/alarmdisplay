@@ -75,14 +75,22 @@ class WaterLevelWidget(QWidget):
         verLayout.addWidget(spacerWidget, 1)
 
         self.pixmap = QPixmap()
+        self.timeStamp = QDateTime()
 
         self.request()
 
     def start(self):
-        self.viewTimer.start()
+        if self.dataValid():
+            self.viewTimer.start()
+        else:
+            self.finished.emit()
 
     def stop(self):
         self.viewTimer.stop()
+
+    def dataValid(self):
+        now = QDateTime.currentDateTime()
+        return self.timeStamp.isValid() and self.timeStamp.daysTo(now) == 0
 
     def request(self):
         url = self.config.get("idle", "water_url", fallback = '')
@@ -99,6 +107,7 @@ class WaterLevelWidget(QWidget):
             try:
                 pixmap.loadFromData(bytes_string)
                 self.pixmap = pixmap
+                self.timeStamp = QDateTime.currentDateTime()
             except:
                 self.logger.error("Failed to set water level data.",
                         exc_info = True)
