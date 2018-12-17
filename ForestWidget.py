@@ -48,7 +48,7 @@ class ForestWidget(QWidget):
         self.logger = logger
 
         self.updateTimer = QTimer(self)
-        self.updateTimer.setInterval(5 * 60000)
+        self.updateTimer.setInterval(6 * 60 * 60000)
         self.updateTimer.setSingleShot(False)
         self.updateTimer.timeout.connect(self.request)
         self.updateTimer.start()
@@ -77,6 +77,7 @@ class ForestWidget(QWidget):
 
         self.imageLabels = []
         self.pixmaps = []
+        self.timeStamps = []
         for url in self.urls:
             label = QLabel(self)
             label.setAlignment(Qt.AlignCenter)
@@ -85,6 +86,7 @@ class ForestWidget(QWidget):
 
             pixmap = QPixmap()
             self.pixmaps.append(pixmap)
+            self.timeStamps.append(QDateTime())
 
         spacerWidget = QWidget(self)
         verLayout.addWidget(spacerWidget, 1)
@@ -92,10 +94,20 @@ class ForestWidget(QWidget):
         self.request()
 
     def start(self):
-        self.viewTimer.start()
+        if self.dataValid():
+            self.viewTimer.start()
+        else:
+            self.finished.emit()
 
     def stop(self):
         self.viewTimer.stop()
+
+    def dataValid(self):
+        now = QDateTime.currentDateTime()
+        for t in self.timeStamps:
+            if not t.isValid() or t.daysTo(now) > 0:
+                return False
+        return True
 
     def request(self):
         for idx in range(len(self.urls)):
@@ -114,6 +126,7 @@ class ForestWidget(QWidget):
                     if req.url() == QUrl(self.urls[idx]):
                         self.pixmaps[idx] = pixmap
                         self.updatePixmaps()
+                        self.timeStamps[idx] = QDateTime.currentDateTime()
             except:
                 self.logger.error("Failed to set forest data.",
                         exc_info = True)
