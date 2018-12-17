@@ -130,9 +130,6 @@ class ForestWidget(QWidget):
             except:
                 self.logger.error("Failed to set forest data.",
                         exc_info = True)
-        else:
-            self.logger.error("Failed to get forest data:")
-            self.logger.error(reply.errorString())
         reply.deleteLater()
 
     def updatePixmaps(self):
