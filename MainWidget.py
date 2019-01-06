@@ -39,7 +39,6 @@ from IdleWidget import IdleWidget
 from AlarmWidget import AlarmWidget
 from Map import getRoute
 from AlarmReceiver import AlarmReceiver
-from ImapMonitor import ImapMonitor
 from SocketListener import SocketListener
 from AlarmReport import AlarmReport
 from CecCommand import CecCommand
@@ -227,13 +226,16 @@ class MainWidget(QWidget):
         self.receiverThread.started.connect(self.alarmReceiver.receive)
         self.receiverThread.start()
 
-        self.imapThread = QThread()
-        self.imapMonitor = ImapMonitor(self.config, self.logger)
-        self.imapMonitor.receivedAlarm.connect(self.receivedXmlAlarm)
-        self.imapMonitor.moveToThread(self.imapThread)
-        self.imapMonitor.finished.connect(self.imapThread.quit)
-        self.imapThread.started.connect(self.imapMonitor.start)
-        self.imapThread.start()
+        if self.config.has_section('email') and \
+                self.config.get("email", "imap_host", fallback = ''):
+            from ImapMonitor import ImapMonitor
+            self.imapThread = QThread()
+            self.imapMonitor = ImapMonitor(self.config, self.logger)
+            self.imapMonitor.receivedAlarm.connect(self.receivedXmlAlarm)
+            self.imapMonitor.moveToThread(self.imapThread)
+            self.imapMonitor.finished.connect(self.imapThread.quit)
+            self.imapThread.started.connect(self.imapMonitor.start)
+            self.imapThread.start()
 
         self.socketListener = SocketListener(self.logger)
         self.socketListener.pagerAlarm.connect(self.receivedPagerAlarm)

@@ -35,7 +35,6 @@ from HistoryWidget import *
 from WeatherWidget import *
 from ForestWidget import *
 from WaterLevelWidget import *
-from CalendarWidget import *
 
 #-----------------------------------------------------------------------------
 
@@ -133,6 +132,7 @@ class IdleWidget(QWidget):
                     hasCalendars = True
                     break
         if hasCalendars:
+            from CalendarWidget import CalendarWidget
             self.calendarWidget = CalendarWidget(self.config, self.logger)
             self.calendarWidget.finished.connect(self.cycle)
             self.stackedWidget.addWidget(self.calendarWidget)
