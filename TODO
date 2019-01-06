@@ -22,6 +22,13 @@ vim: syntax=markdown tw=78 spl=en spell
 * Symbol for route time
 * Draw route over loaded tiles
 
+# Pager
+
+* Reconnect periodically
+
+* Configure device file path
+* Check pager connection?
+
 # Alarm Processing
 
 * Forward XML alarms to satellite systems
