@@ -127,7 +127,8 @@ class CalendarWidget(QWidget):
             try:
                 events.extend(self.loadEvents(url, start, end))
             except:
-                self.logger.error('Failed to load events from %s', url)
+                self.logger.error('Failed to load events from %s:', url,
+                        exc_info = True)
         if events:
             tz = get_localzone()
             self.events = sorted(events, key = lambda e: self.localDt(e, tz))
