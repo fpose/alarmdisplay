@@ -43,6 +43,7 @@ from SocketListener import SocketListener
 from AlarmReport import AlarmReport
 from CecCommand import CecCommand
 from Alarm import Alarm, EinsatzMittel
+from Forwarder import Forwarder
 
 #-----------------------------------------------------------------------------
 
@@ -63,6 +64,7 @@ class MainWidget(QWidget):
         self.seenXml = False
         self.reportDone = False
         self.alarmDateTime = None
+        self.forwarder = Forwarder(config, logger)
 
         self.reportTimer = QTimer(self)
         self.reportTimer.setInterval( \
@@ -347,7 +349,7 @@ class MainWidget(QWidget):
             self.logger.error('Failed to save alarm:', exc_info = True)
 
         try:
-            newAlarm.forward(self.logger)
+            self.forwarder.forward(newAlarm)
         except:
             self.logger.error('Failed to forward alarm:', exc_info = True)
 

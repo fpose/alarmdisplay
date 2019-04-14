@@ -263,8 +263,6 @@ class Alarm:
                     self.objektnummer = m.group(2)
                 else:
                     self.objektnummer = o_num
-                if logger:
-                    logger.error(u'onum: "%s" "%s"', o_num, self.objektnummer)
 
     def parseEinsatzMittel(self, elem, logger):
         for child in elem.childNodes:
@@ -305,28 +303,6 @@ class Alarm:
                 encoding = encoding)
         f.write(contents)
         f.close()
-
-    def forward(self, logger):
-        if not self.config.has_section('forward'):
-            return
-
-        data = None
-        if self.source == 'pager':
-            data = self.pager.encode('utf-8')
-        elif self.source == 'xml':
-            data = self.xml # bytes
-
-        if not data:
-            return
-
-        hostRe = re.compile('host[0-9]+')
-
-        for key, value in self.config.items('forward'):
-            ma = hostRe.fullmatch(key)
-            logger.info("forward %s = %s, %s", key, value, ma)
-            socket = QtNetwork.QUdpSocket()
-            host = QtNetwork.QHostAddress(value)
-            socket.writeDatagram(data, host, 11211)
 
     def dateString(self):
         local_tz = get_localzone()
