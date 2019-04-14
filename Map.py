@@ -187,6 +187,13 @@ def getRoutePixmap(dest_lat_deg, dest_lon_deg, width, height, route, config,
     zoom_y = math.log(min_y_tiles * 360.0 / lat_diff, 2.0)
     zoom = round(min(zoom_x, zoom_y)) - 1
     logger.debug('Zoom: %f x %f => %u', zoom_x, zoom_y, zoom)
+
+    max_zoom = config.getint("route", "max_zoom", fallback = 17)
+    lim_zoom = min(zoom, max_zoom)
+    if lim_zoom != zoom:
+        logger.debug('Limiting to %u', lim_zoom)
+    zoom = lim_zoom
+
     mpp = meters_per_pixel(zoom, lat_deg)
 
     x, y = deg2num(lat_deg, lon_deg, zoom)
