@@ -71,6 +71,8 @@ class ImapMonitor(QtCore.QObject):
         while self.run:
             try:
                 self.imapCycle()
+            except OSError as e:
+                self.logger.error('IMAP cycle failed: %s', e)
             except:
                 self.logger.error('IMAP cycle failed:', exc_info = True)
             if self.run:
