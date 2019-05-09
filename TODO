@@ -31,8 +31,7 @@ vim: syntax=markdown tw=78 spl=en spell
 
 # Alarm Processing
 
-* Forward XML alarms to satellite systems
-
+* Take alarm time before forwarding
 * Process chemical hazards
 * Remove fall-back string if correct alarm follows
 * process check_idle() response and stay in idle mode
@@ -49,6 +48,7 @@ vim: syntax=markdown tw=78 spl=en spell
 
 * Print route information (distance, time)
 * Local resource/unit names in configuration file
+* Disable report on slave displays
 
 # Administration
 
