@@ -44,6 +44,7 @@ from AlarmReport import AlarmReport
 from CecCommand import CecCommand
 from Alarm import Alarm, EinsatzMittel
 from Forwarder import Forwarder
+from Notifier import Notifier
 
 #-----------------------------------------------------------------------------
 
@@ -65,6 +66,7 @@ class MainWidget(QWidget):
         self.reportDone = False
         self.alarmDateTime = None
         self.forwarder = Forwarder(config, logger)
+        self.notifier = Notifier(config, logger)
 
         self.reportTimer = QTimer(self)
         self.reportTimer.setInterval( \
@@ -323,6 +325,11 @@ class MainWidget(QWidget):
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
+
+        try:
+            self.notifier.pager(pagerStr)
+        except:
+            self.logger.error('Notification failed:', exc_info = True)
 
         self.processAlarm(alarm)
 
