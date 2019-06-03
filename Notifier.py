@@ -48,6 +48,16 @@ class Notifier:
 
         self.logger.info('Using %s for notification.', self.url)
 
+    def startup(self):
+
+        if not self.url:
+            return
+
+        json_obj = {}
+        json_obj["host_name"] = self.host_name
+        json_obj["startup"] = True
+        self.notify(json_obj)
+
     def pager(self, pager_string):
 
         if not self.url:
@@ -56,15 +66,20 @@ class Notifier:
         json_obj = {}
         json_obj["host_name"] = self.host_name
         json_obj["pager_string"] = pager_string
+        self.notify(json_obj)
+
+    def notify(self, json_obj):
+
         json_doc = QJsonDocument(json_obj)
         data = json_doc.toJson(QJsonDocument.Compact)
 
-        self.logger.info("Notifing %s...", self.url)
+        self.logger.info("Notifing %s with %s...", self.url, data)
         req = QNetworkRequest(QUrl(self.url))
         req.setHeader(QNetworkRequest.ContentTypeHeader, 'application/json')
         reply = self.networkAccessManager.post(req, data)
 
     def handle_response(self, reply):
+
         req = reply.request()
         err = reply.error()
         if err == QNetworkReply.NoError:

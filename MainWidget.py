@@ -252,6 +252,11 @@ class MainWidget(QWidget):
 
         self.report = AlarmReport(self.config, self.logger)
 
+        try:
+            self.notifier.startup()
+        except:
+            self.logger.error('Startup notification failed:', exc_info = True)
+
         self.logger.info('Setup finished.')
 
     #-------------------------------------------------------------------------
@@ -329,7 +334,7 @@ class MainWidget(QWidget):
         try:
             self.notifier.pager(pagerStr)
         except:
-            self.logger.error('Notification failed:', exc_info = True)
+            self.logger.error('Pager notification failed:', exc_info = True)
 
         self.processAlarm(alarm)
 
