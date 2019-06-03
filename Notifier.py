@@ -26,7 +26,7 @@
 
 import socket
 
-from PyQt5.QtCore import QUrl, QUrlQuery
+from PyQt5.QtCore import QUrl, QJsonDocument
 from PyQt5.QtNetwork import *
 
 #-----------------------------------------------------------------------------
@@ -46,25 +46,22 @@ class Notifier:
         if not self.url:
             return
 
-        self.logger.info('Notifying %s.', self.url)
+        self.logger.info('Using %s for notification.', self.url)
 
     def pager(self, pager_string):
 
         if not self.url:
             return
 
-        # FIXME manually replace semicolon
-        pager_string = pager_string.replace(";", "%3B")
-
-        query = QUrlQuery()
-        query.addQueryItem("host_name", self.host_name)
-        query.addQueryItem("pager_string", pager_string)
-        data = query.toString(QUrl.FullyEncoded).encode('utf-8')
+        json_obj = {}
+        json_obj["host_name"] = self.host_name
+        json_obj["pager_string"] = pager_string
+        json_doc = QJsonDocument(json_obj)
+        data = json_doc.toJson(QJsonDocument.Compact)
 
         self.logger.info("Notifing %s...", self.url)
         req = QNetworkRequest(QUrl(self.url))
-        req.setHeader(QNetworkRequest.ContentTypeHeader,
-                'application/x-www-form-urlencoded')
+        req.setHeader(QNetworkRequest.ContentTypeHeader, 'application/json')
         reply = self.networkAccessManager.post(req, data)
 
     def handle_response(self, reply):
