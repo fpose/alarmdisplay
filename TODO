@@ -10,7 +10,6 @@ vim: syntax=markdown tw=78 spl=en spell
 * Installation script
 * Show revision / date
 * Splash Screen
-* Avoid stack trace on IMAP disconnect
 
 # Alarm Screen
 
@@ -21,6 +20,7 @@ vim: syntax=markdown tw=78 spl=en spell
 * Symbol for distance
 * Symbol for route time
 * Draw route over loaded tiles
+* Draw time since alarm in different colors or symbols
 
 # Pager
 
@@ -28,6 +28,12 @@ vim: syntax=markdown tw=78 spl=en spell
 
 * Configure device file path
 * Check pager connection?
+
+# Sound
+
+* Play sound at alarm update
+* Play sound at different times after alarm
+* Test synchronous sounds
 
 # Alarm Processing
 
