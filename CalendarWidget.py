@@ -33,6 +33,7 @@ import re
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from PyQt5.QtNetwork import *
 
 from CalendarGrid import *
 from CalendarList import *
@@ -62,6 +63,9 @@ class CalendarWidget(QWidget):
         self.viewTimer.setInterval(10000)
         self.viewTimer.setSingleShot(True)
         self.viewTimer.timeout.connect(self.viewTimeout)
+
+        self.networkAccessManager = QNetworkAccessManager()
+        self.networkAccessManager.finished.connect(self.handleResponse)
 
         verLayout = QVBoxLayout(self)
         verLayout.setSpacing(0)
@@ -94,17 +98,28 @@ class CalendarWidget(QWidget):
             """)
         horLayout.addWidget(self.listWidget, 2)
 
+        self.caldav_calendars = []
+        self.ics_calendars = []
+
         self.events = []
-        self.calendars = []
+
+        self.request_events = []
+        self.request_calendars = set()
+
         if self.config.has_section('idle'):
             calRe = re.compile('calendar[0-9]+')
+            icsRe = re.compile('ics[0-9]+')
 
             for key, value in self.config.items('idle'):
                 ma = calRe.fullmatch(key)
-                if not ma:
+                if ma:
+                    self.logger.info("Using CalDAV calendar %s", value)
+                    self.caldav_calendars.append(value)
                     continue
-                self.logger.info("Using calendar %s", value)
-                self.calendars.append(value)
+                ma = icsRe.fullmatch(key)
+                if ma:
+                    self.logger.info("Using ICS calendar %s", value)
+                    self.ics_calendars.append(value)
 
         self.request()
 
@@ -120,37 +135,56 @@ class CalendarWidget(QWidget):
         return dtl
 
     def request(self):
-        events = []
+        self.request_events = []
         start = datetime.datetime.now()
         end = start + datetime.timedelta(days = 62)
-        for url in self.calendars:
+
+        for url in self.caldav_calendars:
             try:
-                events.extend(self.loadEvents(url, start, end))
+                self.loadCalDavEvents(url, start, end)
             except:
-                self.logger.error('Failed to load events from %s:', url,
+                self.logger.error('Failed to load CalDAV events from %s:',
+                        url, exc_info = True)
+
+        self.request_calendars = set()
+
+        for url in self.ics_calendars:
+            try:
+                self.loadIcsEvents(url, start, end)
+            except:
+                self.logger.error('Failed to load ICS events from %s:', url,
                         exc_info = True)
-        if events:
-            tz = get_localzone()
-            self.events = sorted(events, key = lambda e: self.localDt(e, tz))
+            self.request_calendars.add(url)
 
-            busyDays = set()
-            for event in self.events:
-                if 'DTSTART' in event:
-                    dt = event['DTSTART'].dt
-                    if isinstance(dt, datetime.datetime):
-                        dt = dt.astimezone(tz)
-                        date = dt.date()
-                    else:
-                        date = dt
-                    if date not in busyDays:
-                        busyDays.add(date)
-            self.grid.busyDays = busyDays
-            self.grid.update()
+        if not self.request_calendars:
+            self.updateEvents()
 
-            self.listWidget.events = self.events
-            self.listWidget.update()
+    def updateEvents(self):
+        if not self.request_events:
+            return
 
-    def loadEvents(self, url, start, end):
+        tz = get_localzone()
+        self.events = sorted(self.request_events,
+                key = lambda e: self.localDt(e, tz))
+
+        busyDays = set()
+        for event in self.events:
+            if 'DTSTART' in event:
+                dt = event['DTSTART'].dt
+                if isinstance(dt, datetime.datetime):
+                    dt = dt.astimezone(tz)
+                    date = dt.date()
+                else:
+                    date = dt
+                if date not in busyDays:
+                    busyDays.add(date)
+        self.grid.busyDays = busyDays
+        self.grid.update()
+
+        self.listWidget.events = self.events
+        self.listWidget.update()
+
+    def loadCalDavEvents(self, url, start, end):
         client = caldav.DAVClient(url)
         calendar = caldav.Calendar(client = client, url = url)
         results = calendar.date_search(start, end)
@@ -162,7 +196,37 @@ class CalendarWidget(QWidget):
                     events.append(e)
                 else:
                     self.logger.error('Skipping %s', repr(e))
-        return events
+        self.request_events.extend(events)
+
+    def loadIcsEvents(self, url, start, end):
+        req = QNetworkRequest(QUrl(url))
+        self.networkAccessManager.get(req)
+
+    def handleResponse(self, reply):
+        req = reply.request()
+        er = reply.error()
+        url = req.url().toString()
+        if er == QNetworkReply.NoError:
+            ics = reply.readAll().data()
+            ok = True
+            try:
+                cal = icalendar.Calendar.from_ical(ics)
+            except:
+                self.logger.error('Failed to load ICS events from %s:', url,
+                        exc_info = True)
+                ok = False
+            if ok:
+                for e in cal.walk('vevent'):
+                    if 'DTSTART' in e:
+                        self.request_events.append(e)
+                    else:
+                        self.logger.error('Skipping %s', repr(e))
+
+        self.request_calendars.remove(url)
+        if not self.request_calendars:
+            self.updateEvents()
+
+        reply.deleteLater()
 
     def start(self):
         self.viewTimer.start()

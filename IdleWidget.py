@@ -125,7 +125,7 @@ class IdleWidget(QWidget):
 
         hasCalendars = False
         if self.config.has_section('idle'):
-            calRe = re.compile('calendar[0-9]+')
+            calRe = re.compile('(calendar|ics)[0-9]+')
             for key, value in self.config.items('idle'):
                 ma = calRe.fullmatch(key)
                 if ma:

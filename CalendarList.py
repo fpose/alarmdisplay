@@ -24,6 +24,7 @@
 #-----------------------------------------------------------------------------
 
 import datetime
+import re
 from tzlocal import get_localzone
 
 from PyQt5.QtWidgets import QFrame
@@ -33,6 +34,9 @@ from PyQt5.QtCore import Qt, QPoint, QSize, QRect
 #-----------------------------------------------------------------------------
 
 class CalendarList(QFrame):
+
+    feuerNetzDescRe = re.compile('(.*)\n--\nDozent\(en\): (.*)\n--\n.*',
+            re.DOTALL)
 
     def __init__(self, parent, config, logger):
         super(CalendarList, self).__init__(parent)
@@ -108,7 +112,14 @@ class CalendarList(QFrame):
             if 'DESCRIPTION' in event:
                 desc = event['DESCRIPTION']
                 if desc:
-                    if detailText:
+                    ma = self.feuerNetzDescRe.fullmatch(desc)
+                    if ma:
+                        desc = ma.group(1)
+                        if ma.group(2):
+                            if desc:
+                                desc += '\n'
+                            desc += ma.group(2)
+                    if desc and detailText:
                         detailText += '\n'
                     detailText += desc
 
