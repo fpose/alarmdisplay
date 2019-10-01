@@ -123,16 +123,27 @@ class CalendarWidget(QWidget):
 
         self.request()
 
-    def localDt(self, event, tz):
+    def localStart(self, event, tz, now_loc):
         if 'DTSTART' not in event:
-            return datetime.datetime.now()
+            return now_loc
         dt = event['DTSTART'].dt
         if isinstance(dt, datetime.datetime):
-            dtl = dt.astimezone(tz)
+            dt_loc = dt.astimezone(tz)
         else:
-            dtl = datetime.datetime(dt.year, dt.month, dt.day)
-            dtl = tz.localize(dtl)
-        return dtl
+            dt_loc = datetime.datetime(dt.year, dt.month, dt.day)
+            dt_loc = tz.localize(dt_loc)
+        return dt_loc
+
+    def localEnd(self, event, tz, now_loc):
+        if 'DTEND' not in event:
+            return now_loc
+        dt = event['DTEND'].dt
+        if isinstance(dt, datetime.datetime):
+            dt_loc = dt.astimezone(tz)
+        else:
+            dt_loc = datetime.datetime(dt.year, dt.month, dt.day)
+            dt_loc = tz.localize(dt_loc)
+        return dt_loc
 
     def request(self):
         self.request_events = []
@@ -164,8 +175,14 @@ class CalendarWidget(QWidget):
             return
 
         tz = get_localzone()
-        self.events = sorted(self.request_events,
-                key = lambda e: self.localDt(e, tz))
+        now = tz.localize(datetime.datetime.now())
+
+        sorted_events = sorted(self.request_events,
+                key = lambda e: self.localStart(e, tz, now))
+
+        # Filter out events that ended in the past
+        self.events = list(filter(lambda e: self.localEnd(e, tz, now) >= now,
+            sorted_events))
 
         busyDays = set()
         for event in self.events:
