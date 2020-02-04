@@ -29,7 +29,7 @@ import numpy as np
 from PyQt5.QtGui import QPixmap, QPainter, QPolygonF, QPen, QColor
 from PyQt5.QtCore import QPoint, QRect, QSize
 
-import urllib3
+import requests
 import json
 
 from Projection import MercatorProjection
@@ -317,35 +317,30 @@ def getRoute(dest_lat_deg, dest_lon_deg, config, logger):
         return ([], None, None)
 
     headers = {
-      'Accept': 'text/json; charset=utf-8'
-    }
+            'Accept': 'application/geo+json; charset=utf-8',
+            'Authorization': api_key,
+            'Content-Type': 'application/json; charset=utf-8'
+            }
 
-    http = urllib3.PoolManager()
+    url = 'https://api.openrouteservice.org/v2/directions/driving-car/geojson'
 
-    url = 'https://api.openrouteservice.org/directions?' \
-        'api_key={4}&' \
-        'coordinates={0},{1}|{2},{3}&' \
-        'profile=driving-car&' \
-        'geometry_format=polyline&' \
-        'instructions=false&'.format(home_lon_deg, home_lat_deg, \
-            dest_lon_deg, dest_lat_deg, api_key)
+    body = {
+            "coordinates": [[home_lon_deg, home_lat_deg],
+                [dest_lon_deg, dest_lat_deg]],
+            "instructions": False,
+        }
 
     try:
-        request = http.request('GET', url, headers = headers, timeout = 5.0)
+        call = requests.post(url, json = body, headers = headers,
+                timeout = 5.0)
     except:
         logger.error('Route request failed.', exc_info = True)
         return ([], None, None)
 
-    logger.debug('Received route response with status %u.', request.status)
+    logger.debug('Received route response with status %u.', call.status_code)
 
     try:
-        content = request.data.decode('utf-8')
-    except:
-        logger.error('Failed to decode route response data.', exc_info = True)
-        return ([], None, None)
-
-    try:
-        data = json.loads(content)
+        data = json.loads(call.text)
     except:
         logger.error('Failed to load route JSON.', exc_info = True)
         return ([], None, None)
@@ -354,19 +349,25 @@ def getRoute(dest_lat_deg, dest_lon_deg, config, logger):
     #    separators = (',', ': ')))
 
     try:
-        route = data["routes"][0]["geometry"]
+        feature = data["features"][0]
+    except:
+        logger.error('Response feature not found.')
+        return ([], None, None)
+
+    try:
+        route = feature["geometry"]["coordinates"]
     except:
         logger.error('Route is empty.')
         route = []
 
     try:
-        distance = float(data["routes"][0]["summary"]["distance"])
+        distance = float(feature["properties"]["summary"]["distance"])
     except:
         logger.error('Distance is empty.')
         distance = None
 
     try:
-        duration = float(data["routes"][0]["summary"]["duration"])
+        duration = float(feature["properties"]["summary"]["duration"])
     except:
         logger.error('Duration is empty.')
         duration = None
