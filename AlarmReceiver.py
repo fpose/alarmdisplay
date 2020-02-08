@@ -24,6 +24,7 @@
 #-----------------------------------------------------------------------------
 
 import serial
+import time
 
 from PyQt5 import QtCore
 
@@ -33,6 +34,7 @@ class AlarmReceiver(QtCore.QObject):
 
     receivedAlarm = QtCore.pyqtSignal(str)
     finished = QtCore.pyqtSignal()
+    errorMessage = QtCore.pyqtSignal(str)
 
     asciiExceptions = {
         '[': 'Ä', # guessed
@@ -44,44 +46,69 @@ class AlarmReceiver(QtCore.QObject):
         '~': 'ß' # 27-11-10 04:53:29 Dorfstra~e
     }
 
-    def __init__(self, logger):
+    def __init__(self, config, logger):
         super(AlarmReceiver, self).__init__()
         self.logger = logger
+        self.port = config.get("pager", "device", fallback = "/dev/ttyUSB0")
+        self.connected = True
+
+    def setConnected(self, newState):
+        if self.connected and not newState:
+            self.errorMessage.emit('Keine Verbindung zum DME!')
+        if not self.connected and newState:
+            self.errorMessage.emit('')
+        self.connected = newState
 
     def receive(self):
-        self.logger.info('Receiver thread started.')
 
-        try:
-            ser = serial.Serial(
-                port = '/dev/ttyUSB0',
-                baudrate = 9600,
-                parity = serial.PARITY_NONE,
-                stopbits = serial.STOPBITS_ONE,
-                bytesize = serial.EIGHTBITS,
-                timeout = None)
-        except:
-            self.logger.error('Failed to open port!')
+        if not self.port:
             self.finished.emit()
             return
 
-        self.logger.info('Connected to %s', ser.portstr)
+        self.logger.info('Receiver thread started.')
 
-        run = True
-        data = b''
-        bytesReceived = 0
+        reconnectTimeout = 30
 
-        while run:
-            c = ser.read()
-            bytesReceived += 1
-            if c == b'\x00':
-                pagerStr = data.decode('latin1')
-                pagerStr = self.decode(pagerStr)
-                self.receivedAlarm.emit(pagerStr)
-                data = b''
-            else:
-                data += c
+        while True:
+            try:
+                ser = serial.serial_for_url(
+                        'alt://%s?class=PosixPollSerial' % (self.port),
+                        baudrate = 9600,
+                        parity = serial.PARITY_NONE,
+                        stopbits = serial.STOPBITS_ONE,
+                        bytesize = serial.EIGHTBITS,
+                        timeout = 10.0)
+            except:
+                self.setConnected(False)
+                time.sleep(reconnectTimeout)
+                continue
 
-        ser.close()
+            self.logger.info('Connected to %s', ser.portstr)
+            self.setConnected(True)
+
+            data = b''
+            bytesReceived = 0
+
+            while True:
+                try:
+                    c = ser.read()
+                except serial.serialutil.SerialException as e:
+                    self.logger.error('Serial port disconnected:')
+                    self.logger.error(e)
+                    break
+                bytesReceived += 1
+                if c == b'\x00':
+                    pagerStr = data.decode('latin1')
+                    pagerStr = self.decode(pagerStr)
+                    self.receivedAlarm.emit(pagerStr)
+                    data = b''
+                else:
+                    data += c
+
+            ser.close()
+            self.setConnected(False)
+            time.sleep(reconnectTimeout)
+
         self.logger.info('Receiver thread finished.')
         self.finished.emit()
 

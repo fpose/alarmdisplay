@@ -166,6 +166,15 @@ class MainWidget(QWidget):
         self.alarmWidget = AlarmWidget(self)
         self.stackedWidget.addWidget(self.alarmWidget)
 
+        self.errorWidget = QLabel(self)
+        self.errorWidget.setGeometry(self.contentsRect())
+        self.errorWidget.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        self.errorWidget.setStyleSheet("""
+            background-color: transparent;
+            font-size: 20px;
+            color: red;
+            """)
+
         # Shortcuts ----------------------------------------------------------
 
         action = QAction(self)
@@ -225,10 +234,11 @@ class MainWidget(QWidget):
         # Threads ------------------------------------------------------------
 
         self.receiverThread = QThread()
-        self.alarmReceiver = AlarmReceiver(self.logger)
+        self.alarmReceiver = AlarmReceiver(self.config, self.logger)
         self.alarmReceiver.receivedAlarm.connect(self.receivedPagerAlarm)
-        self.alarmReceiver.moveToThread(self.receiverThread)
         self.alarmReceiver.finished.connect(self.receiverThread.quit)
+        self.alarmReceiver.errorMessage.connect(self.receiverError)
+        self.alarmReceiver.moveToThread(self.receiverThread)
         self.receiverThread.started.connect(self.alarmReceiver.receive)
         self.receiverThread.start()
 
@@ -339,6 +349,11 @@ class MainWidget(QWidget):
             self.logger.error('Pager notification failed:', exc_info = True)
 
         self.processAlarm(alarm)
+
+    #-------------------------------------------------------------------------
+
+    def receiverError(self, errorMessage):
+        self.errorWidget.setText(errorMessage)
 
     def receivedXmlAlarm(self, xmlContent):
         self.logger.info('Received XML alarm.')
