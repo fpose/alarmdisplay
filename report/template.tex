@@ -50,7 +50,7 @@ cheetahVarStartToken = @
 
 \newcommand{\alarmreport}[1]{
 
-\begin{tabular}{rp{120mm}}
+\begin{tabular}{rp{140mm}}
 #if @object_name
 Objekt & \textbf{@object_name}\\
 #end if
@@ -73,14 +73,14 @@ Meldender & \textbf{@contact}\\
 Sondersignal & \textbf{@signal}\\
 #end if
 #if @resources
-Alarmierte Einheiten & \raggedright \textbf{%
+Alarmiert & \raggedright \textbf{%
 @resources%
 }
 #end if
 \end{tabular}
 
 \vfill
-\includegraphics[width=\textwidth]{#1}
+\raisebox{-1em}{\includegraphics[width=\textwidth]{#1}}
 }
 
 %-----------------------------------------------------------------------------
