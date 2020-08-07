@@ -113,7 +113,10 @@ class AlarmReport:
         variables['title'] = escapeLaTeX(alarm.title())
         variables['address'] = escapeLaTeX(alarm.address())
         variables['object_name'] = escapeLaTeX(alarm.objektname)
-        variables['escalation'] = escapeLaTeX(alarm.eskalation)
+        esc = alarm.eskalation
+        if esc == '-':
+            esc = ''
+        variables['escalation'] = escapeLaTeX(esc)
         variables['attention'] = escapeLaTeX(alarm.attention())
         variables['location_hint'] = escapeLaTeX(alarm.ortshinweis)
         variables['contact'] = escapeLaTeX(alarm.callerInfo())
@@ -122,8 +125,8 @@ class AlarmReport:
         if alarm.sondersignal == '0':
             sig = 'nein'
         variables['signal'] = escapeLaTeX(sig)
-        variables['resources'] = escapeLaTeX(alarm.einheiten(einheit,
-                lambda x: False, self.logger))
+        einh = alarm.einheiten(einheit, lambda x: False, self.logger)
+        variables['resources'] = escapeLaTeX(einh)
         if alarm.datetime:
             variables['datetime'] = \
                 alarm.datetime.strftime('%Y-%m-%d %H:%M:%S')
