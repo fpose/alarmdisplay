@@ -46,6 +46,7 @@ from Alarm import Alarm, EinsatzMittel
 from Forwarder import Forwarder
 from Notifier import Notifier
 from Sound import Sound
+from GpioControl import GpioControl
 
 #-----------------------------------------------------------------------------
 
@@ -69,6 +70,7 @@ class MainWidget(QWidget):
         self.forwarder = Forwarder(config, logger)
         self.notifier = Notifier(config, logger)
         self.sound = Sound(config, logger)
+        self.gpioControl = GpioControl(config, logger)
 
         self.reportTimer = QTimer(self)
         self.reportTimer.setInterval( \
@@ -392,6 +394,7 @@ class MainWidget(QWidget):
             self.reportDone = False
             self.reportTimer.start()
             self.sound.start()
+            self.gpioControl.trigger()
             self.report.wakeupPrinter()
         else:
             self.alarm.merge(newAlarm, self.logger)
