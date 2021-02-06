@@ -26,24 +26,38 @@
 import websocket
 import time
 import json
+import socket
 
 from PyQt5 import QtCore
 
 #-----------------------------------------------------------------------------
 
 def on_message(ws, message):
-    ws.receiver.logger.info(f'Websocket received message.')
-    ws.receiver.receivedAlarm.emit(message)
+    ws.receiver.logger.info('Websocket received %s.', repr(message))
+    try:
+        msg_dict = json.loads(message)
+    except:
+        ws.receiver.logger.err('No valid json received.')
+        return
+    if 'auth' in msg_dict:
+        ws.receiver.logger.info('Websocket authentication: %s.',
+                msg_dict['auth'])
+    if 'alarm' in msg_dict:
+        ws.receiver.logger.info('Websocket received alarm.')
+        ws.receiver.receivedAlarm.emit(msg_dict['alarm'])
 
 def on_error(ws, error):
-    ws.receiver.logger.info(f'Websocket error.')
+    ws.receiver.logger.info('Websocket error.')
 
 def on_close(ws):
-    ws.receiver.logger.info(f'Websocket closed.')
+    ws.receiver.logger.info('Websocket closed.')
 
 def on_open(ws):
-    ws.receiver.logger.info(f'Websocket connected. Authenticating.')
-    msg = { 'auth_token': ws.receiver.auth_token }
+    ws.receiver.logger.info('Websocket connected. Authenticating.')
+    msg = {
+            'host': ws.receiver.host_name,
+            'auth_token': ws.receiver.auth_token
+            }
     ws.send(json.dumps(msg))
 
 #-----------------------------------------------------------------------------
@@ -56,6 +70,7 @@ class WebsocketReceiver(QtCore.QObject):
     def __init__(self, config, logger):
         super(WebsocketReceiver, self).__init__()
         self.logger = logger
+        self.host_name = socket.gethostname()
         self.url = config.get("websocket", "url", fallback = "")
         self.auth_token = config.get("websocket", "auth_token", fallback = "")
 
@@ -76,7 +91,7 @@ class WebsocketReceiver(QtCore.QObject):
                 on_close = on_close)
         ws.receiver = self
         while True:
-            self.logger.info(f'Connecting to {self.url}...')
+            self.logger.info('Connecting to %s...', self.url)
             ws.run_forever()
             self.logger.error('Websocket closed. Waiting to reconnect...')
             time.sleep(reconnectTimeout)
