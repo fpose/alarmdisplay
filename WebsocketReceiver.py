@@ -55,7 +55,7 @@ def on_close(ws):
 def on_open(ws):
     ws.receiver.logger.info('Websocket connected. Authenticating.')
     msg = {
-            'host': ws.receiver.host_name,
+            'host': ws.receiver.user,
             'auth_token': ws.receiver.auth_token
             }
     ws.send(json.dumps(msg))
@@ -64,14 +64,15 @@ def on_open(ws):
 
 class WebsocketReceiver(QtCore.QObject):
 
-    receivedAlarm = QtCore.pyqtSignal(str)
+    receivedAlarm = QtCore.pyqtSignal(dict)
     finished = QtCore.pyqtSignal()
 
     def __init__(self, config, logger):
         super(WebsocketReceiver, self).__init__()
         self.logger = logger
-        self.host_name = socket.gethostname()
         self.url = config.get("websocket", "url", fallback = "")
+        self.user = config.get("websocket", "user",
+                fallback = socket.gethostname())
         self.auth_token = config.get("websocket", "auth_token", fallback = "")
 
     def receive(self):
