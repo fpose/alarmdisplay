@@ -285,11 +285,10 @@ class Alarm:
         self.art = data.get("COBRA_keyword_ident_1", "")
         ts = int(data.get("timestamp").strip()) / 1000.0
         dt_naive = datetime.datetime.fromtimestamp(ts)
-        dt_utc = pytz.utc.localize(dt_naive)
         zoneStr = self.config.get('websocket', 'time_zone',
                 fallback = 'Europe/Berlin')
         tz = pytz.timezone(zoneStr)
-        self.datetime = dt_utc.astimezone(tz)
+        self.datetime = tz.localize(dt_naive)
         self.stichwort = data.get("COBRA_keyword_1", "")
         self.diagnose = data.get("COBRA_keyword_additional_1", "")
         self.eskalation = '' # FIXME
