@@ -135,6 +135,9 @@ class AlarmWidget(QWidget):
         self.xmlLabel = QLabel(self)
         sourceLayout.addWidget(self.xmlLabel, 1)
 
+        self.jsonLabel = QLabel(self)
+        sourceLayout.addWidget(self.jsonLabel, 1)
+
         # Attention row ------------------------------------------------------
 
         attentionLayout = QHBoxLayout()
@@ -302,6 +305,12 @@ class AlarmWidget(QWidget):
         else:
             pixmap = QPixmap()
         self.pagerLabel.setPixmap(pixmap)
+
+        if 'json' in alarm.sources:
+            pixmap = QPixmap(os.path.join(self.imageDir, 'json.svg'))
+        else:
+            pixmap = QPixmap()
+        self.jsonLabel.setPixmap(pixmap)
 
     def elapsedTimeout(self):
         pixmap = self.timerLabel.pixmap()

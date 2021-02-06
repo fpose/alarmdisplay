@@ -157,7 +157,8 @@ class HistoryWidget(QWidget):
         paths = [os.path.join(path, entry) for entry in os.listdir(path)]
         paths = [path for path in paths if \
                 (path.endswith('.dme') or \
-                path.endswith('.xml')) and \
+                path.endswith('.xml') or \
+                path.endswith('.json')) and \
                 os.path.isfile(path)]
         paths = sorted(paths, reverse = True)
 
@@ -170,7 +171,8 @@ class HistoryWidget(QWidget):
             alarm = Alarm(self.config)
             try:
                 alarm.load(path)
-            except:
+            except Exception as e:
+                self.logger('History failed to load %s: %s', path, e)
                 continue
 
             if alarm.fallbackStr:

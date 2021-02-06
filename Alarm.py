@@ -29,6 +29,7 @@ import re
 import xml.dom.minidom
 import datetime
 import pytz
+import json
 from tzlocal import get_localzone
 
 from PyQt5.QtCore import *
@@ -91,6 +92,7 @@ class Alarm:
         self.source = None
         self.sources = set()
         self.pager = None
+        self.json = None
         self.fallbackStr = None
 
     def fromPager(self, pagerStr, logger = None, dateTime = None):
@@ -272,6 +274,41 @@ class Alarm:
                 em = EinsatzMittel(child)
                 self.einsatzmittel.append(em)
 
+    def fromAlamos(self, data, logger):
+        self.source = 'json'
+        self.sources.add(self.source)
+        self.json = json.dumps(data)
+
+        self.number = data.get("COBRA_name", "")
+        #address = data.get("address") FIXME Alarmiertes Einsatzmittel
+        #einsatzmittel = data.get("alertedRessources")
+        self.art = data.get("COBRA_keyword_ident_1", "")
+        ts = int(data.get("timestamp").strip()) / 1000.0
+        dt_naive = datetime.datetime.fromtimestamp(ts)
+        dt_utc = pytz.utc.localize(dt_naive)
+        zoneStr = self.config.get('websocket', 'time_zone',
+                fallback = 'Europe/Berlin')
+        tz = pytz.timezone(zoneStr)
+        self.datetime = dt_utc.astimezone(tz)
+        self.stichwort = data.get("COBRA_keyword_1", "")
+        self.diagnose = data.get("COBRA_keyword_additional_1", "")
+        self.eskalation = '' # FIXME
+        self.besonderheit = data.get("COBRA_ADDITIONAL_comment", "")
+        self.sondersignal = \
+                data.get("COBRA_ADDITIONAL_special_rights") == 'Ja'
+        self.meldender = data.get("COBRA_reporter_name", "")
+        self.rufnummer = data.get("COBRA_reporter_phone", "")
+        self.plz = data.get("postalCode", "")
+        self.ort = data.get("city", "")
+        self.ortsteil = data.get("city_abbr", "")
+        self.strasse = data.get("street", "")
+        self.hausnummer = data.get("house", "")
+        self.objektname = data.get("building", "")
+        self.objektnummer = '' # FIXME
+        self.ortshinweis = data.get("COBRA_LOCATION_floor", "")
+        self.lon = float(data.get("lng", "0.0"))
+        self.lat = float(data.get("lat", "0.0"))
+
     def out(self, logger):
         logger.info(u'Sondersignal: %s', repr(self.sondersignal))
         logger.info(u'Besonderheit: %s', repr(self.besonderheit))
@@ -294,6 +331,11 @@ class Alarm:
             contents = self.xml # bytes
             encoding = None
             binary = 'b'
+        elif self.source == 'json':
+            ext = '.json'
+            contents = self.json # str
+            encoding = 'utf-8'
+            binary = ''
 
         if not contents:
             return
@@ -324,7 +366,11 @@ class Alarm:
             self.fromPager(contents, logger, dateTime = dateTime)
 
         if path.endswith('.xml'):
-           self.fromXml(contents, logger)
+            self.fromXml(contents, logger)
+
+        if path.endswith('.json'):
+            data = json.loads(contents)
+            self.fromAlamos(data, logger)
 
     def matches(self, other):
         return self.number and other.number and \

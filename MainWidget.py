@@ -66,6 +66,7 @@ class MainWidget(QWidget):
         self.route = ([], None, None)
         self.seenPager = False
         self.seenXml = False
+        self.seenJson = False
         self.reportDone = False
         self.alarmDateTime = None
         self.forwarder = Forwarder(config, logger)
@@ -352,7 +353,7 @@ class MainWidget(QWidget):
     #-------------------------------------------------------------------------
 
     def receivedPagerAlarm(self, pagerStr):
-        self.logger.info('Received alarm: %s', repr(pagerStr))
+        self.logger.info('Received pager alarm: %s', repr(pagerStr))
 
         alarm = Alarm(self.config)
         alarm.fromPager(pagerStr, self.logger)
@@ -366,13 +367,26 @@ class MainWidget(QWidget):
 
     #-------------------------------------------------------------------------
 
-    def receivedWebsocketAlarm(self, data):
-        self.logger.info('Received websocket alarm: %s', repr(data))
+    def receiverError(self, errorMessage):
+        self.errorWidget.setText(errorMessage)
 
     #-------------------------------------------------------------------------
 
-    def receiverError(self, errorMessage):
-        self.errorWidget.setText(errorMessage)
+    def receivedWebsocketAlarm(self, data):
+        self.logger.info('Received websocket alarm: %s', repr(data))
+
+        alarm = Alarm(self.config)
+
+        try:
+            alarm.fromAlamos(data, self.logger)
+        except:
+            self.logger.error('Failed to process websocket alarm:',
+                    exc_info = True)
+            return
+
+        self.processAlarm(alarm)
+
+    #-------------------------------------------------------------------------
 
     def receivedXmlAlarm(self, xmlContent):
         self.logger.info('Received XML alarm.')
@@ -386,6 +400,8 @@ class MainWidget(QWidget):
             return
 
         self.processAlarm(alarm)
+
+    #-------------------------------------------------------------------------
 
     def processAlarm(self, newAlarm):
 
@@ -408,6 +424,7 @@ class MainWidget(QWidget):
             self.route = ([], None, None)
             self.seenPager = False
             self.seenXml = False
+            self.seenJson = False
             self.reportDone = False
             self.reportTimer.start()
             self.sound.start()
@@ -420,6 +437,8 @@ class MainWidget(QWidget):
             self.seenPager = True
         elif newAlarm.source == 'xml':
             self.seenXml = True
+        elif newAlarm.source == 'json':
+            self.seenJson = True
 
         self.idleWidget.stop()
         self.stackedWidget.setCurrentWidget(self.alarmWidget)
@@ -437,7 +456,8 @@ class MainWidget(QWidget):
             self.alarmWidget.setRoute(self.route)
             self.logger.info('Route ready.')
 
-        if self.seenPager and self.seenXml and not self.reportDone:
+        if self.seenJson or (self.seenPager and self.seenXml) \
+                and not self.reportDone:
             self.reportTimer.stop()
             QApplication.processEvents()
             self.generateReport()
