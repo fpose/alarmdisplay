@@ -39,6 +39,7 @@ from IdleWidget import IdleWidget
 from AlarmWidget import AlarmWidget
 from Map import getRoute
 from AlarmReceiver import AlarmReceiver
+from WebsocketReceiver import WebsocketReceiver
 from SocketListener import SocketListener
 from AlarmReport import AlarmReport
 from CecCommand import CecCommand
@@ -244,6 +245,17 @@ class MainWidget(QWidget):
         self.receiverThread.started.connect(self.alarmReceiver.receive)
         self.receiverThread.start()
 
+        self.websocketReceiverThread = QThread()
+        self.websocketReceiver = WebsocketReceiver(self.config, self.logger)
+        self.websocketReceiver.receivedAlarm.connect( \
+                self.receivedWebsocketAlarm)
+        self.websocketReceiver.finished.connect( \
+                self.websocketReceiverThread.quit)
+        self.websocketReceiver.moveToThread(self.websocketReceiverThread)
+        self.websocketReceiverThread.started.connect( \
+                self.websocketReceiver.receive)
+        self.websocketReceiverThread.start()
+
         if self.config.has_section('email') and \
                 self.config.get("email", "imap_host", fallback = ''):
             from ImapMonitor import ImapMonitor
@@ -351,6 +363,11 @@ class MainWidget(QWidget):
             self.logger.error('Pager notification failed:', exc_info = True)
 
         self.processAlarm(alarm)
+
+    #-------------------------------------------------------------------------
+
+    def receivedWebsocketAlarm(self, data):
+        self.logger.info('Received websocket alarm: %s', repr(data))
 
     #-------------------------------------------------------------------------
 
