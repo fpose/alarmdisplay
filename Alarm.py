@@ -526,6 +526,52 @@ class Alarm:
         except:
             return False
 
+    def spoken(self):
+        text = 'Einsatz! '
+
+        if self.art and self.stichwort:
+            text += self.art + self.stichwort + '; ' # B3
+
+        if self.diagnose:
+            text += self.diagnose + ' . '
+
+        if self.eskalation and self.eskalation != '-':
+            text += self.eskalation + ' . '
+
+        if self.besonderheit:
+            text += self.besonderheit + ' . '
+
+        if self.sondersignal is not None and not self.sondersignal:
+            text += 'Ohne Sondersignal! '
+
+        ort = None
+        if self.ort and self.ort != 'Kleve':
+            ort = self.ort
+
+        ortstext = ''
+        if ort and self.ortsteil:
+            ortstext = ort + '-' + self.ortsteil
+        elif ort and not self.ortsteil:
+            ortstext = ort
+        elif not ort and self.ortsteil:
+            ortstext = self.ortsteil
+        text += ortstext
+
+        if self.strasse:
+            if ortstext:
+                text += ', '
+            text += self.strasse
+            if self.hausnummer:
+                text += ' ' + self.hausnummer
+            text += ' . '
+        else:
+            text += '. '
+
+        if self.objektname:
+            text += self.objektname + ' . '
+
+        return text
+
 #-----------------------------------------------------------------------------
 
 class EinsatzMittel:

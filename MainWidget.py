@@ -48,6 +48,7 @@ from Forwarder import Forwarder
 from Notifier import Notifier
 from Sound import Sound
 from GpioControl import GpioControl
+from TextToSpeech import TextToSpeech
 
 #-----------------------------------------------------------------------------
 
@@ -73,6 +74,7 @@ class MainWidget(QWidget):
         self.notifier = Notifier(config, logger)
         self.sound = Sound(config, logger)
         self.gpioControl = GpioControl(config, logger)
+        self.tts = TextToSpeech(config, logger)
 
         self.reportTimer = QTimer(self)
         self.reportTimer.setInterval( \
@@ -428,6 +430,8 @@ class MainWidget(QWidget):
             self.reportDone = False
             self.reportTimer.start()
             self.sound.start()
+            self.tts.clear()
+            self.tts.start()
             self.gpioControl.trigger()
             self.report.wakeupPrinter()
         else:
@@ -455,6 +459,8 @@ class MainWidget(QWidget):
                     self.logger)
             self.alarmWidget.setRoute(self.route)
             self.logger.info('Route ready.')
+
+        self.tts.setText(self.alarm.spoken())
 
         if self.seenJson or (self.seenPager and self.seenXml) \
                 and not self.reportDone:
