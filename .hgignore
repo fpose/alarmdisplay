@@ -8,6 +8,7 @@ alarm_db
 alarmdisplay.conf
 alarmdisplay.cred
 alarmdisplay.log
+db
 report/*.aux
 report/*.log
 report/route.png
