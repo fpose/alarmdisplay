@@ -49,6 +49,7 @@ from Notifier import Notifier
 from Sound import Sound
 from GpioControl import GpioControl
 from TextToSpeech import TextToSpeech
+from StatusWidget import StatusWidget
 
 #-----------------------------------------------------------------------------
 
@@ -258,6 +259,12 @@ class MainWidget(QWidget):
         self.websocketReceiverThread.started.connect( \
                 self.websocketReceiver.receive)
         self.websocketReceiverThread.start()
+
+        if self.websocketReceiver.status:
+            self.statusWidget = StatusWidget(self)
+            layout.addWidget(self.statusWidget)
+            self.websocketReceiver.receivedStatus.connect( \
+                    self.statusWidget.setStatus)
 
         if self.config.has_section('email') and \
                 self.config.get("email", "imap_host", fallback = ''):

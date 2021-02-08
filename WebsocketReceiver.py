@@ -58,9 +58,13 @@ def on_close(ws):
 
 def on_open(ws):
     ws.receiver.logger.info('Websocket connected. Authenticating.')
+    addresses = []
+    for address, name in ws.receiver.status:
+        addresses.append(address)
     msg = {
             'host': ws.receiver.user,
-            'auth_token': ws.receiver.auth_token
+            'auth_token': ws.receiver.auth_token,
+            'register_status': addresses,
             }
     ws.send(json.dumps(msg))
 
