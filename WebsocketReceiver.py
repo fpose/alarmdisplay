@@ -27,6 +27,7 @@ import websocket
 import time
 import json
 import socket
+import re
 
 from PyQt5 import QtCore
 
@@ -45,6 +46,9 @@ def on_message(ws, message):
     if 'alarm' in msg_dict:
         ws.receiver.logger.info('Websocket received alarm.')
         ws.receiver.receivedAlarm.emit(msg_dict['alarm'])
+    if 'status' in msg_dict:
+        ws.receiver.logger.info('Websocket received status.')
+        ws.receiver.receivedStatus.emit(msg_dict['status'])
 
 def on_error(ws, error):
     ws.receiver.logger.info('Websocket error.')
@@ -65,6 +69,7 @@ def on_open(ws):
 class WebsocketReceiver(QtCore.QObject):
 
     receivedAlarm = QtCore.pyqtSignal(dict)
+    receivedStatus = QtCore.pyqtSignal(dict)
     finished = QtCore.pyqtSignal()
 
     def __init__(self, config, logger):
@@ -74,6 +79,28 @@ class WebsocketReceiver(QtCore.QObject):
         self.user = config.get("websocket", "user",
                 fallback = socket.gethostname())
         self.auth_token = config.get("websocket", "auth_token", fallback = "")
+
+        self.status = []
+
+        if config.has_section('websocket'):
+            statusRe = re.compile('status([0-9]+)')
+
+            for key, host in config.items('websocket'):
+                ma = statusRe.fullmatch(key)
+                if not ma:
+                    continue
+
+                num = int(ma.group(1))
+                address = config.get("websocket", key, fallback = '')
+                name = config.get("websocket", 'name%u' % (num),
+                        fallback = address)
+
+                if not address:
+                    continue
+
+                self.logger.info('Adding status %s as %s / %s',
+                        key, address, name)
+                self.status.append((address, name))
 
     def receive(self):
 
