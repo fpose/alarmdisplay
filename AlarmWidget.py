@@ -234,7 +234,10 @@ class AlarmWidget(QWidget):
     def processAlarm(self, alarm):
         self.alarm = alarm
 
-        self.titleLabel.setText(self.alarm.title())
+        title = self.alarm.title()
+        if len(self.alarm.eskalation) < 5:
+            title += ' / ' + self.alarm.eskalation
+        self.titleLabel.setText(title)
 
         image = self.alarm.imageBase()
         if image:
