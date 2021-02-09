@@ -538,12 +538,6 @@ class Alarm:
         if self.eskalation and self.eskalation != '-':
             text += self.eskalation + ' . '
 
-        if self.besonderheit:
-            text += self.besonderheit + ' . '
-
-        if self.sondersignal is not None and not self.sondersignal:
-            text += 'Ohne Sondersignal! '
-
         ort = None
         if self.ort and self.ort != 'Kleve':
             ort = self.ort
@@ -569,6 +563,12 @@ class Alarm:
 
         if self.objektname:
             text += self.objektname + ' . '
+
+        if self.besonderheit:
+            text += self.besonderheit + ' . '
+
+        if self.sondersignal is not None and not self.sondersignal:
+            text += 'Ohne Sondersignal! '
 
         return text
 
