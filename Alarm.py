@@ -530,13 +530,13 @@ class Alarm:
         text = 'Einsatz! '
 
         if self.art and self.stichwort:
-            text += self.art + self.stichwort + '; ' # B3
+            text += '(' + self.art + self.stichwort + '). ' # B3
 
         if self.diagnose:
-            text += self.diagnose + ' . '
+            text += '(' + self.diagnose + '). ' # Wohnungsbrand
 
         if self.eskalation and self.eskalation != '-':
-            text += self.eskalation + ' . '
+            text += '(' + self.eskalation + '). '
 
         ort = None
         if self.ort and self.ort != 'Kleve':
@@ -554,21 +554,20 @@ class Alarm:
         if self.strasse:
             if ortstext:
                 text += ', '
-            text += self.strasse
+            text += '(' + self.strasse
             if self.hausnummer:
                 text += ' ' + self.hausnummer
-            text += ' . '
-        else:
-            text += '. '
+            text += ')'
+        text += '. '
 
         if self.objektname:
-            text += self.objektname + ' . '
+            text += '(' + self.objektname + '). '
 
         if self.besonderheit:
-            text += self.besonderheit + ' . '
+            text += '(' + self.besonderheit + '). '
 
         if self.sondersignal is not None and not self.sondersignal:
-            text += 'Ohne Sondersignal! '
+            text += 'Ohne Sondersignal. '
 
         return text
 
