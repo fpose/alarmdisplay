@@ -25,6 +25,7 @@
 
 import subprocess
 import tempfile
+import os
 from gtts import gTTS
 from PyQt5.QtCore import *
 
@@ -41,6 +42,8 @@ class TextToSpeech(QObject):
                 fallback = 30)
         self.repetitions = self.config.getint("sound", "tts_repetitions",
                 fallback = 10)
+        self.padFile = self.config.get("sound", "tts_pad_file",
+                fallback = '')
 
         self.timer = QTimer(self)
         self.timer.setInterval(self.ttsDelay * 1000)
@@ -59,7 +62,7 @@ class TextToSpeech(QObject):
     def setText(self, text):
         self.logger.info('Generating TTS for %s', text)
         try:
-            new_file = tempfile.NamedTemporaryFile()
+            new_file = tempfile.NamedTemporaryFile(suffix = '.mp3')
         except:
             self.logger.error('Failed to generate temporary file for TTS.')
             return
@@ -70,6 +73,23 @@ class TextToSpeech(QObject):
             self.logger.error('TTS failed.')
             return
         self.file = new_file
+        if self.padFile:
+            try:
+                pad_file = tempfile.NamedTemporaryFile(suffix = '.wav')
+            except:
+                self.logger.error( \
+                        'Failed to generate temporary file for padding.')
+                return
+            cmd = 'sox ' + self.padFile + ' ' + new_file.name + ' ' \
+                    + self.padFile + ' ' + pad_file.name
+            self.logger.info('Executing %s', cmd)
+            try:
+                ret = os.system(cmd)
+            except Exception as e:
+                self.logger.error('Padding failed: %s', e)
+                return
+            if ret == 0:
+                self.file = pad_file
 
     def start(self):
         self.repetition = 0
@@ -107,7 +127,7 @@ class Player(QObject):
     def __init__(self, logger, soundFile):
         super(Player, self).__init__()
         self.logger = logger
-        self.cmd = ['play', '-q', '-t', 'mp3', soundFile]
+        self.cmd = ['play', '-q', soundFile]
 
     def __del__(self):
         self.logger.info(u'Deleting TTS player')
