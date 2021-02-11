@@ -26,6 +26,7 @@
 import os
 import datetime
 import re
+import subprocess
 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -93,6 +94,10 @@ class StatusWidget(QWidget):
         label = QLabel(self)
         layout.addWidget(label, 1)
 
+        self.soundFile = self.config.get("sound", "status", fallback = '')
+        self.thread = QThread()
+        self.player = None
+
     def setStatus(self, status):
         address = status['address']
         if address in self.labelDict:
@@ -104,8 +109,28 @@ class StatusWidget(QWidget):
             else:
                 label.setPixmap(QPixmap())
                 label.setText(str(s))
+            self.play()
         if address in self.animationDict:
             self.animationDict[address].start()
+
+    def play(self):
+        if not self.soundFile:
+            return
+        if self.player:
+            self.logger.info('Status player still active.')
+            return
+
+        self.logger.info('Starting status player...')
+        self.player = Player(self.logger, self.soundFile)
+        self.player.finished.connect(self.playerFinished)
+        self.player.finished.connect(self.thread.quit)
+        self.player.moveToThread(self.thread)
+        self.thread.started.connect(self.player.play)
+        self.thread.start()
+
+    def playerFinished(self):
+        self.logger.info('Status player finished.')
+        self.player = None
 
 #-----------------------------------------------------------------------------
 
@@ -125,5 +150,28 @@ class AnimatedLabel(QLabel):
         return Qt.black
 
     color = pyqtProperty(QColor, getColor, setColor)
+
+#-----------------------------------------------------------------------------
+
+class Player(QObject):
+
+    finished = pyqtSignal()
+
+    def __init__(self, logger, soundFile):
+        super(Player, self).__init__()
+        self.logger = logger
+        self.cmd = ['play', '-q', soundFile]
+
+    def __del__(self):
+        self.logger.info(u'Deleting player')
+
+    @pyqtSlot()
+    def play(self):
+        self.logger.info(u'Running %s', self.cmd)
+        play = subprocess.Popen(self.cmd, stdout = subprocess.DEVNULL)
+        play.wait()
+        if play.returncode != 0:
+            self.logger.error(u'Play command failed.')
+        self.finished.emit()
 
 #-----------------------------------------------------------------------------
