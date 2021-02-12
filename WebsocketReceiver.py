@@ -59,7 +59,7 @@ def on_close(ws):
 def on_open(ws):
     ws.receiver.logger.info('Websocket connected. Authenticating.')
     addresses = []
-    for address, name in ws.receiver.status:
+    for address in ws.receiver.status:
         addresses.append(address)
     msg = {
             'host': ws.receiver.user,
@@ -86,25 +86,17 @@ class WebsocketReceiver(QtCore.QObject):
 
         self.status = []
 
-        if config.has_section('websocket'):
-            statusRe = re.compile('status([0-9]+)')
+        if config.has_section('status'):
+            addressRe = re.compile('address([0-9]+)')
 
-            for key, host in config.items('websocket'):
-                ma = statusRe.fullmatch(key)
-                if not ma:
+            for key, address in config.items('status'):
+                ma = addressRe.fullmatch(key)
+                if not ma or not address:
                     continue
 
-                num = int(ma.group(1))
-                address = config.get("websocket", key, fallback = '')
-                name = config.get("websocket", 'name%u' % (num),
-                        fallback = address)
-
-                if not address:
-                    continue
-
-                self.logger.info('Adding status %s as %s / %s',
-                        key, address, name)
-                self.status.append((address, name))
+                self.logger.info('Adding status address %s as %s',
+                        key, address)
+                self.status.append(address)
 
     def receive(self):
 

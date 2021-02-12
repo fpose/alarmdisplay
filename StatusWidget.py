@@ -41,12 +41,10 @@ class StatusWidget(QWidget):
         super(StatusWidget, self).__init__()
 
         self.main = main
-        self.config = main.config
+        config = main.config
         self.logger = main.logger
-        websocketReceiver = main.websocketReceiver
 
-        imageDir = self.config.get("display", "image_dir",
-                fallback = "images")
+        imageDir = config.get("display", "image_dir", fallback = "images")
         self.statusPixmaps = {}
         for s in (1, 2, 3, 4, 6):
             path = os.path.join(imageDir, 'status%u.svg' % (s))
@@ -68,33 +66,67 @@ class StatusWidget(QWidget):
 
         self.labelDict = {}
         self.animationDict = {}
-        for address, name in websocketReceiver.status:
-            label = QLabel(self)
-            layout.addWidget(label, 1)
-            label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
-            label.setStyleSheet("""
-                font-size: 30px;
-                padding: 10px;
-                """)
-            label.setText(name)
 
-            label = AnimatedLabel(self)
-            layout.addWidget(label, 0)
-            self.labelDict[address] = label
+        index = 0
+        if config.has_section('status'):
+            addressRe = re.compile('address([0-9]+)')
 
-            animation = QPropertyAnimation(label, b'color')
-            animation.setStartValue(QColor(Qt.transparent))
-            animation.setKeyValueAt(0.5, QColor(Qt.white))
-            animation.setEndValue(QColor(Qt.transparent))
-            animation.setDuration(1000)
-            animation.setLoopCount(10)
-            animation.setEasingCurve(QEasingCurve.OutInQuad);
-            self.animationDict[address] = animation
+            for key, address in config.items('status'):
+                ma = addressRe.fullmatch(key)
+                if not ma or not address:
+                    continue
+
+                num = int(ma.group(1))
+                name = config.get("status", 'name%u' % (num),
+                        fallback = address)
+                image = config.get("status", 'image%u' % (num),
+                        fallback = '')
+
+                label = QLabel(self)
+                layout.addWidget(label, 1)
+
+                if image:
+                    path = os.path.join(imageDir, image)
+                    try:
+                        pixmap = QPixmap(path)
+                        label = QLabel(self)
+                        label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                        label.setStyleSheet("""
+                            padding: 10px;
+                            background-color: #202040;
+                            """)
+                        layout.addWidget(label, 0)
+                        label.setPixmap(pixmap)
+                    except:
+                        self.logger.warning('Failed to load image %s.', path,
+                                exc_info = True)
+
+                label = QLabel(self)
+                layout.addWidget(label, 1)
+                label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+                label.setStyleSheet("""
+                    font-size: 30px;
+                    background-color: #202040;
+                    """)
+                label.setText(name)
+
+                label = AnimatedLabel(self)
+                layout.addWidget(label, 0)
+                self.labelDict[address] = label
+
+                animation = QPropertyAnimation(label, b'color')
+                animation.setStartValue(QColor('#202040'))
+                animation.setKeyValueAt(0.5, QColor(Qt.white))
+                animation.setEndValue(QColor('#202040'))
+                animation.setDuration(1000)
+                animation.setLoopCount(10)
+                animation.setEasingCurve(QEasingCurve.OutInQuad);
+                self.animationDict[address] = animation
 
         label = QLabel(self)
         layout.addWidget(label, 1)
 
-        self.soundFile = self.config.get("sound", "status", fallback = '')
+        self.soundFile = config.get("sound", "status", fallback = '')
         self.thread = QThread()
         self.player = None
 
