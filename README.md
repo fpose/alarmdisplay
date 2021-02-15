@@ -22,10 +22,15 @@ The software is written in Python3, using the PyQt libaries for Qt5.
 
 ## Features
 
-- Alarm data overview
-- Target map
-- Route map
-- Maps using OpenStreetMap tiles
+- Alarm data display with target map and route map
+- Maps using OpenStreetMap tiles or custom tiles with fire hydrants
 - Alarm report document for printer output
+- Receive alarms from pagers, IMAP or WebSockets (JSON)
+- Show previous alarms, calendar information, weather data in idle mode
+- Switch screen on and off via CEC
+- Forward alarms to subsequent displays
+- Use GPIO pins to switch lighting or open doors
+- Play sounds and read alarm data with text-to-speech engines
+- Display vehicle status
 
 ------------------------------------------------------------------------------
