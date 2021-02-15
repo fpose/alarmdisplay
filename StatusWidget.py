@@ -105,7 +105,7 @@ class StatusWidget(QWidget):
                 layout.addWidget(label, 1)
                 label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
                 label.setStyleSheet("""
-                    font-size: 30px;
+                    font-size: 25px;
                     background-color: #202040;
                     """)
                 label.setText(name)
