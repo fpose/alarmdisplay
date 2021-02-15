@@ -42,7 +42,8 @@ class Alarm:
     images = {
         'B': 'feuer',
         'C': 'abc',
-        'H': 'hilfe'
+        'H': 'hilfe',
+        'R': 'hilfe',
     }
 
     coordRe = re.compile('#K01;N(\d+)E(\d+);')
