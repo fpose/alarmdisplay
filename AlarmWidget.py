@@ -235,7 +235,7 @@ class AlarmWidget(QWidget):
         self.alarm = alarm
 
         title = self.alarm.title()
-        if len(self.alarm.eskalation) < 5:
+        if self.alarm.eskalation and len(self.alarm.eskalation) < 5:
             title += ' / ' + self.alarm.eskalation
         self.titleLabel.setText(title)
 
