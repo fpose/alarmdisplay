@@ -239,7 +239,11 @@ class CalendarWidget(QWidget):
                     else:
                         self.logger.error('Skipping %s', repr(e))
 
-        self.request_calendars.remove(url)
+        try:
+            self.request_calendars.remove(url)
+        except:
+            self.logger.error('Failed to remove %s.', url,
+                    exc_info = True)
         if not self.request_calendars:
             self.updateEvents()
 
