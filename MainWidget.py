@@ -450,6 +450,7 @@ class MainWidget(QWidget):
             self.seenXml = True
         elif newAlarm.source == 'json':
             self.seenJson = True
+        self.logger.info('Sources: %s', self.alarm.sources)
 
         self.idleWidget.stop()
         self.stackedWidget.setCurrentWidget(self.alarmWidget)
@@ -469,7 +470,7 @@ class MainWidget(QWidget):
 
         self.tts.setText(self.alarm.spoken())
 
-        if self.seenJson or (self.seenPager and self.seenXml) \
+        if (self.seenJson or (self.seenPager and self.seenXml)) \
                 and not self.reportDone:
             self.reportTimer.stop()
             QApplication.processEvents()
@@ -478,6 +479,11 @@ class MainWidget(QWidget):
         self.alarmWidget.setHourGlass(False)
 
     def generateReport(self):
+        if self.reportDone:
+            self.logger.info('Report already done.')
+            return
+
+        self.reportDone = True
         self.alarmWidget.setHourGlass(True)
 
         self.logger.info('Report...')
@@ -485,9 +491,9 @@ class MainWidget(QWidget):
             self.report.generate(self.alarm, self.route)
         except:
             self.logger.error('Report failed:', exc_info = True)
-        self.reportDone = True
-        self.logger.info('Finished.')
+            self.reportDone = False
 
+        self.logger.info('Finished.')
         self.alarmWidget.setHourGlass(False)
 
     def startTimer(self):
@@ -497,7 +503,7 @@ class MainWidget(QWidget):
         if self.screenTimer.interval() > 0:
             self.screenTimer.start()
         self.alarmWidget.startTimer(self.alarmDateTime)
-        self.logger.info(u'Alarm at %s', self.alarmDateTime)
+        self.logger.info('Alarm at %s', self.alarmDateTime)
         self.cecCommand.switchOn()
 
     def simTimeout(self):
