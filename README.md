@@ -1,5 +1,3 @@
-------------------------------------------------------------------------------
-
 vim: tw=78 spl=en spell
 
 # Alarm Display
@@ -32,5 +30,3 @@ The software is written in Python3, using the PyQt libaries for Qt5.
 - Use GPIO pins to switch lighting or open doors
 - Play sounds and read alarm data with text-to-speech engines
 - Display vehicle status
-
-------------------------------------------------------------------------------
