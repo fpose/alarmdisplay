@@ -36,6 +36,7 @@ class GpioControl(QObject):
 
         self.channel = self.config.getint("gpio", "channel", fallback = -1)
         self.on_time = self.config.getint("gpio", "on_time", fallback = 1)
+        self.delay_time = self.config.getint("gpio", "on_delay", fallback = 0)
 
         if self.channel < 0:
             return
@@ -50,8 +51,14 @@ class GpioControl(QObject):
 
         self.gpio = GPIO
 
+        self.logger.info("Initialising GPIO.")
         self.gpio.setmode(self.gpio.BOARD)
-        self.gpio.setup(self.channel, self.gpio.OUT, initial = self.gpio.HIGH)
+        self.gpio.setup(self.channel, self.gpio.OUT, initial = self.gpio.LOW)
+
+        self.on_timer = QTimer(self)
+        self.on_timer.setInterval(self.delay_time * 1000)
+        self.on_timer.setSingleShot(True)
+        self.on_timer.timeout.connect(self.switch_on)
 
         self.off_timer = QTimer(self)
         self.off_timer.setInterval(self.on_time * 1000)
@@ -63,15 +70,19 @@ class GpioControl(QObject):
             return
 
         self.logger.info("Cleaning up GPIO.")
-        self.gpio.output(self.channel, self.gpio.HIGH)
+        self.gpio.output(self.channel, self.gpio.LOW)
         self.gpio.cleanup()
 
     def trigger(self):
         if self.channel < 0 or not self.gpio:
             return
 
+        self.logger.info("Triggering GPIO switch-on timer.")
+        self.on_timer.start()
+
+    def switch_on(self):
         self.logger.info("Switching on GPIO %u." % self.channel)
-        self.gpio.output(self.channel, self.gpio.LOW)
+        self.gpio.output(self.channel, self.gpio.HIGH)
         self.off_timer.start()
 
     def switch_off(self):
@@ -79,6 +90,6 @@ class GpioControl(QObject):
             return
 
         self.logger.info("Switching off GPIO %u." % self.channel)
-        self.gpio.output(self.channel, self.gpio.HIGH)
+        self.gpio.output(self.channel, self.gpio.LOW)
 
 #-----------------------------------------------------------------------------

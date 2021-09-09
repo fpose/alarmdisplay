@@ -135,10 +135,13 @@ class Player(QObject):
     @pyqtSlot()
     def play(self):
         self.logger.info(u'Running %s', self.cmd)
-        play = subprocess.Popen(self.cmd, stdout = subprocess.DEVNULL)
-        play.wait()
-        if play.returncode != 0:
-            self.logger.error(u'TTS play command failed.')
+        try:
+            play = subprocess.Popen(self.cmd, stdout = subprocess.DEVNULL)
+            play.wait()
+            if play.returncode != 0:
+                self.logger.error(u'TTS play command failed.')
+        except:
+            self.logger.error('Failed to execute player.', exc_info = True)
         self.finished.emit()
 
 #-----------------------------------------------------------------------------
