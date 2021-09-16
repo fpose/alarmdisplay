@@ -162,7 +162,7 @@ class AlarmReport:
         inputPaths = [templateDir, imageDir]
         inputs = '.:'
         for path in inputPaths:
-            inputs += ':' + path
+            inputs += ':' + os.path.abspath(path)
         latexEnv = os.environ
         self.logger.info(u'TEXINPUTS=%s', inputs)
         latexEnv['TEXINPUTS'] = inputs
