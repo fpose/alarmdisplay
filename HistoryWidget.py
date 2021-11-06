@@ -172,7 +172,7 @@ class HistoryWidget(QWidget):
             try:
                 alarm.load(path)
             except Exception as e:
-                self.logger('History failed to load %s: %s', path, e)
+                self.logger.error('History failed to load %s: %s', path, e)
                 continue
 
             if alarm.fallbackStr:
