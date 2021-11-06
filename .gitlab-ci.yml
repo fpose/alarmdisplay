@@ -1,0 +1,14 @@
+image: python:latest
+
+cache:
+    paths:
+        - ~/.cache/pip/
+
+before_script:
+  - python -V  # Print out python version for debugging
+  - pip install -r requirements.txt
+
+test:
+    script:
+        - flake8 --ignore=E123,E126,E128,E251,E261,E265,E301,E302,E303,E402,E502,W605,E722
+        - python test.py
