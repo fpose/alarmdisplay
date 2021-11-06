@@ -88,19 +88,24 @@ class AlarmReport:
 
         # Lokale Einheiten FIXME config
         einheit = {
-            u'01': u'LZ Kleve',
-            u'02': u'LZ Materborn',
-            u'03': u'LZ Kellen',
-            u'04': u'LZ Rindern',
-            u'05': u'LG Reichswalde',
-            u'06': u'LG Donsbrüggen',
-            u'07': u'LG Wardhausen-Brienen',
-            u'08': u'LG Griethausen',
-            u'09': u'LG Düffelward',
-            u'10': u'LG Keeken',
-            u'11': u'LG Schenkenschanz',
-            u'12': u'LG Warbeyen'
+            '01': 'LZ Kleve',
+            '02': 'LZ Materborn',
+            '03': 'LZ Kellen',
+            '04': 'LZ Rindern',
+            '05': 'LG Reichswalde',
+            '06': 'LG Donsbrüggen',
+            '07': 'LG Wardhausen-Brienen',
+            '08': 'LG Griethausen',
+            '09': 'LG Düffelward',
+            '10': 'LG Keeken',
+            '11': 'LG Schenkenschanz',
+            '12': 'LG Warbeyen'
             }
+        # Besondere Einheitenzuordnungen FIXME config
+        sonder = {
+                'LZ Kleve': ['01'],
+                'LZ KLV Süd': ['02', '05'],
+                }
 
         variables = {}
 
@@ -125,7 +130,7 @@ class AlarmReport:
         if alarm.sondersignal == '0':
             sig = 'nein'
         variables['signal'] = escapeLaTeX(sig)
-        einh = alarm.einheiten(einheit, lambda x: False, self.logger)
+        einh = alarm.einheiten(einheit, lambda x: False, self.logger, sonder)
         variables['resources'] = escapeLaTeX(einh)
         if alarm.datetime:
             variables['datetime'] = \

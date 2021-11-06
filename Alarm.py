@@ -30,6 +30,7 @@ import xml.dom.minidom
 import datetime
 import pytz
 import json
+from collections import namedtuple
 from tzlocal import get_localzone
 
 from PyQt5.QtCore import *
@@ -65,6 +66,19 @@ class Alarm:
     # <o_nummer>[My ignored object name] KLV 06/666</o_nummer>
     objectNumberRe = re.compile('\s*(\[.*\])\s*(.*)')
 
+    # FW KLV01 DLK23 1
+    einsatzMittelRe = re.compile(('\s*'
+        '([A-Z]+)' # 1) FW
+        '\s+'
+        '([A-Z]+)' # 2) KLV
+        '\s*'
+        '([0-9]+)' # 3) 01
+        '\s+'
+        '([A-Z0-9\-]+)' # 4) DLK23 / TSF-W / ELW1
+        '\s+'
+        '([0-9]+)' # 5) 1
+        '\s*'))
+
     def __init__(self, config, receiveTimeStamp = None):
         self.number = None
         self.datetime = None
@@ -86,7 +100,7 @@ class Alarm:
         self.objektnummer = None
         self.lat = 0.0
         self.lon = 0.0
-        self.einsatzmittel = []
+        self.einsatzmittel = set()
         self.receiveTimeStamp = receiveTimeStamp
         self.xml = None
         self.config = config
@@ -272,8 +286,8 @@ class Alarm:
             if child.nodeType != child.ELEMENT_NODE:
                 continue
             if child.localName == 'em':
-                em = EinsatzMittel(child)
-                self.einsatzmittel.append(em)
+                em = EinsatzMittel.fromXml(child)
+                self.einsatzmittel.add(em)
 
     def fromAlamos(self, data, logger):
         self.source = 'json'
@@ -282,7 +296,17 @@ class Alarm:
 
         self.number = data.get("COBRA_name", "")
         #address = data.get("address") FIXME Alarmiertes Einsatzmittel
-        #einsatzmittel = data.get("alertedRessources")
+        einsatzmittel = data.get("einsatzmittel")
+        em_list = list(filter(None, einsatzmittel.split('\n')))
+        for em in em_list:
+            m = self.einsatzMittelRe.fullmatch(em)
+            if m:
+                # FW KLV01 DLK23 1
+                mittel = EinsatzMittel(m.group(1), m.group(2), m.group(3),
+                        m.group(4), m.group(5), em)
+            else:
+                mittel = EinsatzMittel(None, None, None, None, None, em)
+            self.einsatzmittel.add(mittel)
         self.art = data.get("COBRA_keyword_ident_1", "")
         ts = int(data.get("timestamp").strip()) / 1000.0
         dt_naive = datetime.datetime.fromtimestamp(ts)
@@ -313,7 +337,7 @@ class Alarm:
         logger.info(u'Sondersignal: %s', repr(self.sondersignal))
         logger.info(u'Besonderheit: %s', repr(self.besonderheit))
         for em in self.einsatzmittel:
-            logger.info(em.asString())
+            logger.info(em)
 
     def save(self):
         path = self.config.get('db', 'path', fallback = None)
@@ -410,6 +434,19 @@ class Alarm:
             'objektnummer'
             ]
 
+        # Non-merged fields:
+        # self.number = None
+        # self.datetime = None
+        # self.receiveTimeStamp = receiveTimeStamp
+        # self.xml = None
+        # self.config = config
+        # self.source = None
+        # self.pager = None
+        # self.json = None
+        # self.fallbackStr = None
+        # self.lat = 0.0
+        # self.lon = 0.0
+
         selfVars = vars(self)
         otherVars = vars(other)
         for key in stringVars:
@@ -429,6 +466,9 @@ class Alarm:
 
         # merge sources
         self.sources = self.sources.union(other.sources)
+
+        # merge resources
+        self.einsatzmittel = self.einsatzmittel.union(other.einsatzmittel)
 
         if logger:
             logger.info('Merge complete.')
@@ -491,24 +531,25 @@ class Alarm:
                 return True
         return False
 
-    def einheiten(self, einheit, ignore, logger):
-        zusatz = []
+    def einheiten(self, einheit, ignore, logger, sonder = dict()):
+        zusatz = set()
         for em in self.einsatzmittel:
+            if em.gesprochen in sonder:
+                for z in sonder[em.gesprochen]:
+                    zusatz.add(z)
             if ignore(em):
                 continue
-            if em.zusatz == u'':
-                continue # leer
-            if em.zusatz in zusatz:
-                continue # schon gesehen
+            if not em.zusatz:
+                continue # leer oder None
             if em.zusatz not in einheit:
                 logger.error(u'Unbekannter Zusatz "%s"!', em.zusatz)
                 continue
-            zusatz.append(em.zusatz)
+            zusatz.add(em.zusatz)
 
-        ret = u''
+        ret = ''
         for z in sorted(zusatz):
-            if ret != u'':
-                ret += u', '
+            if ret != '':
+                ret += ', '
             ret += einheit[z]
 
         return ret
@@ -574,68 +615,68 @@ class Alarm:
 
 #-----------------------------------------------------------------------------
 
-class EinsatzMittel:
-    def __init__(self, elem = None):
-        self.org = None
-        self.ort = None
-        self.zusatz = None
-        self.typ = None
-        self.kennung = None
-        self.gesprochen = None
+class EinsatzMittel(namedtuple('EinsatzMittel',
+    'org ort zusatz typ kennung gesprochen')):
 
-        if not elem:
-            return
-
+    @classmethod
+    def fromXml(cls, elem):
+        org = None
+        ort = None
+        zusatz = None
+        typ = None
+        kennung = None
+        gesprochen = None
         for child in elem.childNodes:
             if child.nodeType != child.ELEMENT_NODE:
                 continue
             if child.localName == 'em_organisation':
-                self.org = content(child)
+                org = content(child)
             elif child.localName == 'em_ort':
-                self.ort = content(child)
+                ort = content(child)
             elif child.localName == 'em_ort_zusatz':
-                self.zusatz = content(child)
+                zusatz = content(child)
             elif child.localName == 'em_typ':
-                self.typ = content(child)
+                typ = content(child)
             elif child.localName == 'em_ordnungskennung':
-                self.kennung = content(child)
+                kennung = content(child)
             elif child.localName == 'em_opta_gesprochen':
-                self.gesprochen = content(child)
+                gesprochen = content(child)
+        return cls(org, ort, zusatz, typ, kennung, gesprochen)
 
-    def asString(self):
-        ret = u''
+    def __repr__(self):
+        ret = ''
 
         if self.org:
             ret += self.org
         else:
-            ret += u'**'
-        ret += u' '
+            ret += '**'
+        ret += ' '
 
         if self.ort:
             ret += self.ort
         else:
-            ret += u'***'
-        ret += u' '
+            ret += '***'
+        ret += ' '
 
         if self.zusatz:
             ret += self.zusatz
         else:
-            ret += u'**'
-        ret += u' '
+            ret += '**'
+        ret += ' '
 
         if self.typ:
-            ret += u'{0:<6}'.format(self.typ)
+            ret += '{0:<6}'.format(self.typ)
         else:
-            ret += u'******'
-        ret += u' '
+            ret += '******'
+        ret += ' '
 
         if self.kennung:
-            ret += self.kennung
+            ret += '{0:<2}'.format(self.kennung)
         else:
-            ret += u'**'
+            ret += '**'
 
         if self.gesprochen:
-            ret += u' '
+            ret += ' '
             ret += self.gesprochen
 
         return ret
