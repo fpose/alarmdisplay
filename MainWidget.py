@@ -23,8 +23,6 @@
 #
 #-----------------------------------------------------------------------------
 
-import os
-import math
 import subprocess
 import datetime
 from tzlocal import get_localzone

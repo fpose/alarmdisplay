@@ -26,8 +26,8 @@
 import datetime
 
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtGui import QPainter, QFontMetrics, QColor, QIcon
-from PyQt5.QtCore import Qt, QPoint, QSize, QRect
+from PyQt5.QtGui import QPainter, QColor
+from PyQt5.QtCore import Qt, QRect
 
 #-----------------------------------------------------------------------------
 

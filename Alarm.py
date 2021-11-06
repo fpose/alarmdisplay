@@ -33,9 +33,6 @@ import json
 from collections import namedtuple
 from tzlocal import get_localzone
 
-from PyQt5.QtCore import *
-from PyQt5 import QtNetwork
-
 #-----------------------------------------------------------------------------
 
 class Alarm:
@@ -138,7 +135,7 @@ class Alarm:
             coord = coord[:2] + '.' + coord[2:]
             self.lon = float(coord)
             span = ma.span()
-            pagerStr = pagerStr[: span[0]] + pagerStr[span[1] :]
+            pagerStr = pagerStr[: span[0]] + pagerStr[span[1]:]
 
         ma = self.alarmRe.match(pagerStr)
         if not ma:
@@ -169,7 +166,7 @@ class Alarm:
             tz = pytz.timezone(zoneStr)
             self.datetime = tz.localize(dt_naive)
 
-        einheit = ma.group(2).strip() # unused
+        #einheit = ma.group(2).strip() # unused
         self.number = ma.group(3).strip()
         self.art = ma.group(4)[0]
         self.stichwort = ma.group(4)[1]
@@ -319,7 +316,7 @@ class Alarm:
         self.eskalation = '' # FIXME
         self.besonderheit = data.get("COBRA_ADDITIONAL_comment", "")
         self.sondersignal = \
-                data.get("COBRA_ADDITIONAL_special_rights") == 'Ja'
+            data.get("COBRA_ADDITIONAL_special_rights") == 'Ja'
         self.meldender = data.get("COBRA_reporter_name", "")
         self.rufnummer = data.get("COBRA_reporter_phone", "")
         self.plz = data.get("postalCode", "")
@@ -398,7 +395,7 @@ class Alarm:
 
     def matches(self, other):
         return self.number and other.number and \
-            self.number[-5 :] == other.number[-5 :]
+            self.number[-5:] == other.number[-5:]
 
     def merge(self, other, logger = None):
         if logger:
@@ -616,7 +613,7 @@ class Alarm:
 #-----------------------------------------------------------------------------
 
 class EinsatzMittel(namedtuple('EinsatzMittel',
-    'org ort zusatz typ kennung gesprochen')):
+        'org ort zusatz typ kennung gesprochen')):
 
     @classmethod
     def fromXml(cls, elem):

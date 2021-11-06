@@ -26,7 +26,6 @@
 import datetime
 import caldav
 import icalendar
-import babel.dates
 from tzlocal import get_localzone
 import re
 

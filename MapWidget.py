@@ -27,7 +27,7 @@ import os
 
 from PyQt5.QtWidgets import QFrame
 from PyQt5.QtGui import QPainter, QFontMetrics, QColor, QIcon
-from PyQt5.QtCore import Qt, QPoint, QSize, QRect
+from PyQt5.QtCore import Qt, QPoint, QRect
 
 import Map
 
@@ -87,7 +87,7 @@ class MapWidget(QFrame):
             self.cache = []
             return
         if len(self.cache) > self.maxCacheEntries - 1:
-            self.cache = self.cache[0 : self.maxCacheEntries - 1]
+            self.cache = self.cache[0:self.maxCacheEntries - 1]
         self.cache.insert(0, (self.lat_deg, self.lon_deg, self.pixmap))
 
     def searchCache(self):

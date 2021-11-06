@@ -23,9 +23,6 @@
 #
 #-----------------------------------------------------------------------------
 
-import os
-import datetime
-
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -89,7 +86,6 @@ class WeatherWidget(QWidget):
         self.networkAccessManager.get(req)
 
     def handleResponse(self, reply):
-        req = reply.request()
         er = reply.error()
         if er == QNetworkReply.NoError:
             bytes_string = reply.readAll()

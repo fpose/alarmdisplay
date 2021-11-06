@@ -101,7 +101,7 @@ class ImapMonitor(QtCore.QObject):
         while self.run:
             try:
                 # Wait for an IDLE response
-                responses = imap.idle_check(timeout = 60 * 5)
+                imap.idle_check(timeout = 60 * 5)
                 # TODO: process response and stay in idle mode
             except:
                 self.logger.error('IMAP error:', exc_info = True)
@@ -153,7 +153,7 @@ class ImapMonitor(QtCore.QObject):
 
                 fileName = part.get_filename()
 
-                if fileName == None or not fileName.endswith('xml'):
+                if fileName is None or not fileName.endswith('xml'):
                     continue
 
                 xmlContent = part.get_payload(decode = True)

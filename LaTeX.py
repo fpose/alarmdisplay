@@ -34,7 +34,7 @@ def escapeLaTeX(text):
                 ret += '\'\''
             else:
                 ret += '``'
-            inQuote = not inQuote;
+            inQuote = not inQuote
         elif c == u'&':
             ret += '\&'
         elif c == u'\u202f':

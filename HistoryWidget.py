@@ -31,7 +31,6 @@ from tzlocal import get_localzone
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from PyQt5.QtSvg import QSvgRenderer
 
 from MapWidget import MapWidget
 from Alarm import Alarm

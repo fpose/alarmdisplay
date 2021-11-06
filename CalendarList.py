@@ -28,8 +28,8 @@ import re
 from tzlocal import get_localzone
 
 from PyQt5.QtWidgets import QFrame
-from PyQt5.QtGui import QPainter, QFontMetrics, QColor, QIcon
-from PyQt5.QtCore import Qt, QPoint, QSize, QRect
+from PyQt5.QtGui import QPainter, QFontMetrics, QColor
+from PyQt5.QtCore import Qt, QRect
 
 #-----------------------------------------------------------------------------
 
@@ -51,9 +51,7 @@ class CalendarList(QFrame):
     def paintEvent(self, event):
         painter = QPainter(self)
         margin = 25
-        pad = 10
         cr = self.contentsRect()
-        size = cr.size()
 
         top = cr.top() + margin
 

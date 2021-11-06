@@ -75,7 +75,88 @@ sonder = {
 class alarmdisplayTests(unittest.TestCase):
 
     def test_einsatzmittel(self):
-        json_str = r'{"unitCode": "LZ Kleve", "COBRA_state": "ALERT", "timestamp": "1635865439209", "einsatzmittel": "FW KLV01 DLK23 1\nFW KLV Ger\u00e4tewarte\nLZ KLV S\u00fcd\nLZ Kleve\nRD KLV01 RTW 1", "userName": "Admin", "time": "16:03", "COBRA_keyword_1_text": "Brandschutz", "COBRA_keyword_2": "", "tvp": "TVPN031613beE005d5ea2", "location_dest_long": "Ackerstrasse 299, 47533 Kleve\nKreuzung: \nSektion: \nAnwesen: \nStock: \nKommentar: ", "address": "LZ Kleve", "COBRA_keyword_1": "3", "house": "299", "COBRA_keyword_additional_2": "", "city_abbr": "Kleve", "dbId": "9471fb068f4aff5554723efc7b7a9336367f660a5675f375956d66d9d3195f77", "COBRA_keyword_ident_2": "", "location_URL": "https://maps.google.de/maps?q=51.77849377,6.11907405", "COBRA_keyword_description_2": "", "COBRA_LOCATION_SUBPROPERTY_2": "", "clock_long": "16:03:58", "keyword_1_long": "Einsatzart: B\nStichwort: 3\nMeldebild: Zimmerbrand\nKlartext: Feuer gro\u00df", "COBRA_ADDITIONAL_special_rights": "Ja", "city": "Kleve", "COBRA_LOCATION_SUBPROPERTY_4": "", "pluginmessage": " Ackerstrasse 299, 47533 Kleve -- Alarmiert: FW KLV01 DLK23 1;\nFW KLV Ger\u00e4tewarte;\nLZ KLV S\u00fcd;\nLZ Kleve;\nRD KLV01 RTW 1", "COBRA_reporter_name": "Klink", "keyword": "B3 Zimmerbrand", "COBRA_ADDITIONAL_callback": "", "COBRA_keyword_ident_1": "B", "street": "Ackerstrasse", "gps": "GPSN51778494E06119074", "COBRA_LOCATION_SUBPROPERTY_1": "", "alertedRessources": "FW KLV01 DLK23 1;\nFW KLV Ger\u00e4tewarte;\nLZ KLV S\u00fcd;\nLZ Kleve;\nRD KLV01 RTW 1", "keyword_misc": "Feuer gro\u00df", "COBRA_LOCATION_property": "", "COBRA_LOCATION_SUBPROPERTY_5": "", "origin": " Ackerstrasse 299, 47533 Kleve -- Alarmiert: FW KLV01 DLK23 1;\nFW KLV Ger\u00e4tewarte;\nLZ KLV S\u00fcd;\nLZ Kleve;\nRD KLV01 RTW 1", "COBRA_keyword_additional_1": "Zimmerbrand", "keyword_ident": "B3 Zimmerbrand", "COBRA_reporter": "Klink 017641941580", "alarmState": "NEW", "location_dest": "Ackerstrasse 299, 47533 Kleve", "alarmType": "ALARM", "keyword_description": "Feuer gro\u00df", "COBRA_id": "de0513000000kvi80klp00", "keyword_category": "\ud83d\udd25", "COBRA_keyword_description_1": "Feuer gro\u00df", "postalCode": "47533", "lng": "6.11907405", "COBRA_LOCATION_comment": "", "COBRA_sender_client_id": "KLE_LTS", "COBRA_ADDITIONAL_comment": "", "COBRA_LOCATION_section": "", "COBRA_LOCATION_crossing": "", "COBRA_LOCATION_floor": "", "COBRA_receiver_client_id": "KLE_ALAMOS", "COBRA_all_previous_alerted_resources": "", "COBRA_reporter_phone": "017641941580", "COBRA_ADDITIONAL_priority": "0", "keyword_2_long": "Einsatzart: \nStichwort: \nMeldebild: \nKlartext: ", "building": "", "COBRA_ADDITIONAL_comment_callback": "", "lat": "51.77849377", "keyword_color": "#FF0000", "COBRA_name": "1210057913", "COBRA_LOCATION_SUBPROPERTY_3": "", "unit": "01 - LZ Kleve"}'
+        json_str = (r'{'
+            r'"unitCode": "LZ Kleve",'
+            r'"COBRA_state": "ALERT",'
+            r'"timestamp": "1635865439209",'
+            r'"einsatzmittel": "FW KLV01 DLK23 1\nFW KLV Ger\u00e4tewarte\n'
+            r'LZ KLV S\u00fcd\nLZ Kleve\nRD KLV01 RTW 1",'
+            r'"userName": "Admin",'
+            r'"time": "16:03",'
+            r'"COBRA_keyword_1_text": "Brandschutz",'
+            r'"COBRA_keyword_2": "",'
+            r'"tvp": "TVPN031613beE005d5ea2",'
+            r'"location_dest_long": "Ackerstrasse 299, 47533 Kleve\n'
+            r'Kreuzung: \nSektion: \nAnwesen: \nStock: \nKommentar: ",'
+            r'"address": "LZ Kleve",'
+            r'"COBRA_keyword_1": "3",'
+            r'"house": "299",'
+            r'"COBRA_keyword_additional_2": "",'
+            r'"city_abbr": "Kleve",'
+            r'"dbId": "9471fb068f4aff5554723efc7b7a9336367f660'
+            r'a5675f375956d66d9d3195f77",'
+            r'"COBRA_keyword_ident_2": "",'
+            r'"location_URL": '
+            r'"https://maps.google.de/maps?q=51.77849377,6.11907405",'
+            r'"COBRA_keyword_description_2": "",'
+            r'"COBRA_LOCATION_SUBPROPERTY_2": "",'
+            r'"clock_long": "16:03:58",'
+            r'"keyword_1_long": "Einsatzart: B\nStichwort: 3\n'
+            r'Meldebild: Zimmerbrand\nKlartext: Feuer gro\u00df",'
+            r'"COBRA_ADDITIONAL_special_rights": "Ja",'
+            r'"city": "Kleve",'
+            r'"COBRA_LOCATION_SUBPROPERTY_4": "",'
+            r'"pluginmessage": " Ackerstrasse 299, 47533 Kleve -- '
+            r'Alarmiert: FW KLV01 DLK23 1;\nFW KLV Ger\u00e4tewarte;\n'
+            r'LZ KLV S\u00fcd;\nLZ Kleve;\nRD KLV01 RTW 1",'
+            r'"COBRA_reporter_name": "Klink",'
+            r'"keyword": "B3 Zimmerbrand",'
+            r'"COBRA_ADDITIONAL_callback": "",'
+            r'"COBRA_keyword_ident_1": "B",'
+            r'"street": "Ackerstrasse",'
+            r'"gps": "GPSN51778494E06119074",'
+            r'"COBRA_LOCATION_SUBPROPERTY_1": "",'
+            r'"alertedRessources": "FW KLV01 DLK23 1;\n'
+            r'FW KLV Ger\u00e4tewarte;\nLZ KLV S\u00fcd;\nLZ Kleve;\n'
+            r'RD KLV01 RTW 1",'
+            r'"keyword_misc": "Feuer gro\u00df",'
+            r'"COBRA_LOCATION_property": "",'
+            r'"COBRA_LOCATION_SUBPROPERTY_5": "",'
+            r'"origin": " Ackerstrasse 299, 47533 Kleve -- Alarmiert: '
+            r'FW KLV01 DLK23 1;\nFW KLV Ger\u00e4tewarte;\nLZ KLV S\u00fcd;\n'
+            r'LZ Kleve;\nRD KLV01 RTW 1",'
+            r'"COBRA_keyword_additional_1": "Zimmerbrand",'
+            r'"keyword_ident": "B3 Zimmerbrand",'
+            r'"COBRA_reporter": "Klink 017641941580",'
+            r'"alarmState": "NEW",'
+            r'"location_dest": "Ackerstrasse 299, 47533 Kleve",'
+            r'"alarmType": "ALARM",'
+            r'"keyword_description": "Feuer gro\u00df",'
+            r'"COBRA_id": "de0513000000kvi80klp00",'
+            r'"keyword_category": "\ud83d\udd25",'
+            r'"COBRA_keyword_description_1": "Feuer gro\u00df",'
+            r'"postalCode": "47533",'
+            r'"lng": "6.11907405",'
+            r'"COBRA_LOCATION_comment": "",'
+            r'"COBRA_sender_client_id": "KLE_LTS",'
+            r'"COBRA_ADDITIONAL_comment": "",'
+            r'"COBRA_LOCATION_section": "",'
+            r'"COBRA_LOCATION_crossing": "",'
+            r'"COBRA_LOCATION_floor": "",'
+            r'"COBRA_receiver_client_id": "KLE_ALAMOS",'
+            r'"COBRA_all_previous_alerted_resources": "",'
+            r'"COBRA_reporter_phone": "017641941580",'
+            r'"COBRA_ADDITIONAL_priority": "0",'
+            r'"keyword_2_long": "Einsatzart: \nStichwort: \nMeldebild: \n'
+            r'Klartext: ",'
+            r'"building": "",'
+            r'"COBRA_ADDITIONAL_comment_callback": "",'
+            r'"lat": "51.77849377",'
+            r'"keyword_color": "#FF0000",'
+            r'"COBRA_name": "1210057913",'
+            r'"COBRA_LOCATION_SUBPROPERTY_3": "",'
+            r'"unit": "01 - LZ Kleve"'
+            r'}')
 
         config = configparser.ConfigParser()
         alarm = Alarm(config)
@@ -222,6 +303,8 @@ class alarmdisplayTests(unittest.TestCase):
         eh = alarm.einheiten(einheit, lambda x: False, logger)
         self.assertEqual(eh, 'LZ Kleve, LZ Materborn, LG Reichswalde')
 
+        del app
+
     def test_wolfsgraben(self):
         config = configparser.ConfigParser()
 
@@ -260,6 +343,7 @@ class alarmdisplayTests(unittest.TestCase):
             em.typ = 'RD'
         with self.assertRaises(AttributeError):
             del em.typ
+
 
 #-----------------------------------------------------------------------------
 

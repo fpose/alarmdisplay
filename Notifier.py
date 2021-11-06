@@ -76,11 +76,10 @@ class Notifier:
         self.logger.info("Notifing %s with %s...", self.url, data)
         req = QNetworkRequest(QUrl(self.url))
         req.setHeader(QNetworkRequest.ContentTypeHeader, 'application/json')
-        reply = self.networkAccessManager.post(req, data)
+        self.networkAccessManager.post(req, data)
 
     def handle_response(self, reply):
 
-        req = reply.request()
         err = reply.error()
         if err == QNetworkReply.NoError:
             self.logger.info("Notification successful.")

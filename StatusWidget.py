@@ -24,7 +24,6 @@
 #-----------------------------------------------------------------------------
 
 import os
-import datetime
 import re
 import subprocess
 
@@ -50,10 +49,10 @@ class StatusWidget(QWidget):
             path = os.path.join(imageDir, 'status%u.svg' % (s))
             try:
                 renderer = QSvgRenderer(path)
-                pixmap = QPixmap(48, 48);
-                pixmap.fill(Qt.transparent);
-                painter = QPainter(pixmap);
-                renderer.render(painter, QRectF(pixmap.rect()));
+                pixmap = QPixmap(48, 48)
+                pixmap.fill(Qt.transparent)
+                painter = QPainter(pixmap)
+                renderer.render(painter, QRectF(pixmap.rect()))
             except:
                 self.logger.warning('Failed to load status image %s.', path,
                         exc_info = True)
@@ -67,7 +66,6 @@ class StatusWidget(QWidget):
         self.labelDict = {}
         self.animationDict = {}
 
-        index = 0
         if config.has_section('status'):
             addressRe = re.compile('address([0-9]+)')
 
@@ -120,7 +118,7 @@ class StatusWidget(QWidget):
                 animation.setEndValue(QColor('#202040'))
                 animation.setDuration(1000)
                 animation.setLoopCount(10)
-                animation.setEasingCurve(QEasingCurve.OutInQuad);
+                animation.setEasingCurve(QEasingCurve.OutInQuad)
                 self.animationDict[address] = animation
 
         label = QLabel(self)

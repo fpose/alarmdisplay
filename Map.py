@@ -22,12 +22,11 @@
 #-----------------------------------------------------------------------------
 
 import os
-import time
 import math
 import numpy as np
 
 from PyQt5.QtGui import QPixmap, QPainter, QPolygonF, QPen, QColor
-from PyQt5.QtCore import QPoint, QRect, QSize
+from PyQt5.QtCore import QPoint, QRect
 
 import requests
 import json
@@ -68,9 +67,7 @@ def num2deg(xtile, ytile, zoom):
 def meters_per_pixel(zoom, lat_deg):
     r = 6372798.2
     C = 2 * math.pi * r
-    lat_rad = math.radians(lat_deg)
-    #return C * math.cos(lat_rad) / (2 ** (zoom + 8))
-    return C / (2 ** (zoom + 8)) #equator
+    return C / (2 ** (zoom + 8)) # equator
 
 #-----------------------------------------------------------------------------
 
@@ -325,10 +322,10 @@ def getRoute(dest_lat_deg, dest_lon_deg, config, logger):
     url = 'https://api.openrouteservice.org/v2/directions/driving-car/geojson'
 
     body = {
-            "coordinates": [[home_lon_deg, home_lat_deg],
-                [dest_lon_deg, dest_lat_deg]],
-            "instructions": False,
-        }
+        "coordinates": [[home_lon_deg, home_lat_deg],
+            [dest_lon_deg, dest_lat_deg]],
+        "instructions": False,
+    }
 
     try:
         call = requests.post(url, json = body, headers = headers,

@@ -81,7 +81,7 @@ class TextToSpeech(QObject):
                         'Failed to generate temporary file for padding.')
                 return
             cmd = 'sox ' + self.padFile + ' ' + new_file.name + ' ' \
-                    + self.padFile + ' ' + pad_file.name
+                + self.padFile + ' ' + pad_file.name
             self.logger.info('Executing %s', cmd)
             try:
                 ret = os.system(cmd)
