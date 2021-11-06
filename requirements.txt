@@ -1,6 +1,5 @@
 icalendar
 lxml
-mpltoolkits.basemap
 numpy
 pyproj
 pyqt5
