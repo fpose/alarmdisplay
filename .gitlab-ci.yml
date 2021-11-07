@@ -1,10 +1,12 @@
-image: registry.gitlab.com/florianpose/containerfabrik/alarmdisplay:latest
+
 
 flake:
+    image: registry.gitlab.com/florianpose/containerfabrik/flake8:latest
     script:
         - flake8 --ignore=E123,E126,E128,E251,E261,E265,E301,E302,E303,E402,F403,F405,E502,W605,E722
 
 test:
+    image: registry.gitlab.com/florianpose/containerfabrik/alarmdisplay:latest
     variables:
         QT_QPA_PLATFORM: "offscreen"
     script:
