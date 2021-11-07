@@ -86,27 +86,6 @@ class AlarmReport:
             self.logger.error(u'convert failed')
             return
 
-        # Lokale Einheiten FIXME config
-        einheit = {
-            '01': 'LZ Kleve',
-            '02': 'LZ Materborn',
-            '03': 'LZ Kellen',
-            '04': 'LZ Rindern',
-            '05': 'LG Reichswalde',
-            '06': 'LG Donsbrüggen',
-            '07': 'LG Wardhausen-Brienen',
-            '08': 'LG Griethausen',
-            '09': 'LG Düffelward',
-            '10': 'LG Keeken',
-            '11': 'LG Schenkenschanz',
-            '12': 'LG Warbeyen'
-            }
-        # Besondere Einheitenzuordnungen FIXME config
-        sonder = {
-                'LZ Kleve': ['01'],
-                'LZ KLV Süd': ['02', '05'],
-                }
-
         variables = {}
 
         logo = self.config.get("report", "logo", fallback = None)
@@ -130,7 +109,7 @@ class AlarmReport:
         if alarm.sondersignal == '0':
             sig = 'nein'
         variables['signal'] = escapeLaTeX(sig)
-        einh = alarm.einheiten(einheit, lambda x: False, self.logger, sonder)
+        einh = alarm.alarmiert()
         variables['resources'] = escapeLaTeX(einh)
         if alarm.datetime:
             variables['datetime'] = \

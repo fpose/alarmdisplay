@@ -109,7 +109,7 @@ class alarmdisplayTests(unittest.TestCase):
             r'"pluginmessage": " Ackerstrasse 299, 47533 Kleve -- '
             r'Alarmiert: FW KLV01 DLK23 1;\nFW KLV Ger\u00e4tewarte;\n'
             r'LZ KLV S\u00fcd;\nLZ Kleve;\nRD KLV01 RTW 1",'
-            r'"COBRA_reporter_name": "Klink",'
+            r'"COBRA_reporter_name": "Müller",'
             r'"keyword": "B3 Zimmerbrand",'
             r'"COBRA_ADDITIONAL_callback": "",'
             r'"COBRA_keyword_ident_1": "B",'
@@ -127,7 +127,7 @@ class alarmdisplayTests(unittest.TestCase):
             r'LZ Kleve;\nRD KLV01 RTW 1",'
             r'"COBRA_keyword_additional_1": "Zimmerbrand",'
             r'"keyword_ident": "B3 Zimmerbrand",'
-            r'"COBRA_reporter": "Klink 017641941580",'
+            r'"COBRA_reporter": "Müller 017612345678",'
             r'"alarmState": "NEW",'
             r'"location_dest": "Ackerstrasse 299, 47533 Kleve",'
             r'"alarmType": "ALARM",'
@@ -145,7 +145,7 @@ class alarmdisplayTests(unittest.TestCase):
             r'"COBRA_LOCATION_floor": "",'
             r'"COBRA_receiver_client_id": "KLE_ALAMOS",'
             r'"COBRA_all_previous_alerted_resources": "",'
-            r'"COBRA_reporter_phone": "017641941580",'
+            r'"COBRA_reporter_phone": "017612345678",'
             r'"COBRA_ADDITIONAL_priority": "0",'
             r'"keyword_2_long": "Einsatzart: \nStichwort: \nMeldebild: \n'
             r'Klartext: ",'
@@ -175,6 +175,9 @@ class alarmdisplayTests(unittest.TestCase):
         self.assertEqual(alarm.einsatzmittel, mittel)
         eh = alarm.einheiten(einheit, lambda x: False, logger, sonder)
         self.assertEqual(eh, 'LZ Kleve, LZ Materborn, LG Reichswalde')
+        mittel_txt = alarm.alarmiert()
+        self.assertEqual(mittel_txt, ('LZ KLV Süd, LZ Kleve, '
+            'FW KLV Gerätewarte, FW KLV01 DLK23 1, RD KLV01 RTW 1'))
 
     def test_report(self):
         pager_str = ('12-05-18 19:54:02 LG Reichswalde       '

@@ -551,6 +551,26 @@ class Alarm:
 
         return ret
 
+    def alarmiert(self):
+        mittel_prio = []
+        for em in self.einsatzmittel:
+            g = em.gesprochen
+            if not g:
+                continue
+            if g.startswith('LZ'):
+                prio = 1
+            elif g.startswith('LG'):
+                prio = 2
+            elif g.startswith('FW'):
+                prio = 3
+            elif g.startswith('RD'):
+                prio = 4
+            else:
+                prio = 5
+            mittel_prio.append((g, prio))
+        mittel = sorted(mittel_prio, key=lambda x: (x[1], x[0]))
+        return ', '.join(m[0] for m in mittel)
+
     def filterEinsatzMittel(self, ignore):
         emFiltered = []
         for em in self.einsatzmittel:
