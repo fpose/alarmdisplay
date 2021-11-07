@@ -616,9 +616,9 @@ class MainWidget(QWidget):
         alarm.rufnummer = '0179 555 364532'
         alarm.number = '1170040004'
         alarm.sondersignal = '1'
-        em = EinsatzMittel('FW', 'KLV', '05', 'LF10', '1', None)
+        em = EinsatzMittel('FW', 'KLV', '05', 'LF10', '1', '')
         alarm.einsatzmittel.add(em)
-        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', None)
+        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', '')
         alarm.einsatzmittel.add(em)
 
         self.processAlarm(alarm)

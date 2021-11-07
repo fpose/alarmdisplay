@@ -304,7 +304,7 @@ class Alarm:
                 mittel = EinsatzMittel(m.group(1), m.group(2), m.group(3),
                         m.group(4), m.group(5), em)
             else:
-                mittel = EinsatzMittel(None, None, None, None, None, em)
+                mittel = EinsatzMittel('', '', '', '', '', em)
             self.einsatzmittel.add(mittel)
         self.art = data.get("COBRA_keyword_ident_1", "")
         ts = int(data.get("timestamp").strip()) / 1000.0
@@ -380,10 +380,13 @@ class Alarm:
         f.close()
 
         ma = self.dateRe.search(path)
-        dt_naive = datetime.datetime.strptime(ma.group(),
-                '%Y-%m-%d-%H-%M-%S')
-        local_tz = get_localzone()
-        dateTime = local_tz.localize(dt_naive)
+        if ma:
+            dt_naive = datetime.datetime.strptime(ma.group(),
+                    '%Y-%m-%d-%H-%M-%S')
+            local_tz = get_localzone()
+            dateTime = local_tz.localize(dt_naive)
+        else:
+            dateTime = None
 
         if path.endswith('.dme'):
             self.fromPager(contents, logger, dateTime = dateTime)
@@ -639,12 +642,12 @@ class EinsatzMittel(namedtuple('EinsatzMittel',
 
     @classmethod
     def fromXml(cls, elem):
-        org = None
-        ort = None
-        zusatz = None
-        typ = None
-        kennung = None
-        gesprochen = None
+        org = ''
+        ort = ''
+        zusatz = ''
+        typ = ''
+        kennung = ''
+        gesprochen = ''
         for child in elem.childNodes:
             if child.nodeType != child.ELEMENT_NODE:
                 continue
@@ -696,7 +699,7 @@ class EinsatzMittel(namedtuple('EinsatzMittel',
 
         if self.gesprochen:
             ret += ' '
-            ret += self.gesprochen
+            ret += repr(self.gesprochen)
 
         return ret
 

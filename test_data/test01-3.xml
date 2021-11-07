@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<daten>
+<einsatz>
+<timestamp>20211106213230</timestamp>
+<einsatznummer>1210058837</einsatznummer>
+<einsatzart>B</einsatzart>
+<einsatzstichwort>2</einsatzstichwort>
+<diagnose>Kaminbrand</diagnose>
+<eskalation>-</eskalation>
+<besonderheit>Pommesbude</besonderheit>
+<sondersignal>1</sondersignal>
+<meldender></meldender>
+<rufnummer>017612345678</rufnummer>
+</einsatz>
+<einsatzort>
+<plz>[47533]</plz>
+<ort>Kleve</ort>
+<ortsteil>Kleve</ortsteil>
+<strasse>Hoffmannallee</strasse>
+<hausnummer>999</hausnummer>
+<objekt>
+<o_name></o_name>
+<o_nummer></o_nummer>
+<o_gefahren>
+<gefahr></gefahr>
+<brennbar></brennbar>
+<chemie></chemie>
+<radioaktiv></radioaktiv>
+</o_gefahren>
+</objekt>
+<koordinaten>POINT (6.12914285 51.77927139)</koordinaten>
+</einsatzort>
+<einsatzmittel>
+<em>
+<em_organisation></em_organisation>
+<em_ort></em_ort>
+<em_ort_zusatz></em_ort_zusatz>
+<em_typ></em_typ>
+<em_ordnungskennung></em_ordnungskennung>
+<em_opta_gesprochen>LZ KLV Süd</em_opta_gesprochen>
+</em>
+<em>
+<em_organisation></em_organisation>
+<em_ort>KLV</em_ort>
+<em_ort_zusatz>01</em_ort_zusatz>
+<em_typ></em_typ>
+<em_ordnungskennung></em_ordnungskennung>
+<em_opta_gesprochen>KLV 1</em_opta_gesprochen>
+</em>
+<em>
+<em_organisation>FW</em_organisation>
+<em_ort>KLV</em_ort>
+<em_ort_zusatz>01</em_ort_zusatz>
+<em_typ>LEITER</em_typ>
+<em_ordnungskennung>01</em_ordnungskennung>
+<em_opta_gesprochen>KLV Leiter</em_opta_gesprochen>
+</em>
+<em>
+<em_organisation>FW</em_organisation>
+<em_ort>KLV</em_ort>
+<em_ort_zusatz>01</em_ort_zusatz>
+<em_typ>DLK23</em_typ>
+<em_ordnungskennung>01</em_ordnungskennung>
+<em_opta_gesprochen>KLV 1 DLK23 1</em_opta_gesprochen>
+</em>
+<em>
+<em_organisation></em_organisation>
+<em_ort></em_ort>
+<em_ort_zusatz></em_ort_zusatz>
+<em_typ></em_typ>
+<em_ordnungskennung></em_ordnungskennung>
+<em_opta_gesprochen>LZ KLV West</em_opta_gesprochen>
+</em>
+<em>
+<em_organisation>RD</em_organisation>
+<em_ort>KLV</em_ort>
+<em_ort_zusatz>01</em_ort_zusatz>
+<em_typ>RTW</em_typ>
+<em_ordnungskennung>01</em_ordnungskennung>
+<em_opta_gesprochen>KLV RTW 1</em_opta_gesprochen>
+</em>
+</einsatzmittel>
+</daten>

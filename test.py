@@ -68,6 +68,7 @@ einheit = {
 sonder = {
         'LZ Kleve': ['01'],
         'LZ KLV Süd': ['02', '05'],
+        'LZ KLV West': ['04', '06'],
         }
 
 #-----------------------------------------------------------------------------
@@ -164,11 +165,11 @@ class alarmdisplayTests(unittest.TestCase):
         mittel = set((
                 EinsatzMittel('FW', 'KLV', '01', 'DLK23', '1',
                     'FW KLV01 DLK23 1'),
-                EinsatzMittel(None, None, None, None, None,
+                EinsatzMittel('', '', '', '', '',
                     'FW KLV Gerätewarte'),
-                EinsatzMittel(None, None, None, None, None,
+                EinsatzMittel('', '', '', '', '',
                     'LZ KLV Süd'),
-                EinsatzMittel(None, None, None, None, None,
+                EinsatzMittel('', '', '', '', '',
                     'LZ Kleve'),
                 EinsatzMittel('RD', 'KLV', '01', 'RTW', '1',
                     'RD KLV01 RTW 1')))
@@ -331,21 +332,75 @@ class alarmdisplayTests(unittest.TestCase):
         alarm.rufnummer = '0179 555 364532'
         alarm.number = '1170040004'
         alarm.sondersignal = '1'
-        em = EinsatzMittel('FW', 'KLV', '05', 'LF10', '1', None)
+        em = EinsatzMittel('FW', 'KLV', '05', 'LF10', '1', '')
         alarm.einsatzmittel.add(em)
-        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', None)
+        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', '')
         alarm.einsatzmittel.add(em)
         # adding the same twice
-        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', None)
+        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', '')
         alarm.einsatzmittel.add(em)
         self.assertEqual(len(alarm.einsatzmittel), 2)
 
     def test_einsatzMittelImmutable(self):
-        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', None)
+        em = EinsatzMittel('FW', 'KLV', '02', 'LF20', '1', '')
         with self.assertRaises(AttributeError):
             em.typ = 'RD'
         with self.assertRaises(AttributeError):
             del em.typ
+
+    def test_pommes(self):
+        config = configparser.ConfigParser()
+        alarm = Alarm(config)
+        alarm.load('test_data/test01-1.json', logger)
+        mittel = set((
+                EinsatzMittel('FW', 'KLV', '01', 'DLK23', '1',
+                    'FW KLV01 DLK23 1'),
+                EinsatzMittel('', '', '', '', '',
+                    'FW KLV Gerätewarte'),
+                EinsatzMittel('', '', '', '', '',
+                    'LZ KLV Süd'),
+                EinsatzMittel('', '', '', '', '',
+                    'FW KLV Leiter')))
+        self.assertEqual(alarm.einsatzmittel, mittel)
+        eh = alarm.einheiten(einheit, lambda x: False, logger, sonder)
+        self.assertEqual(eh, 'LZ Kleve, LZ Materborn, LG Reichswalde')
+        mittel_txt = alarm.alarmiert()
+        self.assertEqual(mittel_txt, ('LZ KLV Süd, '
+            'FW KLV Gerätewarte, FW KLV Leiter, FW KLV01 DLK23 1'))
+
+        alarm2 = Alarm(config)
+        alarm2.load('test_data/test01-2.dme', logger)
+        alarm.merge(alarm2)
+
+        self.assertEqual(alarm.einsatzmittel, mittel)
+        eh = alarm.einheiten(einheit, lambda x: False, logger, sonder)
+        self.assertEqual(eh, 'LZ Kleve, LZ Materborn, LG Reichswalde')
+        mittel_txt = alarm.alarmiert()
+        self.assertEqual(mittel_txt, ('LZ KLV Süd, '
+            'FW KLV Gerätewarte, FW KLV Leiter, FW KLV01 DLK23 1'))
+
+        alarm3 = Alarm(config)
+        alarm3.load('test_data/test01-3.xml', logger)
+        alarm.merge(alarm3)
+
+        mittel.add(EinsatzMittel('RD', 'KLV', '01', 'RTW', '01',
+            'KLV RTW 1'))
+        mittel.add(EinsatzMittel('', '', '', '', '',
+            'LZ KLV West'))
+        mittel.add(EinsatzMittel('FW', 'KLV', '01', 'DLK23', '01',
+            'KLV 1 DLK23 1'))
+        mittel.add(EinsatzMittel('', 'KLV', '01', '', '',
+            'KLV 1'))
+        mittel.add(EinsatzMittel('FW', 'KLV', '01', 'LEITER', '01',
+            'KLV Leiter'))
+        self.assertEqual(alarm.einsatzmittel, mittel)
+        eh = alarm.einheiten(einheit, lambda x: False, logger, sonder)
+        self.assertEqual(eh, ('LZ Kleve, LZ Materborn, LZ Rindern,'
+            ' LG Reichswalde, LG Donsbrüggen'))
+        mittel_txt = alarm.alarmiert()
+        self.assertEqual(mittel_txt, ('LZ KLV Süd, LZ KLV West, '
+            'FW KLV Gerätewarte, FW KLV Leiter, FW KLV01 DLK23 1, KLV 1, '
+            'KLV 1 DLK23 1, KLV Leiter, KLV RTW 1'))
 
 
 #-----------------------------------------------------------------------------
