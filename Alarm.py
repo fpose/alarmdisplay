@@ -220,6 +220,8 @@ class Alarm:
                 self.diagnose = content(child)
             elif child.localName == 'eskalation':
                 self.eskalation = content(child)
+                if self.eskalation == '-':
+                    self.eskalation = ''
             elif child.localName == 'besonderheit':
                 self.besonderheit = content(child)
             elif child.localName == 'sondersignal':
@@ -594,7 +596,7 @@ class Alarm:
         if self.diagnose:
             text += '(' + self.diagnose + '). ' # Wohnungsbrand
 
-        if self.eskalation and self.eskalation != '-':
+        if self.eskalation:
             text += '(' + self.eskalation + '). '
 
         ort = None

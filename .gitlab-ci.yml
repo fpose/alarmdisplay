@@ -1,15 +1,13 @@
-image: raspbian/stretch:latest
 
-cache:
-    paths:
-        - ~/.cache/pip/
 
-before_script:
-  - apt-get -qq update && apt-get -qq install -y cec-utils python-libcec python3-babel python3-icalendar python3-lxml python3-mpltoolkits.basemap python3-numpy python3-pip python3-pyproj python3-pyqt5 python3-pyqt5.qtsvg python3-rpi.gpio python3-serial python3-tzlocal python3-urllib3 texlive-fonts-recommended texlive-latex-base texlive-latex-recommended
-  - python -V  # Print out python version for debugging
-  - pip install -r requirements.txt
+flake:
+    image: registry.gitlab.com/florianpose/containerfabrik/flake8:latest
+    script:
+        - flake8 --ignore=E123,E126,E128,E251,E261,E265,E301,E302,E303,E402,F403,F405,E502,W605,E722
 
 test:
+    image: registry.gitlab.com/florianpose/containerfabrik/alarmdisplay:latest
+    variables:
+        QT_QPA_PLATFORM: "offscreen"
     script:
-        - flake8 --ignore=E123,E126,E128,E251,E261,E265,E301,E302,E303,E402,E502,W605,E722
-        - python test.py
+        - python3 test.py
