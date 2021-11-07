@@ -1,13 +1,4 @@
-image: raspbian/stretch:latest
-
-cache:
-    paths:
-        - ~/.cache/pip/
-
-before_script:
-  - apt-get -qq update && apt-get -qq install -y cec-utils python-libcec python3-babel python3-icalendar python3-lxml python3-mpltoolkits.basemap python3-numpy python3-pip python3-pyproj python3-pyqt5 python3-pyqt5.qtsvg python3-rpi.gpio python3-serial python3-tzlocal python3-urllib3 texlive-fonts-recommended texlive-latex-base texlive-latex-recommended
-  - python -V  # Print out python version for debugging
-  - pip install -r requirements.txt
+image: registry.gitlab.com/florianpose/containerfabrik/alarmdisplay:latest
 
 test:
     script:
