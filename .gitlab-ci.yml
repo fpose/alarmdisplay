@@ -5,6 +5,7 @@ cache:
         - ~/.cache/pip/
 
 before_script:
+  - apt-get -qq update && apt-get -qq install -y proj
   - python -V  # Print out python version for debugging
   - pip install -r requirements.txt
 
