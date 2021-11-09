@@ -1,0 +1,17 @@
+#
+# Alarmdisplay configuration
+#
+
+# uncomment this if your display has a black border of unused pixels visible
+# and your display can output without overscan
+disable_overscan=1
+
+# uncomment if hdmi display is not detected and composite is being output
+hdmi_force_hotplug=1
+
+# uncomment to force a specific HDMI mode
+hdmi_group=1 # CEA
+hdmi_mode=16 # 1080p @ 60Hz
+
+# Enable audio (loads snd_bcm2835)
+dtparam=audio=on
