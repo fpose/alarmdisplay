@@ -8,11 +8,11 @@ unzip -p 2021-05-07-raspios-buster-armhf-lite.zip | sudo dd status=progress of=/
 
 # Raspi-config
 
-Network / Hostname: alarmxxxx
-Locale / Locale: de_DE@UTF_8
-Locale / Timezone: Europa/Berlin
-Locale / Match Keyboard layout
-Interfacing / SSH / enable
+- Network / Hostname: alarmxxxx
+- Locale / Locale: de_DE@UTF_8
+- Locale / Timezone: Europa/Berlin
+- Locale / Match Keyboard layout
+- Interfacing / SSH / enable
 
 # Kernel Configuration
 
