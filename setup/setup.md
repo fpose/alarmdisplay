@@ -53,6 +53,7 @@ sudo apt-get install \
     cups \
     cups-bsd \
     git \
+    imagemagick \
     libsox-fmt-mp3 \
     mercurial \
     pandoc \
