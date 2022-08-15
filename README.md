@@ -1,5 +1,10 @@
 vim: tw=78 spl=en spell
 
+# Repository was moved to GitLab
+
+> **Warning**
+> This repository was moved to [GitLab](https://gitlab.com/florianpose/alarmdisplay).
+
 # Alarm Display
 
 This is an alarm display implementation for fire departments (etc). It has
